@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "product": "SEKHEM Runtime",
+  "publisherDisplayName": null,
+  "expectedSubject": null,
+  "expectedThumbprint": null,
+  "timestampUrlPattern": "^https?://[A-Za-z0-9./:_-]+$",
+  "fileDigest": "SHA256",
+  "timestampDigest": "SHA256",
+  "certificateStore": "CurrentUser\\My",
+  "rsaOid": "1.2.840.113549.1.1.1",
+  "codeSigningEku": "1.3.6.1.5.5.7.3.3",
+  "conditionalWriteProtocol": 1,
+  "notes": "Public publisher record only. Set expectedSubject and expectedThumbprint after the CA issues the permanent SEKHEM Authenticode identity. Never store private keys, PFX files, or passwords here."
+}

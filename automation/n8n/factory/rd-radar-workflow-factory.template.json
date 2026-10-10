@@ -1,0 +1,136 @@
+{
+  "templateVersion": "2026-05-23.issue-1301.v1",
+  "issueId": "1301",
+  "owner": "Tasker 5",
+  "templateName": "R&D Radar Workflow Factory Template",
+  "purpose": "Create manual/internal R&D Radar automation workflows with a consistent sanitized WorkflowRunSummary callback contract.",
+  "workflowDefaults": {
+    "active": false,
+    "triggerType": "manual/internal only",
+    "publicTriggerAllowed": false,
+    "scheduledTriggerAllowed": false,
+    "aiProviderCallAllowed": false,
+    "directDbWriteFromN8nAllowed": false,
+    "githubWriteAllowed": false,
+    "rawContentStorageAllowed": false,
+    "credentialsRequired": false
+  },
+  "approvedCallbackContract": {
+    "method": "POST",
+    "path": "/api/rd-radar/workflow-runs",
+    "expectedHttpStatus": 202,
+    "expectedAccepted": true,
+    "currentPersistenceExpected": false,
+    "payloadShape": {
+      "workflowStatus": "PASS",
+      "evidenceCount": 3,
+      "reviewStatus": "PASS",
+      "candidateId": "candidate-csf-guided-risk-assessment-001",
+      "nextGate": "PM_REVIEW_REQUIRED",
+      "runtimeVerificationRequired": true,
+      "forbiddenActionsObserved": false,
+      "source": "n8n/manual-internal",
+      "executedAt": "<iso-8601-runtime-timestamp>"
+    }
+  },
+  "requiredNodes": [
+    {
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "required": true
+    },
+    {
+      "name": "Build Sanitized WorkflowRunSummary Contract",
+      "type": "n8n-nodes-base.function",
+      "required": true,
+      "description": "Builds sanitized workflow summary only. No raw source content or execution logs."
+    },
+    {
+      "name": "Build Backend Callback Payload",
+      "type": "n8n-nodes-base.function",
+      "required": true,
+      "description": "Builds the approved backend callback payload shape."
+    },
+    {
+      "name": "POST WorkflowRunSummary Callback",
+      "type": "n8n-nodes-base.httpRequest",
+      "required": true,
+      "description": "Calls the approved private backend route path only. Runtime URL must be environment-managed, never hardcoded in customer UI."
+    }
+  ],
+  "forbiddenNodes": [
+    "n8n-nodes-base.webhook",
+    "n8n-nodes-base.scheduleTrigger",
+    "n8n-nodes-base.postgres",
+    "n8n-nodes-base.git",
+    "n8n-nodes-base.github",
+    "n8n-nodes-base.openAi"
+  ],
+  "sanitizationRules": {
+    "removeCredentials": true,
+    "removeSecrets": true,
+    "removeAuthHeaders": true,
+    "removeTokens": true,
+    "removeExecutionData": true,
+    "removeRawRuntimeOutput": true,
+    "removeFullResponseHeaders": true,
+    "removeRawHtml": true,
+    "removeRawContent": true,
+    "removeStackTraces": true
+  },
+  "validationChecklist": [
+    "workflow active=false",
+    "manual trigger only",
+    "no public trigger",
+    "no scheduled trigger",
+    "exactly one backend callback HTTP Request node when callback is enabled",
+    "no credentials attached",
+    "no forbidden nodes",
+    "callback response HTTP 202",
+    "accepted=true",
+    "persistence=false unless PM approves guarded persistence activation",
+    "no AI provider call",
+    "no direct DB write from n8n",
+    "no GitHub write",
+    "no raw content or secrets in export/report"
+  ],
+  "runtimeStatus": {
+    "referenceWorkflowName": "SEKHEM Production Track - R&D Radar WorkflowRunSummary Contract",
+    "referenceWorkflowId": "prodTrackRdRadar0520112154",
+    "runtimeCallbackValidated": true,
+    "runtimeCallbackHttpStatus": 202,
+    "runtimeCallbackAccepted": true,
+    "runtimeCallbackPersistence": false,
+    "exportVersionedInPr": 52
+  },
+  "customerSafeStatusContract": {
+    "workflowSummary": "Controlled workflow callback validated",
+    "latestControlledWorkflowStatus": "validated",
+    "dataViewLabels": [
+      "Live data",
+      "Sample view"
+    ],
+    "lastControlledRunStatus": "PASS",
+    "callbackStatus": {
+      "httpStatus": 202,
+      "accepted": true,
+      "persistence": false
+    },
+    "readinessStatus": {
+      "state": "ready_for_pm_review",
+      "nextGate": "PM_REVIEW_REQUIRED",
+      "runtimeVerificationRequired": true
+    },
+    "candidateId": "candidate-csf-guided-risk-assessment-001",
+    "githubReadiness": "read-only/demo-safe",
+    "customerUiForbiddenLabels": [
+      "n8n",
+      "internal IP",
+      "private backend URL",
+      "raw logs",
+      "stack traces",
+      "credentials",
+      "secrets"
+    ]
+  }
+}

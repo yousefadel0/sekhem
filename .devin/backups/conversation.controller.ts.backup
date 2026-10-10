@@ -1,0 +1,110 @@
+import { Body, Controller, Delete, Get, Headers, Inject, Param, Patch, Post, Query, UseGuards } from "@nestjs/common";
+import { response } from "../common/api-response";
+import { AuthService } from "../auth/auth.service";
+import { AuthzGuard } from "../auth/authz.guard";
+import type { CreateConversationDto, UpdateConversationDto, PostMessageDto } from "./conversation.dto";
+import { ConversationService } from "./conversation.service";
+
+/**
+ * ConversationController
+ *
+ * All routes require authentication (cookie session).
+ * Chat message posting is non-blocking — never waits on agent runs.
+ */
+@Controller("conversations")
+@UseGuards(AuthzGuard)
+export class ConversationController {
+  constructor(
+    @Inject(ConversationService) private readonly conversationService: ConversationService,
+    @Inject(AuthService) private readonly authService: AuthService
+  ) {}
+
+  /**
+   * POST /api/conversations
+   * Create a new conversation bound to a project.
+   */
+  @Post()
+  async createConversation(
+    @Headers("cookie") cookieHeader: string | undefined,
+    @Body() body: CreateConversationDto
+  ) {
+    const claims = await this.authService.validateDurableSession(cookieHeader);
+    return response(await this.conversationService.createConversation(claims.sub, body, claims));
+  }
+
+  /**
+   * GET /api/conversations?projectId=...
+   * List conversations for the authenticated user.
+   */
+  @Get()
+  async listConversations(
+    @Headers("cookie") cookieHeader: string | undefined,
+    @Query("projectId") projectId?: string
+  ) {
+    const claims = await this.authService.validateDurableSession(cookieHeader);
+    return response(await this.conversationService.listConversations(claims.sub, projectId, claims));
+  }
+
+  /**
+   * GET /api/conversations/:id
+   * Get conversation with full message history.
+   */
+  @Get(":id")
+  async getConversation(
+    @Param("id") id: string,
+    @Headers("cookie") cookieHeader: string | undefined
+  ) {
+    const claims = await this.authService.validateDurableSession(cookieHeader);
+    return response(await this.conversationService.getConversation(id, claims.sub, claims));
+  }
+
+  /**
+   * PATCH /api/conversations/:id
+   * Update conversation title or metadata (e.g. group name).
+   */
+  @Patch(":id")
+  async updateConversation(
+    @Param("id") id: string,
+    @Headers("cookie") cookieHeader: string | undefined,
+    @Body() body: UpdateConversationDto
+  ) {
+    const claims = await this.authService.validateDurableSession(cookieHeader);
+    await this.conversationService.getConversation(id, claims.sub, claims);
+    return response(await this.conversationService.updateConversation(id, claims.sub, body));
+  }
+
+  /**
+   * DELETE /api/conversations/:id
+   * Delete conversation and cascade its messages, agent runs, and attachments.
+   */
+  @Delete(":id")
+  async deleteConversation(
+    @Param("id") id: string,
+    @Headers("cookie") cookieHeader: string | undefined
+  ) {
+    const claims = await this.authService.validateDurableSession(cookieHeader);
+    await this.conversationService.getConversation(id, claims.sub, claims);
+    return response(await this.conversationService.deleteConversation(id, claims.sub));
+  }
+
+  /**
+   * POST /api/conversations/:id/messages
+   * Post a user message. Non-blocking — does not depend on agent run state.
+   * The chat interface can always receive new messages even while an agent is running.
+   */
+  @Post(":id/messages")
+  async postMessage(
+    @Param("id") conversationId: string,
+    @Headers("cookie") cookieHeader: string | undefined,
+    @Body() body: PostMessageDto
+  ) {
+    const claims = await this.authService.validateDurableSession(cookieHeader);
+    return response(await this.conversationService.postMessage(conversationId, claims, body));
+  }
+
+  @Post(":id/plans")
+  async generatePlan(@Param("id") id: string, @Headers("cookie") cookie: string | undefined, @Body() body: unknown) {
+    const claims = await this.authService.validateDurableSession(cookie);
+    return response(await this.conversationService.generatePlan(id, claims, body));
+  }
+}

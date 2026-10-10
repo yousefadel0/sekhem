@@ -1,0 +1,20 @@
+/** Content-free public recovery codes. Never forward arbitrary exception details. */
+export const RECOVERY_ERRORS: Readonly<Record<string, string>> = {
+  WORKSPACE_STORE_CORRUPT: "Workspace integrity check failed. Access is blocked; an administrator must inspect the stored record. No recovery was performed.",
+  RUNTIME_LEDGER_CORRUPT: "Runtime record integrity check failed. Access is blocked; an administrator must inspect the stored record.",
+  PLAN_EXECUTION_IN_PROGRESS: "Finish or cancel the current execution before creating a new plan.",
+  PLAN_READY_REQUIRED: "Create a validated plan before requesting execution.",
+  PLAN_SOURCE_CHANGED: "The plan or its source evidence changed. Inspect the current file and create a new plan.",
+  PLAN_VERSION_CHANGED: "The plan version changed. Refresh the conversation before continuing.",
+  REPLAN_REQUIRED: "This execution stopped. Review the retained result and create a new plan.",
+  EXACT_EXECUTABLE_INPUT_REQUIRED: "A precise, verifiable change could not be prepared. No operation was started.",
+  CONDITIONAL_WRITE_WORKER_UPGRADE_REQUIRED: "Update and reconnect the runtime to use verified file changes.",
+  EXECUTION_PREPARATION_INTERRUPTED: "Preparing the change was interrupted. Request execution again to review a new proposal.",
+  RUNTIME_OFFLINE: "Open the runtime and reconnect it before continuing.",
+  RUNTIME_GRANT_EXPIRED: "The runtime grant expired. Review and renew its permissions before continuing.",
+  RUNTIME_CAPABILITY_NOT_GRANTED: "The runtime does not have permission for this action. Review its grant first.",
+  WORKSPACE_BINDING_STALE: "The selected workspace changed. Reconnect the intended folder and inspect it again.",
+  RUNTIME_SOURCE_CHANGED: "The file changed after it was read. Inspect it again before preparing another change.",
+  READ_BACK_MISMATCH: "The file read after execution does not match the approved change. Review the retained result.",
+  CERTIFIED_EVIDENCE_UNAVAILABLE: "The required verified source evidence is unavailable. Inspect the requested file again.",
+};

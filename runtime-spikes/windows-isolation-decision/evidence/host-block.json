@@ -1,0 +1,23 @@
+{
+  "phase": "0B-2A",
+  "finalExecution": "BLOCKED_BEFORE_STARTUP",
+  "blockSource": "Windows Application Control",
+  "observedError": "An Application Control policy has blocked this file.",
+  "sandboxEscalation": "APPROVED",
+  "approvalReviewRejection": false,
+  "finalTestsExecuted": 0,
+  "finalAppContainerProfilesCreated": 0,
+  "preliminaryRun": "run-20360-102166171",
+  "preliminaryCounts": {
+    "fatal": "RESTRICTED_TOKEN_FAILED WIN32 87",
+    "pass": 2,
+    "skip": 1,
+    "fail": 0
+  },
+  "preliminaryAttackerToken": {
+    "appContainer": 0,
+    "integrityRid": 8192,
+    "restricted": 1
+  },
+  "decision": "NO SAFE LOCAL READ ARCHITECTURE DEMONSTRATED"
+}

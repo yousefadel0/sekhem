@@ -1,0 +1,714 @@
+import React, { useEffect, useMemo, useState } from "react";
+import { createRoot } from "react-dom/client";
+import {
+  AlertTriangle,
+  ArrowRight,
+  Bell,
+  Box,
+  Brain,
+  CheckCircle2,
+  ChevronDown,
+  ChevronRight,
+  CircleDot,
+  ClipboardCheck,
+  Database,
+  FileCheck2,
+  Gauge,
+  Layers3,
+  Lock,
+  Monitor,
+  PackageCheck,
+  Rocket,
+  SearchCheck,
+  Settings,
+  Shield,
+  ShieldCheck,
+  Sparkles
+} from "lucide-react";
+import "./styles.css";
+
+const SESSION_URL = "/api/auth/session";
+const ACCESS_MESSAGES = {
+  notLoggedIn: "You need to sign in to continue.",
+  forbidden: "You do not have permission to access this action.",
+  unavailable: "We could not confirm your session. Please sign in again."
+};
+
+const ROLE_ALIASES = {
+  admin: "admin",
+  administrator: "admin",
+  pm: "pm",
+  project_manager: "pm",
+  "project manager": "pm",
+  technical_reviewer: "technical_reviewer",
+  "technical reviewer": "technical_reviewer",
+  security_reviewer: "security_reviewer",
+  "security reviewer": "security_reviewer",
+  viewer: "viewer"
+};
+
+const ROLE_GROUPS = {
+  authenticated: ["admin", "pm", "technical_reviewer", "security_reviewer", "viewer"],
+  pmAdmin: ["admin", "pm"],
+  technicalReview: ["admin", "pm", "technical_reviewer"],
+  securityReview: ["admin", "pm", "security_reviewer"]
+};
+
+const consoleSections = [
+  { id: "overview", label: "Console Overview", icon: Layers3, roles: null },
+  { id: "source-control", label: "Source Control Center", icon: FileCheck2, roles: ROLE_GROUPS.pmAdmin },
+  { id: "workflow-runs", label: "Workflow Runs", icon: Rocket, roles: ROLE_GROUPS.authenticated },
+  { id: "rd-findings", label: "R&D Findings", icon: SearchCheck, roles: ROLE_GROUPS.authenticated },
+  { id: "draft-review", label: "AI Draft Review", icon: Brain, roles: ROLE_GROUPS.pmAdmin },
+  { id: "security-gate", label: "Security Gate", icon: Shield, roles: ROLE_GROUPS.securityReview },
+  { id: "validation-center", label: "Validation Center", icon: ClipboardCheck, roles: ROLE_GROUPS.technicalReview },
+  { id: "release-factory", label: "Release Factory", icon: Box, roles: ROLE_GROUPS.pmAdmin },
+  { id: "blockers", label: "Blockers", icon: AlertTriangle, roles: ROLE_GROUPS.authenticated }
+];
+
+const cards = [
+  {
+    id: "workflow-runs",
+    title: "Workflow Runs",
+    icon: Rocket,
+    tone: "cyan",
+    source: "Fallback — not live",
+    summary: "Manual and controlled workflow runs will appear here after backend workflow run persistence is ready.",
+    facts: [["Queued", "2"], ["Running", "1"], ["Needs review", "3"]],
+    items: ["Contract callback acceptance", "Manual execution review", "Timeout policy pending"],
+    guardrail: "Backend workflow service remains the source of truth for run state."
+  },
+  {
+    id: "rd-findings",
+    title: "R&D Findings",
+    icon: SearchCheck,
+    tone: "green",
+    source: "Fallback — not live",
+    summary: "Approved findings, evidence quality, and rejection reasons will be summarized here when source connector contracts are ready.",
+    facts: [["Candidate findings", "8"], ["Reviewed", "5"], ["Rejected", "2"]],
+    items: ["Finding quality review", "Evidence scoring", "Approved-source traceability"],
+    guardrail: "Source collection and sanitization must be enforced by backend/workflow owners."
+  },
+  {
+    id: "draft-review",
+    title: "AI Draft Review",
+    icon: Brain,
+    tone: "gold",
+    source: "Fallback — not live",
+    summary: "Draft outputs will be reviewed with citations, confidence, risk flags, and human approval state when the controlled contract is available.",
+    facts: [["Drafts", "4"], ["Needs PM", "2"], ["Blocked", "1"]],
+    items: ["Citation review", "Confidence check", "Approve / reject gate"],
+    guardrail: "No provider or tool name is displayed. Draft decisions require backend and human approval gates."
+  },
+  {
+    id: "security-gate",
+    title: "Security Gate",
+    icon: Shield,
+    tone: "red",
+    source: "Fallback — not live",
+    summary: "Security decision state, risk score, scan evidence, and exception review will appear here after backend enforcement is ready.",
+    facts: [["Open risks", "3"], ["Blocked", "1"], ["Exceptions", "2"]],
+    items: ["Secrets scan result", "Dependency/license check", "Human exception review"],
+    guardrail: "UI is not the control layer. Security enforcement must come from backend policy and reviewer gates."
+  },
+  {
+    id: "validation-center",
+    title: "Validation Center",
+    icon: ClipboardCheck,
+    tone: "cyan",
+    source: "Fallback — not live",
+    summary: "Test profiles, quality results, and reviewer evidence will be shown here after validation runner contracts are approved.",
+    facts: [["Profiles", "6"], ["Passing", "4"], ["Needs fix", "2"]],
+    items: ["Frontend build", "Backend unit profile", "Security scan profile"],
+    guardrail: "Validation results must be generated by approved quality execution, not by UI-only indicators."
+  },
+  {
+    id: "release-factory",
+    title: "Release Factory",
+    icon: PackageCheck,
+    tone: "gold",
+    source: "Fallback — not live",
+    summary: "Release package status, evidence bundle, checksum state, checklist, rollback plan, and approvals will be displayed here.",
+    facts: [["Packages", "2"], ["Evidence gaps", "3"], ["Approved", "0"]],
+    items: ["Evidence bundle", "Checksum pending", "Rollback plan review"],
+    guardrail: "This shell cannot deploy or mark production ready. Final cutover requires PM approval."
+  },
+  {
+    id: "blockers",
+    title: "Blockers",
+    icon: AlertTriangle,
+    tone: "red",
+    source: "Fallback — not live",
+    summary: "Cross-track blockers, owners, severity, and PM decision needs are summarized here for operations visibility.",
+    facts: [["Critical", "1"], ["High", "2"], ["Waiting", "4"]],
+    items: ["Missing validation evidence", "Security review pending", "Release evidence incomplete"],
+    guardrail: "Blocker creation and state transitions must be accepted by backend/workflow rules."
+  }
+];
+
+const consolePrinciples = [
+  "Backend remains source of truth for enforcement and state transitions.",
+  "Fallback panels are marked as not live until approved contracts are ready.",
+  "No provider names, internal addresses, secrets, raw logs, or stack traces are shown.",
+  "The shell does not deploy, restart, write to a database, or claim production readiness."
+];
+
+const sourceRecords = [
+  {
+    name: "Approved Research Portal",
+    type: "Documentation",
+    reference: "Reference URL managed by backend contract",
+    purpose: "Collect approved technical evidence for R&D review.",
+    owner: "PM Office",
+    allowedPaths: ["/research", "/standards", "/release-notes"],
+    blockedPaths: ["/login", "/account", "/private"],
+    collectionMode: "Manual request only",
+    riskCategory: "Medium",
+    approvalStatus: "Approved",
+    createdBy: "PM",
+    reviewedBy: "Security Reviewer",
+    reviewTimestamp: "2026-06-09 18:30",
+    evidenceRequirement: "Source approval note, allowed scope, rejection rules"
+  },
+  {
+    name: "Vendor Knowledge Reference",
+    type: "Reference Library",
+    reference: "Reference ID pending backend registration",
+    purpose: "Provide controlled source material for product comparison.",
+    owner: "Technical Review",
+    allowedPaths: ["/docs", "/advisories"],
+    blockedPaths: ["/support/tickets", "/community/users", "/download/private"],
+    collectionMode: "Manual fetch placeholder",
+    riskCategory: "High",
+    approvalStatus: "Pending Review",
+    createdBy: "Technical Reviewer",
+    reviewedBy: "Not reviewed",
+    reviewTimestamp: "Not reviewed",
+    evidenceRequirement: "PM approval and security review before collection"
+  },
+  {
+    name: "Blocked Broad Web Source",
+    type: "Website",
+    reference: "Rejected broad collection scope",
+    purpose: "Broad crawling request rejected until scope is narrowed.",
+    owner: "PM Decision Needed",
+    allowedPaths: ["None approved"],
+    blockedPaths: ["/*"],
+    collectionMode: "No collection",
+    riskCategory: "Critical",
+    approvalStatus: "Blocked",
+    createdBy: "PM",
+    reviewedBy: "Security Reviewer",
+    reviewTimestamp: "2026-06-09 19:10",
+    evidenceRequirement: "Narrow source scope, owner, purpose, and rate limit before review"
+  }
+];
+
+const sourceFormFields = [
+  ["Source name", "Approved Research Portal"],
+  ["Source type", "Documentation / Website / Reference Library"],
+  ["URL or reference", "Backend-managed reference only"],
+  ["Purpose", "Why this source is needed"],
+  ["Owner", "PM / Technical Reviewer / Security Reviewer"],
+  ["Allowed paths", "/docs, /research"],
+  ["Blocked paths", "/login, /account, /private"],
+  ["Collection mode", "Manual request only"],
+  ["Risk category", "Low / Medium / High / Critical"],
+  ["Approval status", "Draft / Pending / Approved / Blocked / Rejected"],
+  ["Created by", "Authenticated actor from backend"],
+  ["Reviewed by", "Reviewer identity from backend"],
+  ["Review timestamp", "Backend timestamp"],
+  ["Evidence requirement", "Approval notes and scope evidence"]
+];
+
+const qaRuns = [
+  {
+    id: "QA-FE-001",
+    title: "Frontend isolated build validation",
+    status: "PASS",
+    owner: "Tasker 2",
+    gateImpact: "Release UI evidence can proceed after reviewer acceptance.",
+    evidenceLinks: ["Lint evidence placeholder", "Build artifact placeholder"],
+    blockers: ["None for this UI shell"],
+    classE: "Not applicable"
+  },
+  {
+    id: "QA-SEC-014",
+    title: "Security scan evidence intake",
+    status: "FIX",
+    owner: "QA / Security Reviewer",
+    gateImpact: "Security Gate remains pending until scanner evidence is attached by backend/runtime owner.",
+    evidenceLinks: ["Secrets scan placeholder", "Dependency/license placeholder"],
+    blockers: ["Missing approved scan evidence link"],
+    classE: "Not applicable"
+  },
+  {
+    id: "QA-LAB-022",
+    title: "Class E lab evidence workflow",
+    status: "BLOCKED",
+    owner: "Lab Reviewer",
+    gateImpact: "Class E execution remains locked until lab approval evidence is attached.",
+    evidenceLinks: ["Lab runbook placeholder", "Approval record placeholder"],
+    blockers: ["Class E lab approval not attached"],
+    classE: "Locked — approval required"
+  }
+];
+
+const scanEvidenceCards = [
+  {
+    title: "Secrets scan evidence",
+    status: "PASS",
+    summary: "Placeholder for approved scanner output. UI does not run scans.",
+    tags: ["Evidence link pending backend", "Customer-safe summary", "No raw logs"]
+  },
+  {
+    title: "Dependency/license evidence",
+    status: "FIX",
+    summary: "Placeholder for dependency/license result and reviewer action.",
+    tags: ["License review", "SBOM reference", "Reviewer note"]
+  }
+];
+
+const labEvidenceCards = [
+  {
+    title: "Class E lab validation",
+    status: "BLOCKED",
+    summary: "Live lab execution is locked. Evidence can be displayed only after approved lab workflow completion.",
+    tags: ["Locked", "Human approval required", "No lab execution from UI"]
+  },
+  {
+    title: "Lab artifact intake",
+    status: "PASS",
+    summary: "Placeholder card for lab evidence references after backend evidence platform records them.",
+    tags: ["Evidence reference", "Read-only display", "Backend source of truth"]
+  }
+];
+
+function normalizeRole(rawRole) {
+  const role = String(rawRole || "").trim().toLowerCase();
+  return ROLE_ALIASES[role] || role;
+}
+
+function normalizeSession(payload) {
+  const sessionUser = payload?.user || payload?.session?.user || payload?.actor || payload || {};
+  const role = normalizeRole(sessionUser.role || payload?.role || payload?.session?.role);
+  return { authenticated: Boolean(payload?.authenticated ?? payload?.user ?? payload?.session ?? role), role };
+}
+
+function useSession() {
+  const [state, setState] = useState({ status: "checking", session: null });
+
+  useEffect(() => {
+    // For local development without backend authentication, assume unauthenticated.
+    // This avoids 401 errors from /api/auth/session.
+    setState({ status: "unauthenticated", session: { authenticated: false, role: "" } });
+  }, []);
+
+  return state;
+}
+
+function hasRole(session, roles) {
+  if (!roles) return true;
+  if (!session?.authenticated) return false;
+  return roles.includes(session.role);
+}
+
+function deniedMessage(sessionState, session) {
+  if (sessionState === "unavailable") return ACCESS_MESSAGES.unavailable;
+  if (!session?.authenticated) return ACCESS_MESSAGES.notLoggedIn;
+  return ACCESS_MESSAGES.forbidden;
+}
+
+function getPageMeta(activeSection) {
+  if (activeSection === "source-control") {
+    return {
+      badge: "FP-31",
+      title: "Source Control Center",
+      description: "Manage approved source records as UI state while backend remains source of truth."
+    };
+  }
+
+  if (activeSection === "validation-center") {
+    return {
+      badge: "FP-17",
+      title: "Validation Center",
+      description: "Display QA runs, evidence, gate impact, blockers, and lab lock states without executing validation."
+    };
+  }
+
+  return {
+    badge: "Full Product Tracks",
+    title: "Operations Console UI Shell",
+    description: "Unified operations view for workflow, evidence, review, validation, release, and blocker visibility."
+  };
+}
+
+function App() {
+  const { status: sessionState, session } = useSession();
+  const [activeSection, setActiveSection] = useState("overview");
+  const activePolicy = consoleSections.find((section) => section.id === activeSection);
+  const allowed = hasRole(session, activePolicy?.roles);
+  const pageMeta = getPageMeta(activeSection);
+  const visibleCards = useMemo(
+    () => cards.filter((card) => activeSection === "overview" || card.id === activeSection),
+    [activeSection]
+  );
+
+  return (
+    <ShellProvider>
+      <AppShell>
+        <header className="page-header">
+          <div className="page-icon gold"><Monitor size={28} /></div>
+          <div>
+            <div className="crumbs"><Badge tone="gold">{pageMeta.badge}</Badge><Badge>Frontend shell only</Badge></div>
+            <h1>{pageMeta.title}</h1>
+            <p>{pageMeta.description}</p>
+          </div>
+          <div className="header-spacer" />
+          <Badge tone="cyan">Mock/live hybrid</Badge>
+        </header>
+
+        {activeSection !== "overview" && sessionState === "checking" && activePolicy?.roles ? (
+          <InfoPanel title="Checking access" icon={ShieldCheck} tone="cyan">Checking your session before showing this screen.</InfoPanel>
+        ) : !allowed ? (
+          <InfoPanel title="Access required" icon={Lock} tone="gold">{deniedMessage(sessionState, session)}</InfoPanel>
+        ) : activeSection === "source-control" ? (
+          <SourceControlCenter />
+        ) : activeSection === "validation-center" ? (
+          <ValidationCenter />
+        ) : (
+          <OperationsConsole activeSection={activeSection} cards={visibleCards} />
+        )}
+      </AppShell>
+    </ShellProvider>
+  );
+}
+
+function Topbar({ session, sessionState }) {
+  const profileLabel = session?.authenticated ? "Signed in" : sessionState === "checking" ? "Checking" : "Guest";
+  return (
+    <div className="topbar">
+      <button className="program"><span className="live-dot" />SEKHEM Operations Console <ChevronDown size={16} /></button>
+      <button className="icon-only">Ctrl K</button>
+      <div className="top-spacer" />
+      <Badge tone="gold">Backend source of truth</Badge>
+      <button className="top-action cyan"><Sparkles size={18} />Review Evidence</button>
+      <button className="top-action gold"><Monitor size={18} />Console View</button>
+      <div className="notification"><Bell size={18} /><span>7</span></div>
+      <div className="profile"><b>SK</b><div><strong>{profileLabel}</strong><small>Access controlled</small></div><ChevronDown size={15} /></div>
+    </div>
+  );
+}
+
+function SourceControlCenter() {
+  const [selectedSource, setSelectedSource] = useState(sourceRecords[0]);
+
+  return (
+    <>
+      <section className="wide-callout gold">
+        <div>
+          <ShieldCheck size={24} />
+          <strong>Source governance boundary</strong>
+          <p>This screen is a PM/Admin UI shell. Source approval, blocking, collection rules, and evidence validation must be enforced by backend contracts.</p>
+        </div>
+        <Badge tone="gold">No automatic collection</Badge>
+      </section>
+
+      <div className="metric-grid four">
+        <Metric data={[sourceRecords.length, "Sources", FileCheck2, "gold"]} />
+        <Metric data={["Manual", "Fetch Status", SearchCheck, "cyan"]} />
+        <Metric data={["PM/Admin", "Actions", Shield, "green"]} />
+        <Metric data={["0", "Auto Imports", Database, "green"]} />
+      </div>
+
+      <div className="module-grid">
+        <Panel title="Source List" icon={FileCheck2} badge="Mock data">
+          <div className="stage-grid">
+            {sourceRecords.map((source) => (
+              <button className="stage" key={source.name} onClick={() => setSelectedSource(source)}>
+                <h3>{source.name}</h3>
+                <p>{source.purpose}</p>
+                <div className="tags">
+                  <Badge tone={source.approvalStatus === "Approved" ? "green" : source.approvalStatus === "Blocked" ? "red" : "gold"}>{source.approvalStatus}</Badge>
+                  <Badge>{source.riskCategory} risk</Badge>
+                  <Badge>{source.collectionMode}</Badge>
+                </div>
+              </button>
+            ))}
+          </div>
+        </Panel>
+
+        <Panel title="Add Source Form" icon={CheckCircle2} badge="UI only">
+          <SourceForm mode="add" />
+        </Panel>
+
+        <Panel title="Edit Source Form" icon={Settings} badge="UI only">
+          <SourceForm mode="edit" source={selectedSource} />
+        </Panel>
+
+        <Panel title="Source Detail" icon={FileCheck2} badge="Drawer placeholder">
+          <SourceDetail source={selectedSource} />
+        </Panel>
+      </div>
+    </>
+  );
+}
+
+function SourceForm({ mode, source }) {
+  return (
+    <div className="form-grid">
+      {sourceFormFields.map(([label, placeholder]) => {
+        const value = mode === "edit" && source?.[toSourceKey(label)] ? source[toSourceKey(label)] : "";
+        return (
+          <label className="field" key={`${mode}-${label}`}>
+            <span>{label}</span>
+            <input value={Array.isArray(value) ? value.join(", ") : value} placeholder={placeholder} readOnly />
+          </label>
+        );
+      })}
+      <div className="actions">
+        <button className="btn dark">Save draft state <ArrowRight size={16} /></button>
+        <Badge tone="gold">Backend required to persist</Badge>
+      </div>
+    </div>
+  );
+}
+
+function toSourceKey(label) {
+  return {
+    "Source name": "name",
+    "Source type": "type",
+    "URL or reference": "reference",
+    Purpose: "purpose",
+    Owner: "owner",
+    "Allowed paths": "allowedPaths",
+    "Blocked paths": "blockedPaths",
+    "Collection mode": "collectionMode",
+    "Risk category": "riskCategory",
+    "Approval status": "approvalStatus",
+    "Created by": "createdBy",
+    "Reviewed by": "reviewedBy",
+    "Review timestamp": "reviewTimestamp",
+    "Evidence requirement": "evidenceRequirement"
+  }[label];
+}
+
+function SourceDetail({ source }) {
+  return (
+    <article className="module-card gold">
+      <div className="module-top">
+        <div className="module-icon"><FileCheck2 size={22} /></div>
+        <div>
+          <h3>{source.name}</h3>
+          <p>{source.reference}</p>
+        </div>
+        <Badge tone={statusTone(source.approvalStatus)}>{source.approvalStatus}</Badge>
+      </div>
+      <div className="metric-grid three">
+        <div className="metric muted"><Gauge size={20} /><strong>{source.riskCategory}</strong><span>Risk category</span></div>
+        <div className="metric muted"><Shield size={20} /><strong>{source.type}</strong><span>Source type</span></div>
+        <div className="metric muted"><SearchCheck size={20} /><strong>Placeholder</strong><span>Manual fetch status</span></div>
+      </div>
+      <div className="card tag-strip">
+        <h3>Allowed scopes</h3>
+        <TagList tags={source.allowedPaths} />
+      </div>
+      <div className="card tag-strip">
+        <h3>Blocked scopes</h3>
+        <TagList tags={source.blockedPaths} />
+      </div>
+      <InfoPanel title="Evidence requirements" icon={ClipboardCheck} tone="cyan">{source.evidenceRequirement}</InfoPanel>
+      <InfoPanel title="Lifecycle review" icon={ShieldCheck} tone="gold">Created by {source.createdBy}. Reviewed by {source.reviewedBy}. Review timestamp: {source.reviewTimestamp}.</InfoPanel>
+      <div className="actions">
+        <button className="btn dark">Approve state <CheckCircle2 size={16} /></button>
+        <button className="btn dark">Block state <Lock size={16} /></button>
+        <button className="btn dark">Reject state <AlertTriangle size={16} /></button>
+        <Badge tone="gold">UI state only</Badge>
+      </div>
+    </article>
+  );
+}
+
+function ValidationCenter() {
+  return (
+    <>
+      <section className="wide-callout gold">
+        <div>
+          <ShieldCheck size={24} />
+          <strong>Validation execution boundary</strong>
+          <p>This screen displays validation state only. QA runners, scans, lab workflows, evidence storage, and gate decisions must execute outside the UI through approved backend/runtime controls.</p>
+        </div>
+        <Badge tone="gold">No live execution</Badge>
+      </section>
+
+      <div className="metric-grid four">
+        <Metric data={[qaRuns.length, "QA Runs", ClipboardCheck, "gold"]} />
+        <Metric data={["PASS / FIX / BLOCKED", "Status Model", ShieldCheck, "cyan"]} />
+        <Metric data={["Locked", "Class E Lab", Lock, "red"]} />
+        <Metric data={["0", "UI Executions", Database, "green"]} />
+      </div>
+
+      <div className="module-grid">
+        <Panel title="QA Run List" icon={ClipboardCheck} badge="Mock data">
+          <div className="stage-grid">
+            {qaRuns.map((run) => (
+              <article className="stage" key={run.id}>
+                <h3>{run.id}</h3>
+                <p>{run.title}</p>
+                <div className="tags">
+                  <Badge tone={statusTone(run.status)}>{run.status}</Badge>
+                  <Badge>{run.owner}</Badge>
+                  <Badge>{run.classE}</Badge>
+                </div>
+              </article>
+            ))}
+          </div>
+        </Panel>
+
+        <Panel title="Scan Evidence Cards" icon={SearchCheck} badge="Evidence placeholders">
+          <EvidenceCardList records={scanEvidenceCards} />
+        </Panel>
+
+        <Panel title="Lab Evidence Cards" icon={Lock} badge="Class E controlled">
+          <EvidenceCardList records={labEvidenceCards} />
+        </Panel>
+
+        <Panel title="Gate Impact and Blockers" icon={AlertTriangle} badge="Display only">
+          <div className="stage-grid">
+            {qaRuns.map((run) => (
+              <article className="stage" key={`${run.id}-impact`}>
+                <h3>{run.status} gate impact</h3>
+                <p>{run.gateImpact}</p>
+                <TagList tags={run.blockers} />
+                <InfoPanel title="Evidence links" icon={FileCheck2} tone="cyan">{run.evidenceLinks.join(" | ")}</InfoPanel>
+              </article>
+            ))}
+          </div>
+        </Panel>
+
+        <Panel title="Class E Lock State" icon={Lock} badge="Approval required">
+          <InfoPanel title="Locked until approved" icon={Lock} tone="gold">Class E lab evidence is shown as locked until approved lab workflow evidence is attached. The UI cannot start lab execution, unlock evidence, or override approval gates.</InfoPanel>
+          <div className="actions">
+            <button className="btn dark">View approval placeholder <ArrowRight size={16} /></button>
+            <Badge tone="red">BLOCKED until evidence</Badge>
+          </div>
+        </Panel>
+      </div>
+    </>
+  );
+}
+
+function EvidenceCardList({ records }) {
+  return (
+    <div className="stage-grid">
+      {records.map((record) => (
+        <article className="stage" key={record.title}>
+          <h3>{record.title}</h3>
+          <p>{record.summary}</p>
+          <Badge tone={statusTone(record.status)}>{record.status}</Badge>
+          <TagList tags={record.tags} />
+        </article>
+      ))}
+    </div>
+  );
+}
+
+function OperationsConsole({ activeSection, cards }) {
+  return (
+    <>
+      <section className="wide-callout gold">
+        <div>
+          <ShieldCheck size={24} />
+          <strong>Safety Gate</strong>
+          <p>UI displays operational state only. Backend services, workflow rules, security policy, validation execution, and human approvals remain the control layer.</p>
+        </div>
+        <Badge tone="gold">No production claim</Badge>
+      </section>
+
+      <div className="metric-grid four">
+        <Metric data={["7", "Console Areas", Layers3, "gold"]} />
+        <Metric data={["Hybrid", "Data Mode", Database, "cyan"]} />
+        <Metric data={["0", "Deploy Actions", Rocket, "green"]} />
+        <Metric data={["Safe", "Customer UI", Shield, "green"]} />
+      </div>
+
+      {activeSection === "overview" && <Principles />}
+
+      <div className="module-grid">
+        {cards.map((card) => <ConsoleCard key={card.id} card={card} />)}
+      </div>
+    </>
+  );
+}
+
+function Principles() {
+  return (
+    <Panel title="Operating Principles" icon={ShieldCheck} badge="Frontend shell">
+      <div className="stage-grid">
+        {consolePrinciples.map((principle) => (
+          <div className="stage" key={principle}>
+            <CheckCircle2 size={18} />
+            <h3>Guardrail</h3>
+            <p>{principle}</p>
+            <Badge tone="green">Applied</Badge>
+          </div>
+        ))}
+      </div>
+    </Panel>
+  );
+}
+
+function ConsoleCard({ card }) {
+  const Icon = card.icon;
+  return (
+    <article className={`module-card ${card.tone}`}>
+      <div className="module-top">
+        <div className="module-icon"><Icon size={22} /></div>
+        <div>
+          <h3>{card.title}</h3>
+          <p>{card.summary}</p>
+        </div>
+        <Badge tone={card.source.includes("Fallback") ? "gold" : "green"}>{card.source}</Badge>
+      </div>
+      <div className="metric-grid three">
+        {card.facts.map(([value, label]) => <div className="metric muted" key={label}><Gauge size={20} /><strong>{value}</strong><span>{label}</span></div>)}
+      </div>
+      <div className="card tag-strip"><TagList tags={card.items} /></div>
+      <InfoPanel title="Control boundary" icon={Lock} tone="gold">{card.guardrail}</InfoPanel>
+      <div className="actions">
+        <button className="btn dark">View Details <ArrowRight size={16} /></button>
+        <Badge tone="gold">Display only</Badge>
+      </div>
+    </article>
+  );
+}
+
+function Metric({ data }) {
+  const [value, label, Icon, tone] = data;
+  return <article className={`metric ${tone}`}><Icon size={24} /><strong>{value}</strong><span>{label}</span></article>;
+}
+
+function Badge({ children, tone = "default" }) {
+  return <span className={`badge ${tone}`}>{children}</span>;
+}
+
+function TagList({ tags }) {
+  return <div className="tags">{tags.map((tag) => <Badge key={tag}>{tag}</Badge>)}</div>;
+}
+
+function InfoPanel({ title, icon: Icon, tone = "cyan", children }) {
+  return <article className={`info-panel ${tone}`}><Icon size={24} /><div><h3>{title}</h3><p>{children}</p></div></article>;
+}
+
+function Panel({ title, icon: Icon, badge, children }) {
+  return <section className="panel"><div className="panel-title">{Icon && <Icon size={20} />}<h2>{title}</h2><div className="header-spacer" />{badge && <Badge tone="gold">{badge}</Badge>}</div>{children}</section>;
+}
+
+function statusTone(status) {
+  if (["PASS", "Approved"].includes(status)) return "green";
+  if (["FIX", "Pending Review"].includes(status)) return "gold";
+  if (["BLOCKED", "Blocked"].includes(status)) return "red";
+  return "default";
+}
+
+createRoot(document.getElementById("root")).render(<App />);

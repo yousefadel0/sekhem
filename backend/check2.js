@@ -1,0 +1,1 @@
+const { PrismaClient } = require('@prisma/client'); const prisma = new PrismaClient(); async function run() { const latestRun = await prisma.agentRun.findFirst({ orderBy: { createdAt: 'desc' } }); console.log('Latest Run ID:', latestRun?.id, 'Conv:', latestRun?.conversationId); } run().finally(() => prisma.$disconnect());

@@ -1,0 +1,1 @@
+{"pass":87,"fail":3,"skip":9,"raceIterationsPerCase":10000,"READ_ONLY_FILESYSTEM":"NO-GO","FILESYSTEM_MUTATION":"NO-GO","PROCESS_EXECUTION":"NOT_EVALUATED","GIT":"NOT_EVALUATED","normalReadEntryPoint":"HARD_LINK_POLICY_UNPROVEN","productionIntegration":false,"fixturesRetained":true}

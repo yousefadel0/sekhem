@@ -1,0 +1,53 @@
+{
+  "name": "sekhem-product-api",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@11.1.2",
+  "description": "Batch 7 final hardening and API freeze backend foundation for Sekhem Product Application.",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/main.js",
+    "start:dev": "tsx watch src/main.ts",
+    "lint": "eslint .",
+    "test": "tsx --test --test-concurrency=1 test/*.test.ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "prisma:validate": "node scripts/prisma-cli.mjs validate",
+    "prisma:generate": "node scripts/prisma-cli.mjs generate",
+    "db:push": "prisma db push",
+    "db:seed": "tsx prisma/seed.ts"
+  },
+  "dependencies": {
+    "@nestjs/common": "^10.4.20",
+    "@nestjs/core": "^10.4.20",
+    "@nestjs/platform-express": "^10.4.20",
+    "@prisma/client": "^6.19.0",
+    "@types/pdf-parse": "^1.1.5",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.15.1",
+    "pdf-parse": "^2.4.5",
+    "playwright": "1.64.0",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.2",
+    "ssh2": "1.17.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.4",
+    "@nestjs/testing": "^10.4.20",
+    "@types/express": "^5.0.5",
+    "@types/node": "^22.19.1",
+    "@types/ssh2": "1.15.5",
+    "eslint": "^9.39.4",
+    "globals": "^16.5.0",
+    "prisma": "^6.19.0",
+    "supertest": "^3.0.0",
+    "tsx": "^4.21.0",
+    "typescript": "^5.7.3",
+    "typescript-eslint": "^8.59.3"
+  },
+  "engines": {
+    "node": ">=24.21.0 <25"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  }
+}

@@ -1,0 +1,196 @@
+{
+  "excludesSelf": true,
+  "fileCount": 38,
+  "files": [
+    {
+      "path": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\runtime-spikes\\windows-confinement\\.gitignore",
+      "bytes": 7,
+      "sha256": "181314065DF2F2FDAF920B1A8B5311DAA216A2D6489A06ADA5B49CC514D89417"
+    },
+    {
+      "path": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\runtime-spikes\\windows-confinement\\adversarial-tests.cpp",
+      "bytes": 32834,
+      "sha256": "FEF38825D5222ABA15D7BA4A7ED1340A363413B60D10D262DFCD546373AA783F"
+    },
+    {
+      "path": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\runtime-spikes\\windows-confinement\\build.ps1",
+      "bytes": 1615,
+      "sha256": "221953BBC7ACA5B2201305886673FC1E8257598BA85E17372B43ED431FC867CB"
+    },
+    {
+      "path": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\runtime-spikes\\windows-confinement\\build\\adversarial-tests.obj",
+      "bytes": 2092415,
+      "sha256": "A817CC834D47B7FC2C161F989491FED944232E88069B6DC8D76B00D18AE9ADCE"
+    },
+    {
+      "path": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\runtime-spikes\\windows-confinement\\build\\confinement-spike.exe",
+      "bytes": 549888,
+      "sha256": "548A1099BFB75D84C1306F6E597F8CE58B36C43DD65577ADD0887736D79A4682"
+    },
+    {
+      "path": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\runtime-spikes\\windows-confinement\\build\\confinement.obj",
+      "bytes": 577920,
+      "sha256": "68D37B0CC9C244EAFA194CB6A60E035FBD3C2FC66B2C89BCB2F4E19EE7DE8C3E"
+    },
+    {
+      "path": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\runtime-spikes\\windows-confinement\\build\\manifest.json",
+      "bytes": 803,
+      "sha256": "5AAC6D1440E463BA372CCCE0DF73D462CFC8C980DC4B16B638FE9AB22D290145"
+    },
+    {
+      "path": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\runtime-spikes\\windows-confinement\\confinement.cpp",
+      "bytes": 12119,
+      "sha256": "731C83F6B13D4DC9D37B7D80FCE69B955852466BF1C5FC38119ED6E654B4DEB6"
+    },
+    {
+      "path": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\runtime-spikes\\windows-confinement\\confinement.hpp",
+      "bytes": 2980,
+      "sha256": "2D68CA5EAB7AC2BB8D774A9E6B69336BF2CBFF0D97A06A021DDD7327013D590D"
+    },
+    {
+      "path": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\runtime-spikes\\windows-confinement\\evidence\\protected-boundaries.json",
+      "bytes": 407,
+      "sha256": "4A2EDC5A6655C02C3B46ED4DB467CFB5240C43B6FA46FE7CD1C41C1E0DE2DEB2"
+    },
+    {
+      "path": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\runtime-spikes\\windows-confinement\\evidence\\run-14208-99450921\\fixture-location.txt",
+      "bytes": 75,
+      "sha256": "C72056383800A0E2F53E0CF9517A2374CA4FE972B335540E51E58AD24F9965E8"
+    },
+    {
+      "path": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\runtime-spikes\\windows-confinement\\evidence\\run-14208-99450921\\observations.jsonl",
+      "bytes": 1897,
+      "sha256": "9193EC1BECEAE5F6C62F5946B79632CD839026EF97C84FA9058BE38A203C2B63"
+    },
+    {
+      "path": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\runtime-spikes\\windows-confinement\\evidence\\run-14208-99450921\\races.jsonl",
+      "bytes": 2318765,
+      "sha256": "BB06AFFD7A957024780807445C10D9943622185A200DECDD4534EC859B37AFB2"
+    },
+    {
+      "path": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\runtime-spikes\\windows-confinement\\evidence\\run-14208-99450921\\summary.json",
+      "bytes": 114,
+      "sha256": "8564CA838313ADA4A4412B74A0016EFCF7EE258748FC341B7D953645DFCCDC81"
+    },
+    {
+      "path": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\runtime-spikes\\windows-confinement\\evidence\\run-14208-99450921\\tests.jsonl",
+      "bytes": 6740,
+      "sha256": "C68D8E744A5858EF9E1F0863712090C3659EEE4EA4F3D7EBCF588675CD4D54A6"
+    },
+    {
+      "path": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\runtime-spikes\\windows-confinement\\evidence\\run-16672-99234468\\fixture-location.txt",
+      "bytes": 75,
+      "sha256": "E4B637E1AD989F87602B5D45B486E2916673BEB6C258AC2889709982D29920BB"
+    },
+    {
+      "path": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\runtime-spikes\\windows-confinement\\evidence\\run-16672-99234468\\observations.jsonl",
+      "bytes": 1813,
+      "sha256": "6F491C715D50F6084AC4D48EF663BC9997C7B43736B11D2FB18A35F16F04B89C"
+    },
+    {
+      "path": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\runtime-spikes\\windows-confinement\\evidence\\run-16672-99234468\\races.jsonl",
+      "bytes": 90108,
+      "sha256": "693DF76274D4E2F6A055FACB936B5AACD7BA0EFCA8505E590FEEBC596E5AC173"
+    },
+    {
+      "path": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\runtime-spikes\\windows-confinement\\evidence\\run-16672-99234468\\summary.json",
+      "bytes": 113,
+      "sha256": "E2042806834BB18DD6D058F89E4247163D9E8DECFC4D8981ECCC9E22F8E6E98F"
+    },
+    {
+      "path": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\runtime-spikes\\windows-confinement\\evidence\\run-16672-99234468\\tests.jsonl",
+      "bytes": 6839,
+      "sha256": "522235F35DA085B5F9054F1ED991B3C61C47EBB6ED9855054BF6FDB7A43473E9"
+    },
+    {
+      "path": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\runtime-spikes\\windows-confinement\\evidence\\run-21492-99761515\\fixture-location.txt",
+      "bytes": 73,
+      "sha256": "DDAB1BE187D87BB5A6EC4AF5259D4153AAB16501C1490DC0C90A3BF6D376D7D9"
+    },
+    {
+      "path": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\runtime-spikes\\windows-confinement\\evidence\\run-21492-99761515\\observations.jsonl",
+      "bytes": 2037,
+      "sha256": "DEA679D1EB7A931EEE62635A6EA469EC419598A59514620B50916F40AB63C3F4"
+    },
+    {
+      "path": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\runtime-spikes\\windows-confinement\\evidence\\run-21492-99761515\\races.jsonl",
+      "bytes": 11932095,
+      "sha256": "3341E63BEDC50E18891266A5D92A97B5B8A65A41BDA5B531C69D343969A7201C"
+    },
+    {
+      "path": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\runtime-spikes\\windows-confinement\\evidence\\run-21492-99761515\\summary.json",
+      "bytes": 285,
+      "sha256": "2B3840369D07B987775C8026764C293A9BA3DB34294BFE6CF0BE5AB44CB16856"
+    },
+    {
+      "path": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\runtime-spikes\\windows-confinement\\evidence\\run-21492-99761515\\tests.jsonl",
+      "bytes": 6845,
+      "sha256": "308474703E5A9BE69FDC6355AAFB3A936EE37C55DAFC67DB7C70DD04640566EC"
+    },
+    {
+      "path": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\runtime-spikes\\windows-confinement\\evidence\\run-21852-99579234\\fixture-location.txt",
+      "bytes": 76,
+      "sha256": "9BBFEF2074AA2A751D513E5099A9AE4024DF75C68156B6754F32BB6785746D02"
+    },
+    {
+      "path": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\runtime-spikes\\windows-confinement\\evidence\\run-21852-99579234\\observations.jsonl",
+      "bytes": 1927,
+      "sha256": "03880BBBEA3C3E2566757D9F3164E91DD794A16FCEEB62F4C51FA18C20BD831B"
+    },
+    {
+      "path": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\runtime-spikes\\windows-confinement\\evidence\\run-21852-99579234\\races.jsonl",
+      "bytes": 11860132,
+      "sha256": "8A2AB76AC7EB9AF501D89C515105EEB0E011FE7C3ACC0FC43157F951DE344DAF"
+    },
+    {
+      "path": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\runtime-spikes\\windows-confinement\\evidence\\run-21852-99579234\\summary.json",
+      "bytes": 285,
+      "sha256": "2B3840369D07B987775C8026764C293A9BA3DB34294BFE6CF0BE5AB44CB16856"
+    },
+    {
+      "path": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\runtime-spikes\\windows-confinement\\evidence\\run-21852-99579234\\tests.jsonl",
+      "bytes": 6838,
+      "sha256": "B7029B6B97F1E2821C28DEEAD99C2B27E6246A754356D54688905641C8999E27"
+    },
+    {
+      "path": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\runtime-spikes\\windows-confinement\\evidence\\run-5752-99073062\\fixture-location.txt",
+      "bytes": 75,
+      "sha256": "671B4FCFE8EB236C2299E5BEBBBA85EDC914C3B88F62C27CD73E9FAC60F0C000"
+    },
+    {
+      "path": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\runtime-spikes\\windows-confinement\\evidence\\run-5752-99073062\\observations.jsonl",
+      "bytes": 1513,
+      "sha256": "FE98F68DED6FD366B09E2D74BB3B9E31654EC43CA01A2B5EB60A974D4F60879F"
+    },
+    {
+      "path": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\runtime-spikes\\windows-confinement\\evidence\\run-5752-99073062\\races.jsonl",
+      "bytes": 1810696,
+      "sha256": "33AC28818ED8311BAE66E02F61B15FA8B7F3E34806090349792C0492D3423681"
+    },
+    {
+      "path": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\runtime-spikes\\windows-confinement\\evidence\\run-5752-99073062\\tests.jsonl",
+      "bytes": 6420,
+      "sha256": "13D3D49E2F8D70CA8819B44BDC5835C2B0EDCABEA907BFF0B7C42EDED8A25138"
+    },
+    {
+      "path": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\runtime-spikes\\windows-confinement\\PRE_EDIT_AUDIT.md",
+      "bytes": 2735,
+      "sha256": "AC3A04D8399AA9B9AA8CA2B5D8B5A966099E1A7CDAE427540A83C7F8F4F53216"
+    },
+    {
+      "path": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\runtime-spikes\\windows-confinement\\README.md",
+      "bytes": 3776,
+      "sha256": "E782A12CE0A79B68B8C79F364B8ABA6FD89F9A72636965C58FAE2EDB35AD1B71"
+    },
+    {
+      "path": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\runtime-spikes\\windows-confinement\\REPORT.md",
+      "bytes": 27411,
+      "sha256": "615B3391BD461E74AB7EB6796DC8175E7C105D30154906AF88C0840C114D7967"
+    },
+    {
+      "path": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\runtime-spikes\\windows-confinement\\run.ps1",
+      "bytes": 477,
+      "sha256": "34D5C9CD53CC8B4ADEA9A5B54AE4CD6CC91742AD80016E0713175AF451F75E99"
+    }
+  ]
+}

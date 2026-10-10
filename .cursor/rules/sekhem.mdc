@@ -1,0 +1,227 @@
+---
+description: SEKHEM Cursor rules — token-efficient, task-scoped engineering
+alwaysApply: true
+---
+
+# SEKHEM Cursor Engineering Rules
+
+## 1. TOKEN / CONTEXT EFFICIENCY — CRITICAL
+
+- NEVER perform a repository-wide scan for a normal task.
+- NEVER reread unrelated files.
+- Read only the minimum files required for the current task.
+- Start with the exact file/component/route named in the task.
+- Follow imports only when necessary.
+- Prefer targeted symbol/route/DTO/error searches.
+- Do not generate repository summaries unless explicitly requested.
+- Do not repeat architecture discovery when the architecture is already known below.
+- Do not inspect generated/build/vendor directories unless explicitly required.
+- If 2–5 files can solve the issue, do not inspect dozens of files.
+
+Before opening a file, ask internally:
+"Is this file directly required to solve the current task?"
+If NO, do not open it.
+
+## 2. ONE TASK AT A TIME
+
+- Work ONLY on the current requested task.
+- Do not start the next feature/page automatically.
+- Do not proactively refactor unrelated code.
+- Do not clean up unrelated technical debt.
+- After acceptance criteria pass, STOP.
+- Report the result and wait for the next task.
+
+## 3. EXISTING ARCHITECTURE IS AUTHORITATIVE
+
+Existing architecture must be reused.
+
+- Do not create a second Agent Runtime.
+- Do not create a second authentication/session system.
+- Do not create duplicate API endpoints.
+- Do not replace existing infrastructure without proving it is defective.
+- Reuse existing services, DTOs, repositories, guards, UI primitives, and utilities.
+
+Core path:
+Browser → Next.js → existing /api rewrite → NestJS → PostgreSQL
+
+Do not bypass this architecture.
+
+## 4. AUTHENTICATION / SECURITY
+
+- Backend authorization is authoritative.
+- Preserve organization/project/resource authorization.
+- Never weaken authentication to make the UI work.
+- Never use localStorage as the authentication source.
+- Never use document.cookie as the security boundary.
+- Preserve the HttpOnly `sekhem_session` cookie contract.
+- Never expose session/access tokens in frontend JSON.
+- Never hardcode credentials/passwords.
+- Logout must use the real backend logout/revocation flow.
+- Do not create signup unless explicitly requested.
+- Do not introduce cross-organization data access.
+- Admin must not bypass dangerous-operation approval/safety gates.
+
+## 5. DATABASE
+
+- PostgreSQL is the production source of truth.
+- No silent in-memory fallback in production.
+- Do not modify Prisma schema/migrations unless explicitly required.
+- Do not create migrations for frontend parsing problems.
+- Reuse the existing DataAccess/Prisma infrastructure.
+- Preserve transaction and authorization semantics.
+
+## 6. AGENT RUNTIME
+
+- Existing Agent Runtime is authoritative.
+- Do not rebuild it.
+- Do not create another job/runtime system.
+- AgentRun is the durable asynchronous job.
+- Preserve durable state, plans, steps, events, artifacts, approvals, audit, pause/resume/stop/steering.
+- Do not add Redis/BullMQ/n8n unless explicitly required.
+- Respect safe checkpoints and approval gates.
+
+## 7. API CONTRACTS
+
+Before modifying/creating an endpoint:
+
+1. Search for the existing route/controller/service.
+2. Inspect the existing DTO.
+3. Inspect relevant tests.
+4. Inspect the frontend caller if relevant.
+
+Rules:
+- Never create an endpoint that already exists.
+- Never invent DTO fields or response envelopes.
+- Match frontend parsing to the real backend contract.
+- Do not convert API errors into fake empty states.
+- Do not silently turn malformed responses into success.
+- Preserve HTTP status and authorization semantics.
+
+## 8. FRONTEND
+
+- `/admin/*` is the Admin Control Plane.
+- `/demo/*` is legacy/reference unless explicitly requested.
+- Do not modify legacy pages to solve Admin problems.
+- Reuse existing design primitives.
+- Do not add dependencies unless necessary.
+- Keep Server/Client boundaries intentional.
+- Do not solve layout problems with arbitrary z-index, negative margins, opacity, or overflow hacks.
+
+## 9. DATA UI STATES
+
+Data-driven UI must distinguish:
+- loading
+- success
+- truthful empty state
+- actual error
+
+Never fabricate:
+- counts
+- statuses
+- API results
+- success states
+
+Never hide a contract error with `Array.isArray` fallback or fake empty data.
+
+## 10. DEBUGGING
+
+For a bug:
+
+1. Reproduce it.
+2. Identify the exact file/component/request.
+3. Inspect the actual runtime/network response.
+4. Identify the root cause.
+5. Make the smallest correct fix.
+6. Run the narrowest relevant test.
+7. Run broader verification only if needed.
+
+DO NOT guess.
+DO NOT stack speculative fixes.
+DO NOT rewrite unrelated code.
+
+For API/browser issues prefer:
+Network → status → response body → parser → component
+
+over repository-wide exploration.
+
+## 11. LAYOUT / CSS
+
+- Identify the actual DOM/CSS cause before changing layout.
+- Preserve desktop/mobile differences.
+- Do not remove mobile drawer behavior to fix desktop.
+- Do not disable scrolling to conceal overflow.
+- Avoid arbitrary z-index escalation.
+- Avoid fixed positioning unless intentionally required by the architecture.
+
+## 12. TESTING
+
+- Run the narrowest relevant test first.
+- Run typecheck for affected packages.
+- Run broader tests when shared infrastructure changed.
+- UI/API changes require runtime verification when applicable.
+- Auth changes require authenticated + unauthenticated verification.
+- Endpoint changes require status + response shape + authorization verification.
+
+## 13. CHANGE DISCIPLINE
+
+- Keep changes minimal and task-scoped.
+- Do not reformat the repository.
+- Do not upgrade dependencies unless explicitly requested.
+- Do not delete existing functionality unless explicitly required.
+- Do not touch unrelated pages/files.
+
+## 14. REPORTING
+
+Keep completion reports concise:
+- Root cause
+- Files changed
+- Fix
+- Tests/typechecks
+- Runtime verification
+- Remaining blocker
+
+Do not provide a giant repository summary.
+
+## 15. STOP RULE
+
+When the current task passes:
+STOP.
+
+Do not start another Admin page.
+Do not perform another full forensic audit.
+Do not refactor unrelated code.
+Wait for the next task.
+
+## ADMIN PAGE ORDER
+
+1. Overview
+2. Agent Runs
+3. Activity
+4. Users
+5. Organizations
+6. Groups
+7. Projects
+8. Access
+9. R&D
+10. Evidence
+11. Initiatives
+12. Approvals
+13. Artifacts
+14. Status
+15. Settings
+
+Only work on the explicitly requested page/task.
+
+## PROJECT TRUTHS
+
+- Backend: NestJS
+- Frontend: Next.js
+- Database: PostgreSQL
+- Existing Agent Runtime: reuse it
+- Existing authentication/session: reuse it
+- Admin Control Plane is separate from `/demo/*`
+- Production paths use real data only
+- No duplicate runtime
+- No duplicate authentication
+- No duplicate endpoints
+- Backend authorization is authoritative

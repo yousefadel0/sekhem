@@ -1,0 +1,93 @@
+{"test":"A ordinary bounded read","result":"PASS","detail":"OK"}
+{"test":"B nested read","result":"PASS","detail":"OK"}
+{"test":"A case insensitive lookup","result":"PASS","detail":"OK"}
+{"test":"A empty file","result":"PASS","detail":"OK"}
+{"test":"B directory cannot be read as file","result":"PASS","detail":"OK"}
+{"test":"T truncation","result":"PASS","detail":"OK"}
+{"test":"T maximum bound","result":"PASS","detail":"OK"}
+{"test":"T invalid zero limit","result":"PASS","detail":"OK"}
+{"test":"T excessive limit","result":"PASS","detail":"OK"}
+{"test":"U not found distinct","result":"PASS","detail":"OK"}
+{"test":"C parent","result":"PASS","detail":"OK"}
+{"test":"C nested parent","result":"PASS","detail":"OK"}
+{"test":"C dot","result":"PASS","detail":"OK"}
+{"test":"C empty component","result":"PASS","detail":"OK"}
+{"test":"C trailing separator","result":"PASS","detail":"OK"}
+{"test":"C empty","result":"PASS","detail":"OK"}
+{"test":"D absolute","result":"PASS","detail":"OK"}
+{"test":"D drive qualified","result":"PASS","detail":"OK"}
+{"test":"D drive relative","result":"PASS","detail":"OK"}
+{"test":"E UNC","result":"PASS","detail":"OK"}
+{"test":"E DOS device","result":"PASS","detail":"OK"}
+{"test":"E NT device","result":"PASS","detail":"OK"}
+{"test":"E GLOBALROOT","result":"PASS","detail":"OK"}
+{"test":"E extended path","result":"PASS","detail":"OK"}
+{"test":"F ADS","result":"PASS","detail":"OK"}
+{"test":"F default stream","result":"PASS","detail":"OK"}
+{"test":"F colon","result":"PASS","detail":"OK"}
+{"test":"G CON","result":"PASS","detail":"OK"}
+{"test":"G reserved extension","result":"PASS","detail":"OK"}
+{"test":"G COM1","result":"PASS","detail":"OK"}
+{"test":"G LPT9","result":"PASS","detail":"OK"}
+{"test":"G console","result":"PASS","detail":"OK"}
+{"test":"G superscript","result":"PASS","detail":"OK"}
+{"test":"H trailing dot","result":"PASS","detail":"OK"}
+{"test":"H trailing space","result":"PASS","detail":"OK"}
+{"test":"H leading space","result":"PASS","detail":"OK"}
+{"test":"I backslash","result":"PASS","detail":"OK"}
+{"test":"I mixed slash","result":"PASS","detail":"OK"}
+{"test":"I decomposed NFC","result":"PASS","detail":"OK"}
+{"test":"I bidi","result":"PASS","detail":"OK"}
+{"test":"I slash confusable","result":"PASS","detail":"OK"}
+{"test":"I wildcard","result":"PASS","detail":"OK"}
+{"test":"I embedded NUL","result":"PASS","detail":"OK"}
+{"test":"I unpaired high","result":"PASS","detail":"OK"}
+{"test":"I unpaired low","result":"PASS","detail":"OK"}
+{"test":"I excessive path","result":"PASS","detail":"OK"}
+{"test":"I NFC Unicode","result":"PASS","detail":"OK"}
+{"test":"POLICY sensitive 46 4","result":"PASS","detail":"OK"}
+{"test":"POLICY sensitive 46 4","result":"PASS","detail":"OK"}
+{"test":"POLICY sensitive 99 21","result":"PASS","detail":"OK"}
+{"test":"POLICY sensitive 105 6","result":"PASS","detail":"OK"}
+{"test":"POLICY sensitive 115 20","result":"PASS","detail":"OK"}
+{"test":"POLICY sensitive 115 10","result":"PASS","detail":"OK"}
+{"test":"POLICY sensitive 46 11","result":"PASS","detail":"OK"}
+{"test":"POLICY confined object is not authorized","result":"PASS","detail":"OK"}
+{"test":"K junction inside rejected","result":"PASS","detail":"OK"}
+{"test":"K junction escape rejected","result":"PASS","detail":"OK"}
+{"test":"L nested reparse rejected","result":"PASS","detail":"OK"}
+{"test":"M reparse root rejected","result":"PASS","detail":"OK"}
+{"test":"M intermediate registration reparse","result":"PASS","detail":"OK"}
+{"test":"J file symlink inside","result":"SKIP","detail":"SYMLINK_PRIVILEGE_UNAVAILABLE"}
+{"test":"J file symlink escape","result":"SKIP","detail":"SYMLINK_PRIVILEGE_UNAVAILABLE"}
+{"test":"J directory symlink","result":"SKIP","detail":"SYMLINK_PRIVILEGE_UNAVAILABLE"}
+{"test":"API NtCreateFile flags 0","result":"PASS","detail":"OK"}
+{"test":"API NtCreateFile flags 1","result":"PASS","detail":"OK"}
+{"test":"API NtCreateFile flags 2","result":"PASS","detail":"OK"}
+{"test":"API NtCreateFile flags 3","result":"PASS","detail":"OK"}
+{"test":"N existing outside hard link denied","result":"PASS","detail":"OK"}
+{"test":"N existing inside hard link denied","result":"FAIL","detail":"HARDLINK_CREATE_FAILED"}
+{"test":"O hard link creation during held read","result":"FAIL","detail":"HARDLINK_CREATED_DURING_HELD_READ"}
+{"test":"O preopened read-only handle cannot add link","result":"FAIL","detail":"PREOPENED_LINK_BYPASS"}
+{"test":"O preopened mutating handle denies reader","result":"PASS","detail":"OK"}
+{"test":"P target rename during held read","result":"PASS","detail":"OK"}
+{"test":"P parent move during held read","result":"PASS","detail":"OK"}
+{"test":"Q target replacement during held read","result":"PASS","detail":"OK"}
+{"test":"R reparse introduced after input validation","result":"PASS","detail":"OK"}
+{"test":"S root replacement denied while registered","result":"PASS","detail":"OK"}
+{"test":"S registration changes object identity","result":"FAIL","detail":"REPLACEABLE_MOVE_FAILED"}
+{"test":"U sanitized errors","result":"PASS","detail":"OK"}
+{"test":"I short-name alias policy","result":"PASS","detail":"OK"}
+{"test":"X volume root rejected","result":"PASS","detail":"OK"}
+{"test":"X UNC rejected before network access","result":"PASS","detail":"OK"}
+{"test":"X file root rejected","result":"PASS","detail":"OK"}
+{"test":"X case-sensitive directory detection","result":"SKIP","detail":"CASE_SENSITIVE_MODE_CREATION_UNAVAILABLE"}
+{"test":"X environment ReFS","result":"SKIP","detail":"NOT_AVAILABLE_IN_DISPOSABLE_ENVIRONMENT"}
+{"test":"X environment FAT/exFAT","result":"SKIP","detail":"NOT_AVAILABLE_IN_DISPOSABLE_ENVIRONMENT"}
+{"test":"X environment removable","result":"SKIP","detail":"NOT_AVAILABLE_IN_DISPOSABLE_ENVIRONMENT"}
+{"test":"X environment network share integration","result":"SKIP","detail":"NOT_AVAILABLE_IN_DISPOSABLE_ENVIRONMENT"}
+{"test":"Q stress file replacement","result":"FAIL","detail":"RACE_NO_SUCCESSFUL_ADVERSARIAL_CHANGES"}
+{"test":"P stress parent moved outside root","result":"PASS","detail":"OK"}
+{"test":"R stress junction introduction removal","result":"FAIL","detail":"RACE_NO_SUCCESSFUL_ADVERSARIAL_CHANGES"}
+{"test":"R stress symlink introduction removal","result":"SKIP","detail":"SYMLINK_PRIVILEGE_UNAVAILABLE"}
+{"test":"O stress hard-link create remove","result":"PASS","detail":"OK"}

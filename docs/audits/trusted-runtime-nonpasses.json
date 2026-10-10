@@ -1,0 +1,1676 @@
+[
+  {
+    "id": 1,
+    "test": "GET provider settings returns safe metadata only",
+    "suite": "AI Gateway provider settings HTTP contract",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\ai-gateway-provider-settings.test.ts",
+    "outcome": "CANCELLED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "Provider-settings HTTP suite login hook",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: test did not finish before its parent and was cancelled] { code: 'ERR_TEST_FAILURE', failureType: 'cancelledByParent', cause: 'test did not finish before its parent and was cancelled' }",
+    "parentHookErrorAndStack": "not ok 24 - AI Gateway provider settings HTTP contract\n  ---\n  duration_ms: 750.1764\n  type: 'suite'\n  location: 'D:\\\\yy\\\\yy\\\\sekhem-product-application-main\\\\sekhem-product-application-main\\\\backend\\\\test\\\\ai-gateway-provider-settings.test.ts:2:6900'\n  failureType: 'hookFailed'\n  error: |-\n    Expected values to be strictly equal:\n    \n    401 !== 201\n    \n  code: 'ERR_ASSERTION'\n  name: 'AssertionError'\n  expected: 201\n  actual: 401\n  operator: 'strictEqual'\n  stack: |-\n    SuiteContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\ai-gateway-provider-settings.test.ts:178:12)\n    process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    async TestHook.run (node:internal/test_runner/test:1409:7)\n    async Suite.runHook (node:internal/test_runner/test:1289:9)\n    async Suite.run (node:internal/test_runner/test:1899:7)\n    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)\n  ...",
+    "skipReason": null,
+    "reason": "Setup supplies staging env credentials but does not provision database users/sessions or isolate auth mode. The effective environment is postgres_read, DB auth=true, NODE_ENV=development. All five expected fixture emails are absent; AuthService.login selects DB auth and returns 401 Invalid credentials. Cancelled cases never entered their test bodies because the suite login hook asserted 201.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:66",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 2,
+    "test": "rejects blocked-field payloads with normalized safe errors",
+    "suite": "AI Gateway provider settings HTTP contract",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\ai-gateway-provider-settings.test.ts",
+    "outcome": "CANCELLED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "Provider-settings HTTP suite login hook",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: test did not finish before its parent and was cancelled] { code: 'ERR_TEST_FAILURE', failureType: 'cancelledByParent', cause: 'test did not finish before its parent and was cancelled' }",
+    "parentHookErrorAndStack": "not ok 24 - AI Gateway provider settings HTTP contract\n  ---\n  duration_ms: 750.1764\n  type: 'suite'\n  location: 'D:\\\\yy\\\\yy\\\\sekhem-product-application-main\\\\sekhem-product-application-main\\\\backend\\\\test\\\\ai-gateway-provider-settings.test.ts:2:6900'\n  failureType: 'hookFailed'\n  error: |-\n    Expected values to be strictly equal:\n    \n    401 !== 201\n    \n  code: 'ERR_ASSERTION'\n  name: 'AssertionError'\n  expected: 201\n  actual: 401\n  operator: 'strictEqual'\n  stack: |-\n    SuiteContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\ai-gateway-provider-settings.test.ts:178:12)\n    process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    async TestHook.run (node:internal/test_runner/test:1409:7)\n    async Suite.runHook (node:internal/test_runner/test:1289:9)\n    async Suite.run (node:internal/test_runner/test:1899:7)\n    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)\n  ...",
+    "skipReason": null,
+    "reason": "Setup supplies staging env credentials but does not provision database users/sessions or isolate auth mode. The effective environment is postgres_read, DB auth=true, NODE_ENV=development. All five expected fixture emails are absent; AuthService.login selects DB auth and returns 401 Invalid credentials. Cancelled cases never entered their test bodies because the suite login hook asserted 201.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:66",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 3,
+    "test": "sets budget and requests activation without enabling provider calls",
+    "suite": "AI Gateway provider settings HTTP contract",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\ai-gateway-provider-settings.test.ts",
+    "outcome": "CANCELLED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "Provider-settings HTTP suite login hook",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: test did not finish before its parent and was cancelled] { code: 'ERR_TEST_FAILURE', failureType: 'cancelledByParent', cause: 'test did not finish before its parent and was cancelled' }",
+    "parentHookErrorAndStack": "not ok 24 - AI Gateway provider settings HTTP contract\n  ---\n  duration_ms: 750.1764\n  type: 'suite'\n  location: 'D:\\\\yy\\\\yy\\\\sekhem-product-application-main\\\\sekhem-product-application-main\\\\backend\\\\test\\\\ai-gateway-provider-settings.test.ts:2:6900'\n  failureType: 'hookFailed'\n  error: |-\n    Expected values to be strictly equal:\n    \n    401 !== 201\n    \n  code: 'ERR_ASSERTION'\n  name: 'AssertionError'\n  expected: 201\n  actual: 401\n  operator: 'strictEqual'\n  stack: |-\n    SuiteContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\ai-gateway-provider-settings.test.ts:178:12)\n    process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    async TestHook.run (node:internal/test_runner/test:1409:7)\n    async Suite.runHook (node:internal/test_runner/test:1289:9)\n    async Suite.run (node:internal/test_runner/test:1899:7)\n    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)\n  ...",
+    "skipReason": null,
+    "reason": "Setup supplies staging env credentials but does not provision database users/sessions or isolate auth mode. The effective environment is postgres_read, DB auth=true, NODE_ENV=development. All five expected fixture emails are absent; AuthService.login selects DB auth and returns 401 Invalid credentials. Cancelled cases never entered their test bodies because the suite login hook asserted 201.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:66",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 4,
+    "test": "rejects unauthenticated AI Patch reads and writes",
+    "suite": "AI Patch draft-only HTTP contract",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\ai-patch.http.test.ts",
+    "outcome": "CANCELLED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "AI Patch HTTP suite login hook",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: test did not finish before its parent and was cancelled] { code: 'ERR_TEST_FAILURE', failureType: 'cancelledByParent', cause: 'test did not finish before its parent and was cancelled' }",
+    "parentHookErrorAndStack": "not ok 25 - AI Patch draft-only HTTP contract\n  ---\n  duration_ms: 726.1244\n  type: 'suite'\n  location: 'D:\\\\yy\\\\yy\\\\sekhem-product-application-main\\\\sekhem-product-application-main\\\\backend\\\\test\\\\ai-patch.http.test.ts:2:3017'\n  failureType: 'hookFailed'\n  error: |-\n    Expected values to be strictly equal:\n    \n    401 !== 201\n    \n  code: 'ERR_ASSERTION'\n  name: 'AssertionError'\n  expected: 201\n  actual: 401\n  operator: 'strictEqual'\n  stack: |-\n    SuiteContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\ai-patch.http.test.ts:102:12)\n    process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    async TestHook.run (node:internal/test_runner/test:1409:7)\n    async Suite.runHook (node:internal/test_runner/test:1289:9)\n    async Suite.run (node:internal/test_runner/test:1899:7)\n    async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)\n  ...",
+    "skipReason": null,
+    "reason": "Setup supplies staging env credentials but does not provision database users/sessions or isolate auth mode. The effective environment is postgres_read, DB auth=true, NODE_ENV=development. All five expected fixture emails are absent; AuthService.login selects DB auth and returns 401 Invalid credentials. Cancelled cases never entered their test bodies because the suite login hook asserted 201.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:66",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 5,
+    "test": "creates and reads a draft-only AI Patch request",
+    "suite": "AI Patch draft-only HTTP contract",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\ai-patch.http.test.ts",
+    "outcome": "CANCELLED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "AI Patch HTTP suite login hook",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: test did not finish before its parent and was cancelled] { code: 'ERR_TEST_FAILURE', failureType: 'cancelledByParent', cause: 'test did not finish before its parent and was cancelled' }",
+    "parentHookErrorAndStack": "not ok 25 - AI Patch draft-only HTTP contract\n  ---\n  duration_ms: 726.1244\n  type: 'suite'\n  location: 'D:\\\\yy\\\\yy\\\\sekhem-product-application-main\\\\sekhem-product-application-main\\\\backend\\\\test\\\\ai-patch.http.test.ts:2:3017'\n  failureType: 'hookFailed'\n  error: |-\n    Expected values to be strictly equal:\n    \n    401 !== 201\n    \n  code: 'ERR_ASSERTION'\n  name: 'AssertionError'\n  expected: 201\n  actual: 401\n  operator: 'strictEqual'\n  stack: |-\n    SuiteContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\ai-patch.http.test.ts:102:12)\n    process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    async TestHook.run (node:internal/test_runner/test:1409:7)\n    async Suite.runHook (node:internal/test_runner/test:1289:9)\n    async Suite.run (node:internal/test_runner/test:1899:7)\n    async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)\n  ...",
+    "skipReason": null,
+    "reason": "Setup supplies staging env credentials but does not provision database users/sessions or isolate auth mode. The effective environment is postgres_read, DB auth=true, NODE_ENV=development. All five expected fixture emails are absent; AuthService.login selects DB auth and returns 401 Invalid credentials. Cancelled cases never entered their test bodies because the suite login hook asserted 201.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:66",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 6,
+    "test": "moves a draft through review states and returns status history",
+    "suite": "AI Patch draft-only HTTP contract",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\ai-patch.http.test.ts",
+    "outcome": "CANCELLED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "AI Patch HTTP suite login hook",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: test did not finish before its parent and was cancelled] { code: 'ERR_TEST_FAILURE', failureType: 'cancelledByParent', cause: 'test did not finish before its parent and was cancelled' }",
+    "parentHookErrorAndStack": "not ok 25 - AI Patch draft-only HTTP contract\n  ---\n  duration_ms: 726.1244\n  type: 'suite'\n  location: 'D:\\\\yy\\\\yy\\\\sekhem-product-application-main\\\\sekhem-product-application-main\\\\backend\\\\test\\\\ai-patch.http.test.ts:2:3017'\n  failureType: 'hookFailed'\n  error: |-\n    Expected values to be strictly equal:\n    \n    401 !== 201\n    \n  code: 'ERR_ASSERTION'\n  name: 'AssertionError'\n  expected: 201\n  actual: 401\n  operator: 'strictEqual'\n  stack: |-\n    SuiteContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\ai-patch.http.test.ts:102:12)\n    process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    async TestHook.run (node:internal/test_runner/test:1409:7)\n    async Suite.runHook (node:internal/test_runner/test:1289:9)\n    async Suite.run (node:internal/test_runner/test:1899:7)\n    async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)\n  ...",
+    "skipReason": null,
+    "reason": "Setup supplies staging env credentials but does not provision database users/sessions or isolate auth mode. The effective environment is postgres_read, DB auth=true, NODE_ENV=development. All five expected fixture emails are absent; AuthService.login selects DB auth and returns 401 Invalid credentials. Cancelled cases never entered their test bodies because the suite login hook asserted 201.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:66",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 7,
+    "test": "approves a reviewed draft through the explicit gate without applying artifacts",
+    "suite": "AI Patch draft-only HTTP contract",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\ai-patch.http.test.ts",
+    "outcome": "CANCELLED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "AI Patch HTTP suite login hook",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: test did not finish before its parent and was cancelled] { code: 'ERR_TEST_FAILURE', failureType: 'cancelledByParent', cause: 'test did not finish before its parent and was cancelled' }",
+    "parentHookErrorAndStack": "not ok 25 - AI Patch draft-only HTTP contract\n  ---\n  duration_ms: 726.1244\n  type: 'suite'\n  location: 'D:\\\\yy\\\\yy\\\\sekhem-product-application-main\\\\sekhem-product-application-main\\\\backend\\\\test\\\\ai-patch.http.test.ts:2:3017'\n  failureType: 'hookFailed'\n  error: |-\n    Expected values to be strictly equal:\n    \n    401 !== 201\n    \n  code: 'ERR_ASSERTION'\n  name: 'AssertionError'\n  expected: 201\n  actual: 401\n  operator: 'strictEqual'\n  stack: |-\n    SuiteContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\ai-patch.http.test.ts:102:12)\n    process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    async TestHook.run (node:internal/test_runner/test:1409:7)\n    async Suite.runHook (node:internal/test_runner/test:1289:9)\n    async Suite.run (node:internal/test_runner/test:1899:7)\n    async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)\n  ...",
+    "skipReason": null,
+    "reason": "Setup supplies staging env credentials but does not provision database users/sessions or isolate auth mode. The effective environment is postgres_read, DB auth=true, NODE_ENV=development. All five expected fixture emails are absent; AuthService.login selects DB auth and returns 401 Invalid credentials. Cancelled cases never entered their test bodies because the suite login hook asserted 201.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:66",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 8,
+    "test": "rejects only reviewed drafts through the explicit gate",
+    "suite": "AI Patch draft-only HTTP contract",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\ai-patch.http.test.ts",
+    "outcome": "CANCELLED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "AI Patch HTTP suite login hook",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: test did not finish before its parent and was cancelled] { code: 'ERR_TEST_FAILURE', failureType: 'cancelledByParent', cause: 'test did not finish before its parent and was cancelled' }",
+    "parentHookErrorAndStack": "not ok 25 - AI Patch draft-only HTTP contract\n  ---\n  duration_ms: 726.1244\n  type: 'suite'\n  location: 'D:\\\\yy\\\\yy\\\\sekhem-product-application-main\\\\sekhem-product-application-main\\\\backend\\\\test\\\\ai-patch.http.test.ts:2:3017'\n  failureType: 'hookFailed'\n  error: |-\n    Expected values to be strictly equal:\n    \n    401 !== 201\n    \n  code: 'ERR_ASSERTION'\n  name: 'AssertionError'\n  expected: 201\n  actual: 401\n  operator: 'strictEqual'\n  stack: |-\n    SuiteContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\ai-patch.http.test.ts:102:12)\n    process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    async TestHook.run (node:internal/test_runner/test:1409:7)\n    async Suite.runHook (node:internal/test_runner/test:1289:9)\n    async Suite.run (node:internal/test_runner/test:1899:7)\n    async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)\n  ...",
+    "skipReason": null,
+    "reason": "Setup supplies staging env credentials but does not provision database users/sessions or isolate auth mode. The effective environment is postgres_read, DB auth=true, NODE_ENV=development. All five expected fixture emails are absent; AuthService.login selects DB auth and returns 401 Invalid credentials. Cancelled cases never entered their test bodies because the suite login hook asserted 201.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:66",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 9,
+    "test": "stops non-terminal drafts through the explicit gate and locks terminal gate actions",
+    "suite": "AI Patch draft-only HTTP contract",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\ai-patch.http.test.ts",
+    "outcome": "CANCELLED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "AI Patch HTTP suite login hook",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: test did not finish before its parent and was cancelled] { code: 'ERR_TEST_FAILURE', failureType: 'cancelledByParent', cause: 'test did not finish before its parent and was cancelled' }",
+    "parentHookErrorAndStack": "not ok 25 - AI Patch draft-only HTTP contract\n  ---\n  duration_ms: 726.1244\n  type: 'suite'\n  location: 'D:\\\\yy\\\\yy\\\\sekhem-product-application-main\\\\sekhem-product-application-main\\\\backend\\\\test\\\\ai-patch.http.test.ts:2:3017'\n  failureType: 'hookFailed'\n  error: |-\n    Expected values to be strictly equal:\n    \n    401 !== 201\n    \n  code: 'ERR_ASSERTION'\n  name: 'AssertionError'\n  expected: 201\n  actual: 401\n  operator: 'strictEqual'\n  stack: |-\n    SuiteContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\ai-patch.http.test.ts:102:12)\n    process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    async TestHook.run (node:internal/test_runner/test:1409:7)\n    async Suite.runHook (node:internal/test_runner/test:1289:9)\n    async Suite.run (node:internal/test_runner/test:1899:7)\n    async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)\n  ...",
+    "skipReason": null,
+    "reason": "Setup supplies staging env credentials but does not provision database users/sessions or isolate auth mode. The effective environment is postgres_read, DB auth=true, NODE_ENV=development. All five expected fixture emails are absent; AuthService.login selects DB auth and returns 401 Invalid credentials. Cancelled cases never entered their test bodies because the suite login hook asserted 201.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:66",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 10,
+    "test": "rejects missing and sensitive explicit gate action fields",
+    "suite": "AI Patch draft-only HTTP contract",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\ai-patch.http.test.ts",
+    "outcome": "CANCELLED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "AI Patch HTTP suite login hook",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: test did not finish before its parent and was cancelled] { code: 'ERR_TEST_FAILURE', failureType: 'cancelledByParent', cause: 'test did not finish before its parent and was cancelled' }",
+    "parentHookErrorAndStack": "not ok 25 - AI Patch draft-only HTTP contract\n  ---\n  duration_ms: 726.1244\n  type: 'suite'\n  location: 'D:\\\\yy\\\\yy\\\\sekhem-product-application-main\\\\sekhem-product-application-main\\\\backend\\\\test\\\\ai-patch.http.test.ts:2:3017'\n  failureType: 'hookFailed'\n  error: |-\n    Expected values to be strictly equal:\n    \n    401 !== 201\n    \n  code: 'ERR_ASSERTION'\n  name: 'AssertionError'\n  expected: 201\n  actual: 401\n  operator: 'strictEqual'\n  stack: |-\n    SuiteContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\ai-patch.http.test.ts:102:12)\n    process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    async TestHook.run (node:internal/test_runner/test:1409:7)\n    async Suite.runHook (node:internal/test_runner/test:1289:9)\n    async Suite.run (node:internal/test_runner/test:1899:7)\n    async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)\n  ...",
+    "skipReason": null,
+    "reason": "Setup supplies staging env credentials but does not provision database users/sessions or isolate auth mode. The effective environment is postgres_read, DB auth=true, NODE_ENV=development. All five expected fixture emails are absent; AuthService.login selects DB auth and returns 401 Invalid credentials. Cancelled cases never entered their test bodies because the suite login hook asserted 201.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:66",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 11,
+    "test": "creates, lists, and reads review-only artifacts",
+    "suite": "AI Patch draft-only HTTP contract",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\ai-patch.http.test.ts",
+    "outcome": "CANCELLED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "AI Patch HTTP suite login hook",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: test did not finish before its parent and was cancelled] { code: 'ERR_TEST_FAILURE', failureType: 'cancelledByParent', cause: 'test did not finish before its parent and was cancelled' }",
+    "parentHookErrorAndStack": "not ok 25 - AI Patch draft-only HTTP contract\n  ---\n  duration_ms: 726.1244\n  type: 'suite'\n  location: 'D:\\\\yy\\\\yy\\\\sekhem-product-application-main\\\\sekhem-product-application-main\\\\backend\\\\test\\\\ai-patch.http.test.ts:2:3017'\n  failureType: 'hookFailed'\n  error: |-\n    Expected values to be strictly equal:\n    \n    401 !== 201\n    \n  code: 'ERR_ASSERTION'\n  name: 'AssertionError'\n  expected: 201\n  actual: 401\n  operator: 'strictEqual'\n  stack: |-\n    SuiteContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\ai-patch.http.test.ts:102:12)\n    process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    async TestHook.run (node:internal/test_runner/test:1409:7)\n    async Suite.runHook (node:internal/test_runner/test:1289:9)\n    async Suite.run (node:internal/test_runner/test:1899:7)\n    async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)\n  ...",
+    "skipReason": null,
+    "reason": "Setup supplies staging env credentials but does not provision database users/sessions or isolate auth mode. The effective environment is postgres_read, DB auth=true, NODE_ENV=development. All five expected fixture emails are absent; AuthService.login selects DB auth and returns 401 Invalid credentials. Cancelled cases never entered their test bodies because the suite login hook asserted 201.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:66",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 12,
+    "test": "returns a safe consolidated audit timeline",
+    "suite": "AI Patch draft-only HTTP contract",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\ai-patch.http.test.ts",
+    "outcome": "CANCELLED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "AI Patch HTTP suite login hook",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: test did not finish before its parent and was cancelled] { code: 'ERR_TEST_FAILURE', failureType: 'cancelledByParent', cause: 'test did not finish before its parent and was cancelled' }",
+    "parentHookErrorAndStack": "not ok 25 - AI Patch draft-only HTTP contract\n  ---\n  duration_ms: 726.1244\n  type: 'suite'\n  location: 'D:\\\\yy\\\\yy\\\\sekhem-product-application-main\\\\sekhem-product-application-main\\\\backend\\\\test\\\\ai-patch.http.test.ts:2:3017'\n  failureType: 'hookFailed'\n  error: |-\n    Expected values to be strictly equal:\n    \n    401 !== 201\n    \n  code: 'ERR_ASSERTION'\n  name: 'AssertionError'\n  expected: 201\n  actual: 401\n  operator: 'strictEqual'\n  stack: |-\n    SuiteContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\ai-patch.http.test.ts:102:12)\n    process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    async TestHook.run (node:internal/test_runner/test:1409:7)\n    async Suite.runHook (node:internal/test_runner/test:1289:9)\n    async Suite.run (node:internal/test_runner/test:1899:7)\n    async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)\n  ...",
+    "skipReason": null,
+    "reason": "Setup supplies staging env credentials but does not provision database users/sessions or isolate auth mode. The effective environment is postgres_read, DB auth=true, NODE_ENV=development. All five expected fixture emails are absent; AuthService.login selects DB auth and returns 401 Invalid credentials. Cancelled cases never entered their test bodies because the suite login hook asserted 201.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:66",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 13,
+    "test": "returns a safe 404 for an unknown audit draft",
+    "suite": "AI Patch draft-only HTTP contract",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\ai-patch.http.test.ts",
+    "outcome": "CANCELLED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "AI Patch HTTP suite login hook",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: test did not finish before its parent and was cancelled] { code: 'ERR_TEST_FAILURE', failureType: 'cancelledByParent', cause: 'test did not finish before its parent and was cancelled' }",
+    "parentHookErrorAndStack": "not ok 25 - AI Patch draft-only HTTP contract\n  ---\n  duration_ms: 726.1244\n  type: 'suite'\n  location: 'D:\\\\yy\\\\yy\\\\sekhem-product-application-main\\\\sekhem-product-application-main\\\\backend\\\\test\\\\ai-patch.http.test.ts:2:3017'\n  failureType: 'hookFailed'\n  error: |-\n    Expected values to be strictly equal:\n    \n    401 !== 201\n    \n  code: 'ERR_ASSERTION'\n  name: 'AssertionError'\n  expected: 201\n  actual: 401\n  operator: 'strictEqual'\n  stack: |-\n    SuiteContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\ai-patch.http.test.ts:102:12)\n    process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    async TestHook.run (node:internal/test_runner/test:1409:7)\n    async Suite.runHook (node:internal/test_runner/test:1289:9)\n    async Suite.run (node:internal/test_runner/test:1899:7)\n    async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)\n  ...",
+    "skipReason": null,
+    "reason": "Setup supplies staging env credentials but does not provision database users/sessions or isolate auth mode. The effective environment is postgres_read, DB auth=true, NODE_ENV=development. All five expected fixture emails are absent; AuthService.login selects DB auth and returns 401 Invalid credentials. Cancelled cases never entered their test bodies because the suite login hook asserted 201.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:66",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 14,
+    "test": "rejects unsafe artifact paths and forbidden fields",
+    "suite": "AI Patch draft-only HTTP contract",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\ai-patch.http.test.ts",
+    "outcome": "CANCELLED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "AI Patch HTTP suite login hook",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: test did not finish before its parent and was cancelled] { code: 'ERR_TEST_FAILURE', failureType: 'cancelledByParent', cause: 'test did not finish before its parent and was cancelled' }",
+    "parentHookErrorAndStack": "not ok 25 - AI Patch draft-only HTTP contract\n  ---\n  duration_ms: 726.1244\n  type: 'suite'\n  location: 'D:\\\\yy\\\\yy\\\\sekhem-product-application-main\\\\sekhem-product-application-main\\\\backend\\\\test\\\\ai-patch.http.test.ts:2:3017'\n  failureType: 'hookFailed'\n  error: |-\n    Expected values to be strictly equal:\n    \n    401 !== 201\n    \n  code: 'ERR_ASSERTION'\n  name: 'AssertionError'\n  expected: 201\n  actual: 401\n  operator: 'strictEqual'\n  stack: |-\n    SuiteContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\ai-patch.http.test.ts:102:12)\n    process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    async TestHook.run (node:internal/test_runner/test:1409:7)\n    async Suite.runHook (node:internal/test_runner/test:1289:9)\n    async Suite.run (node:internal/test_runner/test:1899:7)\n    async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)\n  ...",
+    "skipReason": null,
+    "reason": "Setup supplies staging env credentials but does not provision database users/sessions or isolate auth mode. The effective environment is postgres_read, DB auth=true, NODE_ENV=development. All five expected fixture emails are absent; AuthService.login selects DB auth and returns 401 Invalid credentials. Cancelled cases never entered their test bodies because the suite login hook asserted 201.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:66",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 15,
+    "test": "rejects artifact creation for terminal drafts",
+    "suite": "AI Patch draft-only HTTP contract",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\ai-patch.http.test.ts",
+    "outcome": "CANCELLED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "AI Patch HTTP suite login hook",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: test did not finish before its parent and was cancelled] { code: 'ERR_TEST_FAILURE', failureType: 'cancelledByParent', cause: 'test did not finish before its parent and was cancelled' }",
+    "parentHookErrorAndStack": "not ok 25 - AI Patch draft-only HTTP contract\n  ---\n  duration_ms: 726.1244\n  type: 'suite'\n  location: 'D:\\\\yy\\\\yy\\\\sekhem-product-application-main\\\\sekhem-product-application-main\\\\backend\\\\test\\\\ai-patch.http.test.ts:2:3017'\n  failureType: 'hookFailed'\n  error: |-\n    Expected values to be strictly equal:\n    \n    401 !== 201\n    \n  code: 'ERR_ASSERTION'\n  name: 'AssertionError'\n  expected: 201\n  actual: 401\n  operator: 'strictEqual'\n  stack: |-\n    SuiteContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\ai-patch.http.test.ts:102:12)\n    process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    async TestHook.run (node:internal/test_runner/test:1409:7)\n    async Suite.runHook (node:internal/test_runner/test:1289:9)\n    async Suite.run (node:internal/test_runner/test:1899:7)\n    async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)\n  ...",
+    "skipReason": null,
+    "reason": "Setup supplies staging env credentials but does not provision database users/sessions or isolate auth mode. The effective environment is postgres_read, DB auth=true, NODE_ENV=development. All five expected fixture emails are absent; AuthService.login selects DB auth and returns 401 Invalid credentials. Cancelled cases never entered their test bodies because the suite login hook asserted 201.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:66",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 16,
+    "test": "rejects invalid transitions and locks terminal states",
+    "suite": "AI Patch draft-only HTTP contract",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\ai-patch.http.test.ts",
+    "outcome": "CANCELLED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "AI Patch HTTP suite login hook",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: test did not finish before its parent and was cancelled] { code: 'ERR_TEST_FAILURE', failureType: 'cancelledByParent', cause: 'test did not finish before its parent and was cancelled' }",
+    "parentHookErrorAndStack": "not ok 25 - AI Patch draft-only HTTP contract\n  ---\n  duration_ms: 726.1244\n  type: 'suite'\n  location: 'D:\\\\yy\\\\yy\\\\sekhem-product-application-main\\\\sekhem-product-application-main\\\\backend\\\\test\\\\ai-patch.http.test.ts:2:3017'\n  failureType: 'hookFailed'\n  error: |-\n    Expected values to be strictly equal:\n    \n    401 !== 201\n    \n  code: 'ERR_ASSERTION'\n  name: 'AssertionError'\n  expected: 201\n  actual: 401\n  operator: 'strictEqual'\n  stack: |-\n    SuiteContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\ai-patch.http.test.ts:102:12)\n    process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    async TestHook.run (node:internal/test_runner/test:1409:7)\n    async Suite.runHook (node:internal/test_runner/test:1289:9)\n    async Suite.run (node:internal/test_runner/test:1899:7)\n    async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)\n  ...",
+    "skipReason": null,
+    "reason": "Setup supplies staging env credentials but does not provision database users/sessions or isolate auth mode. The effective environment is postgres_read, DB auth=true, NODE_ENV=development. All five expected fixture emails are absent; AuthService.login selects DB auth and returns 401 Invalid credentials. Cancelled cases never entered their test bodies because the suite login hook asserted 201.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:66",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 17,
+    "test": "rejects missing or invalid transition request fields",
+    "suite": "AI Patch draft-only HTTP contract",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\ai-patch.http.test.ts",
+    "outcome": "CANCELLED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "AI Patch HTTP suite login hook",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: test did not finish before its parent and was cancelled] { code: 'ERR_TEST_FAILURE', failureType: 'cancelledByParent', cause: 'test did not finish before its parent and was cancelled' }",
+    "parentHookErrorAndStack": "not ok 25 - AI Patch draft-only HTTP contract\n  ---\n  duration_ms: 726.1244\n  type: 'suite'\n  location: 'D:\\\\yy\\\\yy\\\\sekhem-product-application-main\\\\sekhem-product-application-main\\\\backend\\\\test\\\\ai-patch.http.test.ts:2:3017'\n  failureType: 'hookFailed'\n  error: |-\n    Expected values to be strictly equal:\n    \n    401 !== 201\n    \n  code: 'ERR_ASSERTION'\n  name: 'AssertionError'\n  expected: 201\n  actual: 401\n  operator: 'strictEqual'\n  stack: |-\n    SuiteContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\ai-patch.http.test.ts:102:12)\n    process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    async TestHook.run (node:internal/test_runner/test:1409:7)\n    async Suite.runHook (node:internal/test_runner/test:1289:9)\n    async Suite.run (node:internal/test_runner/test:1899:7)\n    async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)\n  ...",
+    "skipReason": null,
+    "reason": "Setup supplies staging env credentials but does not provision database users/sessions or isolate auth mode. The effective environment is postgres_read, DB auth=true, NODE_ENV=development. All five expected fixture emails are absent; AuthService.login selects DB auth and returns 401 Invalid credentials. Cancelled cases never entered their test bodies because the suite login hook asserted 201.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:66",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 18,
+    "test": "rejects missing required string fields",
+    "suite": "AI Patch draft-only HTTP contract",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\ai-patch.http.test.ts",
+    "outcome": "CANCELLED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "AI Patch HTTP suite login hook",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: test did not finish before its parent and was cancelled] { code: 'ERR_TEST_FAILURE', failureType: 'cancelledByParent', cause: 'test did not finish before its parent and was cancelled' }",
+    "parentHookErrorAndStack": "not ok 25 - AI Patch draft-only HTTP contract\n  ---\n  duration_ms: 726.1244\n  type: 'suite'\n  location: 'D:\\\\yy\\\\yy\\\\sekhem-product-application-main\\\\sekhem-product-application-main\\\\backend\\\\test\\\\ai-patch.http.test.ts:2:3017'\n  failureType: 'hookFailed'\n  error: |-\n    Expected values to be strictly equal:\n    \n    401 !== 201\n    \n  code: 'ERR_ASSERTION'\n  name: 'AssertionError'\n  expected: 201\n  actual: 401\n  operator: 'strictEqual'\n  stack: |-\n    SuiteContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\ai-patch.http.test.ts:102:12)\n    process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    async TestHook.run (node:internal/test_runner/test:1409:7)\n    async Suite.runHook (node:internal/test_runner/test:1289:9)\n    async Suite.run (node:internal/test_runner/test:1899:7)\n    async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)\n  ...",
+    "skipReason": null,
+    "reason": "Setup supplies staging env credentials but does not provision database users/sessions or isolate auth mode. The effective environment is postgres_read, DB auth=true, NODE_ENV=development. All five expected fixture emails are absent; AuthService.login selects DB auth and returns 401 Invalid credentials. Cancelled cases never entered their test bodies because the suite login hook asserted 201.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:66",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 19,
+    "test": "rejects non-string-array constraints and safety notes",
+    "suite": "AI Patch draft-only HTTP contract",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\ai-patch.http.test.ts",
+    "outcome": "CANCELLED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "AI Patch HTTP suite login hook",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: test did not finish before its parent and was cancelled] { code: 'ERR_TEST_FAILURE', failureType: 'cancelledByParent', cause: 'test did not finish before its parent and was cancelled' }",
+    "parentHookErrorAndStack": "not ok 25 - AI Patch draft-only HTTP contract\n  ---\n  duration_ms: 726.1244\n  type: 'suite'\n  location: 'D:\\\\yy\\\\yy\\\\sekhem-product-application-main\\\\sekhem-product-application-main\\\\backend\\\\test\\\\ai-patch.http.test.ts:2:3017'\n  failureType: 'hookFailed'\n  error: |-\n    Expected values to be strictly equal:\n    \n    401 !== 201\n    \n  code: 'ERR_ASSERTION'\n  name: 'AssertionError'\n  expected: 201\n  actual: 401\n  operator: 'strictEqual'\n  stack: |-\n    SuiteContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\ai-patch.http.test.ts:102:12)\n    process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    async TestHook.run (node:internal/test_runner/test:1409:7)\n    async Suite.runHook (node:internal/test_runner/test:1289:9)\n    async Suite.run (node:internal/test_runner/test:1899:7)\n    async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)\n  ...",
+    "skipReason": null,
+    "reason": "Setup supplies staging env credentials but does not provision database users/sessions or isolate auth mode. The effective environment is postgres_read, DB auth=true, NODE_ENV=development. All five expected fixture emails are absent; AuthService.login selects DB auth and returns 401 Invalid credentials. Cancelled cases never entered their test bodies because the suite login hook asserted 201.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:66",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 20,
+    "test": "rejects forbidden execution-shaped or sensitive fields",
+    "suite": "AI Patch draft-only HTTP contract",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\ai-patch.http.test.ts",
+    "outcome": "CANCELLED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "AI Patch HTTP suite login hook",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: test did not finish before its parent and was cancelled] { code: 'ERR_TEST_FAILURE', failureType: 'cancelledByParent', cause: 'test did not finish before its parent and was cancelled' }",
+    "parentHookErrorAndStack": "not ok 25 - AI Patch draft-only HTTP contract\n  ---\n  duration_ms: 726.1244\n  type: 'suite'\n  location: 'D:\\\\yy\\\\yy\\\\sekhem-product-application-main\\\\sekhem-product-application-main\\\\backend\\\\test\\\\ai-patch.http.test.ts:2:3017'\n  failureType: 'hookFailed'\n  error: |-\n    Expected values to be strictly equal:\n    \n    401 !== 201\n    \n  code: 'ERR_ASSERTION'\n  name: 'AssertionError'\n  expected: 201\n  actual: 401\n  operator: 'strictEqual'\n  stack: |-\n    SuiteContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\ai-patch.http.test.ts:102:12)\n    process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    async TestHook.run (node:internal/test_runner/test:1409:7)\n    async Suite.runHook (node:internal/test_runner/test:1289:9)\n    async Suite.run (node:internal/test_runner/test:1899:7)\n    async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)\n  ...",
+    "skipReason": null,
+    "reason": "Setup supplies staging env credentials but does not provision database users/sessions or isolate auth mode. The effective environment is postgres_read, DB auth=true, NODE_ENV=development. All five expected fixture emails are absent; AuthService.login selects DB auth and returns 401 Invalid credentials. Cancelled cases never entered their test bodies because the suite login hook asserted 201.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:66",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 21,
+    "test": "allows Viewer to access product and R&D read routes",
+    "suite": "Backend RBAC authorization boundary",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\auth-rbac.http.test.ts",
+    "outcome": "FAILED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "RBAC HTTP login setup",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: Expected values to be strictly equal:\n\n401 !== 201\n] {\n  code: 'ERR_TEST_FAILURE',\n  failureType: 'testCodeFailure',\n  cause: AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  401 !== 201\n  \n      at sessionCookie (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\auth-rbac.http.test.ts:75:12)\n      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n      at async TestContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\auth-rbac.http.test.ts:128:20)\n      at async Test.run (node:internal/test_runner/test:1409:7)\n      at async Suite.processPendingSubtests (node:internal/test_runner/test:974:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: 401,\n    expected: 201,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n}",
+    "parentHookErrorAndStack": null,
+    "skipReason": null,
+    "reason": "Setup supplies staging env credentials but does not provision database users/sessions or isolate auth mode. The effective environment is postgres_read, DB auth=true, NODE_ENV=development. All five expected fixture emails are absent; AuthService.login selects DB auth and returns 401 Invalid credentials. Cancelled cases never entered their test bodies because the suite login hook asserted 201.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:66",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 22,
+    "test": "blocks Viewer from audit events and approval decisions without fake audit actor",
+    "suite": "Backend RBAC authorization boundary",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\auth-rbac.http.test.ts",
+    "outcome": "FAILED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "RBAC HTTP login setup",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: Expected values to be strictly equal:\n\n401 !== 201\n] {\n  code: 'ERR_TEST_FAILURE',\n  failureType: 'testCodeFailure',\n  cause: AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  401 !== 201\n  \n      at sessionCookie (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\auth-rbac.http.test.ts:75:12)\n      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n      at async TestContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\auth-rbac.http.test.ts:142:20)\n      at async Test.run (node:internal/test_runner/test:1409:7)\n      at async Suite.processPendingSubtests (node:internal/test_runner/test:974:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: 401,\n    expected: 201,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n}",
+    "parentHookErrorAndStack": null,
+    "skipReason": null,
+    "reason": "Setup supplies staging env credentials but does not provision database users/sessions or isolate auth mode. The effective environment is postgres_read, DB auth=true, NODE_ENV=development. All five expected fixture emails are absent; AuthService.login selects DB auth and returns 401 Invalid credentials. Cancelled cases never entered their test bodies because the suite login hook asserted 201.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:66",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 23,
+    "test": "blocks Technical Reviewer from generic task status updates without fake audit actor",
+    "suite": "Backend RBAC authorization boundary",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\auth-rbac.http.test.ts",
+    "outcome": "FAILED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "RBAC HTTP login setup",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: Expected values to be strictly equal:\n\n401 !== 201\n] {\n  code: 'ERR_TEST_FAILURE',\n  failureType: 'testCodeFailure',\n  cause: AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  401 !== 201\n  \n      at sessionCookie (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\auth-rbac.http.test.ts:75:12)\n      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n      at async TestContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\auth-rbac.http.test.ts:155:31)\n      at async Test.run (node:internal/test_runner/test:1409:7)\n      at async Suite.processPendingSubtests (node:internal/test_runner/test:974:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: 401,\n    expected: 201,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n}",
+    "parentHookErrorAndStack": null,
+    "skipReason": null,
+    "reason": "Setup supplies staging env credentials but does not provision database users/sessions or isolate auth mode. The effective environment is postgres_read, DB auth=true, NODE_ENV=development. All five expected fixture emails are absent; AuthService.login selects DB auth and returns 401 Invalid credentials. Cancelled cases never entered their test bodies because the suite login hook asserted 201.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:66",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 24,
+    "test": "blocks Security Reviewer from non-security R&D write endpoints",
+    "suite": "Backend RBAC authorization boundary",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\auth-rbac.http.test.ts",
+    "outcome": "FAILED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "RBAC HTTP login setup",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: Expected values to be strictly equal:\n\n401 !== 201\n] {\n  code: 'ERR_TEST_FAILURE',\n  failureType: 'testCodeFailure',\n  cause: AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  401 !== 201\n  \n      at sessionCookie (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\auth-rbac.http.test.ts:75:12)\n      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n      at async TestContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\auth-rbac.http.test.ts:167:30)\n      at async Test.run (node:internal/test_runner/test:1409:7)\n      at async Suite.processPendingSubtests (node:internal/test_runner/test:974:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: 401,\n    expected: 201,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n}",
+    "parentHookErrorAndStack": null,
+    "skipReason": null,
+    "reason": "Setup supplies staging env credentials but does not provision database users/sessions or isolate auth mode. The effective environment is postgres_read, DB auth=true, NODE_ENV=development. All five expected fixture emails are absent; AuthService.login selects DB auth and returns 401 Invalid credentials. Cancelled cases never entered their test bodies because the suite login hook asserted 201.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:66",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 25,
+    "test": "allows Viewer workflow reads but blocks workflow and AI Patch writes",
+    "suite": "Backend RBAC authorization boundary",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\auth-rbac.http.test.ts",
+    "outcome": "FAILED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "RBAC HTTP login setup",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: Expected values to be strictly equal:\n\n401 !== 201\n] {\n  code: 'ERR_TEST_FAILURE',\n  failureType: 'testCodeFailure',\n  cause: AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  401 !== 201\n  \n      at sessionCookie (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\auth-rbac.http.test.ts:75:12)\n      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n      at async TestContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\auth-rbac.http.test.ts:178:20)\n      at async Test.run (node:internal/test_runner/test:1409:7)\n      at async Suite.processPendingSubtests (node:internal/test_runner/test:974:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: 401,\n    expected: 201,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n}",
+    "parentHookErrorAndStack": null,
+    "skipReason": null,
+    "reason": "Setup supplies staging env credentials but does not provision database users/sessions or isolate auth mode. The effective environment is postgres_read, DB auth=true, NODE_ENV=development. All five expected fixture emails are absent; AuthService.login selects DB auth and returns 401 Invalid credentials. Cancelled cases never entered their test bodies because the suite login hook asserted 201.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:66",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 26,
+    "test": "uses the authenticated actor for workflow and AI Patch audit fields",
+    "suite": "Backend RBAC authorization boundary",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\auth-rbac.http.test.ts",
+    "outcome": "FAILED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "RBAC HTTP login setup",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: Expected values to be strictly equal:\n\n401 !== 201\n] {\n  code: 'ERR_TEST_FAILURE',\n  failureType: 'testCodeFailure',\n  cause: AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  401 !== 201\n  \n      at sessionCookie (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\auth-rbac.http.test.ts:75:12)\n      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n      at async TestContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\auth-rbac.http.test.ts:201:31)\n      at async Test.run (node:internal/test_runner/test:1409:7)\n      at async Suite.processPendingSubtests (node:internal/test_runner/test:974:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: 401,\n    expected: 201,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n}",
+    "parentHookErrorAndStack": null,
+    "skipReason": null,
+    "reason": "Setup supplies staging env credentials but does not provision database users/sessions or isolate auth mode. The effective environment is postgres_read, DB auth=true, NODE_ENV=development. All five expected fixture emails are absent; AuthService.login selects DB auth and returns 401 Invalid credentials. Cancelled cases never entered their test bodies because the suite login hook asserted 201.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:66",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 27,
+    "test": "allows Technical Reviewer to create R&D technical review records",
+    "suite": "Backend RBAC authorization boundary",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\auth-rbac.http.test.ts",
+    "outcome": "FAILED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "RBAC HTTP login setup",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: Expected values to be strictly equal:\n\n401 !== 201\n] {\n  code: 'ERR_TEST_FAILURE',\n  failureType: 'testCodeFailure',\n  cause: AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  401 !== 201\n  \n      at sessionCookie (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\auth-rbac.http.test.ts:75:12)\n      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n      at async TestContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\auth-rbac.http.test.ts:236:31)\n      at async Test.run (node:internal/test_runner/test:1409:7)\n      at async Suite.processPendingSubtests (node:internal/test_runner/test:974:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: 401,\n    expected: 201,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n}",
+    "parentHookErrorAndStack": null,
+    "skipReason": null,
+    "reason": "Setup supplies staging env credentials but does not provision database users/sessions or isolate auth mode. The effective environment is postgres_read, DB auth=true, NODE_ENV=development. All five expected fixture emails are absent; AuthService.login selects DB auth and returns 401 Invalid credentials. Cancelled cases never entered their test bodies because the suite login hook asserted 201.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:66",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 28,
+    "test": "allows PM to create and decide approvals with authenticated audit actor",
+    "suite": "Backend RBAC authorization boundary",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\auth-rbac.http.test.ts",
+    "outcome": "FAILED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "RBAC HTTP login setup",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: Expected values to be strictly equal:\n\n401 !== 201\n] {\n  code: 'ERR_TEST_FAILURE',\n  failureType: 'testCodeFailure',\n  cause: AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  401 !== 201\n  \n      at sessionCookie (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\auth-rbac.http.test.ts:75:12)\n      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n      at async TestContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\auth-rbac.http.test.ts:252:16)\n      at async Test.run (node:internal/test_runner/test:1409:7)\n      at async Suite.processPendingSubtests (node:internal/test_runner/test:974:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: 401,\n    expected: 201,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n}",
+    "parentHookErrorAndStack": null,
+    "skipReason": null,
+    "reason": "Setup supplies staging env credentials but does not provision database users/sessions or isolate auth mode. The effective environment is postgres_read, DB auth=true, NODE_ENV=development. All five expected fixture emails are absent; AuthService.login selects DB auth and returns 401 Invalid credentials. Cancelled cases never entered their test bodies because the suite login hook asserted 201.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:66",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 29,
+    "test": "keeps the session cookie HttpOnly, Secure and Strict while logout clears it",
+    "suite": "Authentication cookie contract",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\auth-service-contract.test.ts",
+    "outcome": "FAILED",
+    "classification": "PRE_EXISTING",
+    "affectedModule": "Authentication cookie contract test",
+    "errorAndStack": "Error [ERR_TEST_FAILURE]: The input did not match the regular expression /; Secure/. Input:\n\n'sekhem_session=[REDACTED_TEST_TOKEN]; HttpOnly; SameSite=Strict; Path=/; Max-Age=28800'\n\n    at async Promise.all (index 0) {\n  code: 'ERR_TEST_FAILURE',\n  failureType: 'testCodeFailure',\n  cause: AssertionError [ERR_ASSERTION]: The input did not match the regular expression /; Secure/. Input:\n  \n  'sekhem_session=[REDACTED_TEST_TOKEN]; HttpOnly; SameSite=Strict; Path=/; Max-Age=28800'\n  \n      at TestContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\auth-service-contract.test.ts:26:12)\n      at async Test.run (node:internal/test_runner/test:1409:7)\n      at async Promise.all (index 0)\n      at async Suite.run (node:internal/test_runner/test:1905:7)\n      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: 'sekhem_session=[REDACTED_TEST_TOKEN]; HttpOnly; SameSite=Strict; Path=/; Max-Age=28800',\n    expected: /; Secure/,\n    operator: 'match',\n    diff: 'simple'\n  }\n}",
+    "parentHookErrorAndStack": null,
+    "skipReason": null,
+    "reason": "Known pre-runtime Secure assertion expects production cookie behavior in nonproduction NODE_ENV.",
+    "evidence": [
+      "docs/phase-0a-control-loop.md:117",
+      "docs/sekhem-mvp-repair-report.md:133",
+      "Pre-runtime and current source/test SHA256 equality"
+    ]
+  },
+  {
+    "id": 30,
+    "test": "sets an HTTP-only secure cookie on valid login without token in response body",
+    "suite": "Auth HTTP boundary",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\auth.http.test.ts",
+    "outcome": "FAILED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "Auth HTTP login setup",
+    "errorAndStack": "Error [ERR_TEST_FAILURE]: Expected values to be strictly equal:\n\n401 !== 201\n\n    at async Promise.all (index 0) {\n  code: 'ERR_TEST_FAILURE',\n  failureType: 'testCodeFailure',\n  cause: AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  401 !== 201\n  \n      at TestContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\auth.http.test.ts:88:12)\n      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n      at async Test.run (node:internal/test_runner/test:1409:7)\n      at async Promise.all (index 0)\n      at async Suite.run (node:internal/test_runner/test:1905:7)\n      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: 401,\n    expected: 201,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n}",
+    "parentHookErrorAndStack": null,
+    "skipReason": null,
+    "reason": "Setup supplies staging env credentials but does not provision database users/sessions or isolate auth mode. The effective environment is postgres_read, DB auth=true, NODE_ENV=development. All five expected fixture emails are absent; AuthService.login selects DB auth and returns 401 Invalid credentials. Cancelled cases never entered their test bodies because the suite login hook asserted 201.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:66",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 31,
+    "test": "returns active session from a valid cookie",
+    "suite": "Auth HTTP boundary",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\auth.http.test.ts",
+    "outcome": "FAILED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "Auth HTTP login setup",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: Expected values to be strictly equal:\n\n401 !== 200\n] {\n  code: 'ERR_TEST_FAILURE',\n  failureType: 'testCodeFailure',\n  cause: AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  401 !== 200\n  \n      at TestContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\auth.http.test.ts:131:12)\n      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n      at async Test.run (node:internal/test_runner/test:1409:7)\n      at async Suite.processPendingSubtests (node:internal/test_runner/test:974:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: 401,\n    expected: 200,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n}",
+    "parentHookErrorAndStack": null,
+    "skipReason": null,
+    "reason": "Setup supplies staging env credentials but does not provision database users/sessions or isolate auth mode. The effective environment is postgres_read, DB auth=true, NODE_ENV=development. All five expected fixture emails are absent; AuthService.login selects DB auth and returns 401 Invalid credentials. Cancelled cases never entered their test bodies because the suite login hook asserted 201.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:66",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 32,
+    "test": "clears session cookie on logout",
+    "suite": "Auth HTTP boundary",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\auth.http.test.ts",
+    "outcome": "FAILED",
+    "classification": "OUTDATED_ASSERTION",
+    "affectedModule": "AuthController logout cookie assertion",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: The input did not match the regular expression /Secure/. Input:\n\n'sekhem_session=; HttpOnly; SameSite=Strict; Path=/; Max-Age=0'\n] {\n  code: 'ERR_TEST_FAILURE',\n  failureType: 'testCodeFailure',\n  cause: AssertionError [ERR_ASSERTION]: The input did not match the regular expression /Secure/. Input:\n  \n  'sekhem_session=; HttpOnly; SameSite=Strict; Path=/; Max-Age=0'\n  \n      at TestContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\auth.http.test.ts:165:12)\n      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n      at async Test.run (node:internal/test_runner/test:1409:7)\n      at async Suite.processPendingSubtests (node:internal/test_runner/test:974:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: 'sekhem_session=; HttpOnly; SameSite=Strict; Path=/; Max-Age=0',\n    expected: /Secure/,\n    operator: 'match',\n    diff: 'simple'\n  }\n}",
+    "parentHookErrorAndStack": null,
+    "skipReason": null,
+    "reason": "Requires Secure even with NODE_ENV=development; AuthService.clearCookie deliberately adds it only in production. Status and logout-body assertions preceding it pass. AuthService and this test are unchanged from pre-runtime hashes.",
+    "evidence": [
+      "backend/src/auth/auth.service.ts:240",
+      "backend/test/auth.http.test.ts:182",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 33,
+    "test": "rejects unauthenticated human workflow routes and unsigned machine callbacks",
+    "suite": "Backend Batch 6 automation and AI contract endpoints",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\automation-contract.test.ts",
+    "outcome": "CANCELLED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "Automation HTTP suite login hook",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: test did not finish before its parent and was cancelled] { code: 'ERR_TEST_FAILURE', failureType: 'cancelledByParent', cause: 'test did not finish before its parent and was cancelled' }",
+    "parentHookErrorAndStack": "not ok 35 - Backend Batch 6 automation and AI contract endpoints\n  ---\n  duration_ms: 550.8851\n  type: 'suite'\n  location: 'D:\\\\yy\\\\yy\\\\sekhem-product-application-main\\\\sekhem-product-application-main\\\\backend\\\\test\\\\automation-contract.test.ts:2:4674'\n  failureType: 'hookFailed'\n  error: |-\n    Expected values to be strictly equal:\n    \n    401 !== 201\n    \n  code: 'ERR_ASSERTION'\n  name: 'AssertionError'\n  expected: 201\n  actual: 401\n  operator: 'strictEqual'\n  stack: |-\n    SuiteContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\automation-contract.test.ts:169:12)\n    process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    async TestHook.run (node:internal/test_runner/test:1409:7)\n    async Suite.runHook (node:internal/test_runner/test:1289:9)\n    async Suite.run (node:internal/test_runner/test:1899:7)\n    async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)\n  ...",
+    "skipReason": null,
+    "reason": "Setup supplies staging env credentials but does not provision database users/sessions or isolate auth mode. The effective environment is postgres_read, DB auth=true, NODE_ENV=development. All five expected fixture emails are absent; AuthService.login selects DB auth and returns 401 Invalid credentials. Cancelled cases never entered their test bodies because the suite login hook asserted 201.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:66",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 34,
+    "test": "POST /api/workflows/events creates a local workflow run placeholder",
+    "suite": "Backend Batch 6 automation and AI contract endpoints",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\automation-contract.test.ts",
+    "outcome": "CANCELLED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "Automation HTTP suite login hook",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: test did not finish before its parent and was cancelled] { code: 'ERR_TEST_FAILURE', failureType: 'cancelledByParent', cause: 'test did not finish before its parent and was cancelled' }",
+    "parentHookErrorAndStack": "not ok 35 - Backend Batch 6 automation and AI contract endpoints\n  ---\n  duration_ms: 550.8851\n  type: 'suite'\n  location: 'D:\\\\yy\\\\yy\\\\sekhem-product-application-main\\\\sekhem-product-application-main\\\\backend\\\\test\\\\automation-contract.test.ts:2:4674'\n  failureType: 'hookFailed'\n  error: |-\n    Expected values to be strictly equal:\n    \n    401 !== 201\n    \n  code: 'ERR_ASSERTION'\n  name: 'AssertionError'\n  expected: 201\n  actual: 401\n  operator: 'strictEqual'\n  stack: |-\n    SuiteContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\automation-contract.test.ts:169:12)\n    process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    async TestHook.run (node:internal/test_runner/test:1409:7)\n    async Suite.runHook (node:internal/test_runner/test:1289:9)\n    async Suite.run (node:internal/test_runner/test:1899:7)\n    async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)\n  ...",
+    "skipReason": null,
+    "reason": "Setup supplies staging env credentials but does not provision database users/sessions or isolate auth mode. The effective environment is postgres_read, DB auth=true, NODE_ENV=development. All five expected fixture emails are absent; AuthService.login selects DB auth and returns 401 Invalid credentials. Cancelled cases never entered their test bodies because the suite login hook asserted 201.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:66",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 35,
+    "test": "GET /api/workflows/runs lists local workflow placeholders",
+    "suite": "Backend Batch 6 automation and AI contract endpoints",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\automation-contract.test.ts",
+    "outcome": "CANCELLED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "Automation HTTP suite login hook",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: test did not finish before its parent and was cancelled] { code: 'ERR_TEST_FAILURE', failureType: 'cancelledByParent', cause: 'test did not finish before its parent and was cancelled' }",
+    "parentHookErrorAndStack": "not ok 35 - Backend Batch 6 automation and AI contract endpoints\n  ---\n  duration_ms: 550.8851\n  type: 'suite'\n  location: 'D:\\\\yy\\\\yy\\\\sekhem-product-application-main\\\\sekhem-product-application-main\\\\backend\\\\test\\\\automation-contract.test.ts:2:4674'\n  failureType: 'hookFailed'\n  error: |-\n    Expected values to be strictly equal:\n    \n    401 !== 201\n    \n  code: 'ERR_ASSERTION'\n  name: 'AssertionError'\n  expected: 201\n  actual: 401\n  operator: 'strictEqual'\n  stack: |-\n    SuiteContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\automation-contract.test.ts:169:12)\n    process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    async TestHook.run (node:internal/test_runner/test:1409:7)\n    async Suite.runHook (node:internal/test_runner/test:1289:9)\n    async Suite.run (node:internal/test_runner/test:1899:7)\n    async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)\n  ...",
+    "skipReason": null,
+    "reason": "Setup supplies staging env credentials but does not provision database users/sessions or isolate auth mode. The effective environment is postgres_read, DB auth=true, NODE_ENV=development. All five expected fixture emails are absent; AuthService.login selects DB auth and returns 401 Invalid credentials. Cancelled cases never entered their test bodies because the suite login hook asserted 201.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:66",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 36,
+    "test": "GET /api/workflows/runs/:id returns local workflow placeholder",
+    "suite": "Backend Batch 6 automation and AI contract endpoints",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\automation-contract.test.ts",
+    "outcome": "CANCELLED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "Automation HTTP suite login hook",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: test did not finish before its parent and was cancelled] { code: 'ERR_TEST_FAILURE', failureType: 'cancelledByParent', cause: 'test did not finish before its parent and was cancelled' }",
+    "parentHookErrorAndStack": "not ok 35 - Backend Batch 6 automation and AI contract endpoints\n  ---\n  duration_ms: 550.8851\n  type: 'suite'\n  location: 'D:\\\\yy\\\\yy\\\\sekhem-product-application-main\\\\sekhem-product-application-main\\\\backend\\\\test\\\\automation-contract.test.ts:2:4674'\n  failureType: 'hookFailed'\n  error: |-\n    Expected values to be strictly equal:\n    \n    401 !== 201\n    \n  code: 'ERR_ASSERTION'\n  name: 'AssertionError'\n  expected: 201\n  actual: 401\n  operator: 'strictEqual'\n  stack: |-\n    SuiteContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\automation-contract.test.ts:169:12)\n    process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    async TestHook.run (node:internal/test_runner/test:1409:7)\n    async Suite.runHook (node:internal/test_runner/test:1289:9)\n    async Suite.run (node:internal/test_runner/test:1899:7)\n    async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)\n  ...",
+    "skipReason": null,
+    "reason": "Setup supplies staging env credentials but does not provision database users/sessions or isolate auth mode. The effective environment is postgres_read, DB auth=true, NODE_ENV=development. All five expected fixture emails are absent; AuthService.login selects DB auth and returns 401 Invalid credentials. Cancelled cases never entered their test bodies because the suite login hook asserted 201.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:66",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 37,
+    "test": "POST /api/workflows/callbacks accepts a valid manual internal callback",
+    "suite": "Backend Batch 6 automation and AI contract endpoints",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\automation-contract.test.ts",
+    "outcome": "CANCELLED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "Automation HTTP suite login hook",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: test did not finish before its parent and was cancelled] { code: 'ERR_TEST_FAILURE', failureType: 'cancelledByParent', cause: 'test did not finish before its parent and was cancelled' }",
+    "parentHookErrorAndStack": "not ok 35 - Backend Batch 6 automation and AI contract endpoints\n  ---\n  duration_ms: 550.8851\n  type: 'suite'\n  location: 'D:\\\\yy\\\\yy\\\\sekhem-product-application-main\\\\sekhem-product-application-main\\\\backend\\\\test\\\\automation-contract.test.ts:2:4674'\n  failureType: 'hookFailed'\n  error: |-\n    Expected values to be strictly equal:\n    \n    401 !== 201\n    \n  code: 'ERR_ASSERTION'\n  name: 'AssertionError'\n  expected: 201\n  actual: 401\n  operator: 'strictEqual'\n  stack: |-\n    SuiteContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\automation-contract.test.ts:169:12)\n    process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    async TestHook.run (node:internal/test_runner/test:1409:7)\n    async Suite.runHook (node:internal/test_runner/test:1289:9)\n    async Suite.run (node:internal/test_runner/test:1899:7)\n    async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)\n  ...",
+    "skipReason": null,
+    "reason": "Setup supplies staging env credentials but does not provision database users/sessions or isolate auth mode. The effective environment is postgres_read, DB auth=true, NODE_ENV=development. All five expected fixture emails are absent; AuthService.login selects DB auth and returns 401 Invalid credentials. Cancelled cases never entered their test bodies because the suite login hook asserted 201.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:66",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 38,
+    "test": "POST /api/workflows/callbacks rejects a missing required field",
+    "suite": "Backend Batch 6 automation and AI contract endpoints",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\automation-contract.test.ts",
+    "outcome": "CANCELLED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "Automation HTTP suite login hook",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: test did not finish before its parent and was cancelled] { code: 'ERR_TEST_FAILURE', failureType: 'cancelledByParent', cause: 'test did not finish before its parent and was cancelled' }",
+    "parentHookErrorAndStack": "not ok 35 - Backend Batch 6 automation and AI contract endpoints\n  ---\n  duration_ms: 550.8851\n  type: 'suite'\n  location: 'D:\\\\yy\\\\yy\\\\sekhem-product-application-main\\\\sekhem-product-application-main\\\\backend\\\\test\\\\automation-contract.test.ts:2:4674'\n  failureType: 'hookFailed'\n  error: |-\n    Expected values to be strictly equal:\n    \n    401 !== 201\n    \n  code: 'ERR_ASSERTION'\n  name: 'AssertionError'\n  expected: 201\n  actual: 401\n  operator: 'strictEqual'\n  stack: |-\n    SuiteContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\automation-contract.test.ts:169:12)\n    process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    async TestHook.run (node:internal/test_runner/test:1409:7)\n    async Suite.runHook (node:internal/test_runner/test:1289:9)\n    async Suite.run (node:internal/test_runner/test:1899:7)\n    async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)\n  ...",
+    "skipReason": null,
+    "reason": "Setup supplies staging env credentials but does not provision database users/sessions or isolate auth mode. The effective environment is postgres_read, DB auth=true, NODE_ENV=development. All five expected fixture emails are absent; AuthService.login selects DB auth and returns 401 Invalid credentials. Cancelled cases never entered their test bodies because the suite login hook asserted 201.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:66",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 39,
+    "test": "POST /api/workflows/callbacks rejects an invalid status",
+    "suite": "Backend Batch 6 automation and AI contract endpoints",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\automation-contract.test.ts",
+    "outcome": "CANCELLED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "Automation HTTP suite login hook",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: test did not finish before its parent and was cancelled] { code: 'ERR_TEST_FAILURE', failureType: 'cancelledByParent', cause: 'test did not finish before its parent and was cancelled' }",
+    "parentHookErrorAndStack": "not ok 35 - Backend Batch 6 automation and AI contract endpoints\n  ---\n  duration_ms: 550.8851\n  type: 'suite'\n  location: 'D:\\\\yy\\\\yy\\\\sekhem-product-application-main\\\\sekhem-product-application-main\\\\backend\\\\test\\\\automation-contract.test.ts:2:4674'\n  failureType: 'hookFailed'\n  error: |-\n    Expected values to be strictly equal:\n    \n    401 !== 201\n    \n  code: 'ERR_ASSERTION'\n  name: 'AssertionError'\n  expected: 201\n  actual: 401\n  operator: 'strictEqual'\n  stack: |-\n    SuiteContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\automation-contract.test.ts:169:12)\n    process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    async TestHook.run (node:internal/test_runner/test:1409:7)\n    async Suite.runHook (node:internal/test_runner/test:1289:9)\n    async Suite.run (node:internal/test_runner/test:1899:7)\n    async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)\n  ...",
+    "skipReason": null,
+    "reason": "Setup supplies staging env credentials but does not provision database users/sessions or isolate auth mode. The effective environment is postgres_read, DB auth=true, NODE_ENV=development. All five expected fixture emails are absent; AuthService.login selects DB auth and returns 401 Invalid credentials. Cancelled cases never entered their test bodies because the suite login hook asserted 201.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:66",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 40,
+    "test": "POST /api/workflows/callbacks rejects unsafe raw content",
+    "suite": "Backend Batch 6 automation and AI contract endpoints",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\automation-contract.test.ts",
+    "outcome": "CANCELLED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "Automation HTTP suite login hook",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: test did not finish before its parent and was cancelled] { code: 'ERR_TEST_FAILURE', failureType: 'cancelledByParent', cause: 'test did not finish before its parent and was cancelled' }",
+    "parentHookErrorAndStack": "not ok 35 - Backend Batch 6 automation and AI contract endpoints\n  ---\n  duration_ms: 550.8851\n  type: 'suite'\n  location: 'D:\\\\yy\\\\yy\\\\sekhem-product-application-main\\\\sekhem-product-application-main\\\\backend\\\\test\\\\automation-contract.test.ts:2:4674'\n  failureType: 'hookFailed'\n  error: |-\n    Expected values to be strictly equal:\n    \n    401 !== 201\n    \n  code: 'ERR_ASSERTION'\n  name: 'AssertionError'\n  expected: 201\n  actual: 401\n  operator: 'strictEqual'\n  stack: |-\n    SuiteContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\automation-contract.test.ts:169:12)\n    process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    async TestHook.run (node:internal/test_runner/test:1409:7)\n    async Suite.runHook (node:internal/test_runner/test:1289:9)\n    async Suite.run (node:internal/test_runner/test:1899:7)\n    async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)\n  ...",
+    "skipReason": null,
+    "reason": "Setup supplies staging env credentials but does not provision database users/sessions or isolate auth mode. The effective environment is postgres_read, DB auth=true, NODE_ENV=development. All five expected fixture emails are absent; AuthService.login selects DB auth and returns 401 Invalid credentials. Cancelled cases never entered their test bodies because the suite login hook asserted 201.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:66",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 41,
+    "test": "POST /api/workflows/callbacks rejects invalid transitions",
+    "suite": "Backend Batch 6 automation and AI contract endpoints",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\automation-contract.test.ts",
+    "outcome": "CANCELLED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "Automation HTTP suite login hook",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: test did not finish before its parent and was cancelled] { code: 'ERR_TEST_FAILURE', failureType: 'cancelledByParent', cause: 'test did not finish before its parent and was cancelled' }",
+    "parentHookErrorAndStack": "not ok 35 - Backend Batch 6 automation and AI contract endpoints\n  ---\n  duration_ms: 550.8851\n  type: 'suite'\n  location: 'D:\\\\yy\\\\yy\\\\sekhem-product-application-main\\\\sekhem-product-application-main\\\\backend\\\\test\\\\automation-contract.test.ts:2:4674'\n  failureType: 'hookFailed'\n  error: |-\n    Expected values to be strictly equal:\n    \n    401 !== 201\n    \n  code: 'ERR_ASSERTION'\n  name: 'AssertionError'\n  expected: 201\n  actual: 401\n  operator: 'strictEqual'\n  stack: |-\n    SuiteContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\automation-contract.test.ts:169:12)\n    process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    async TestHook.run (node:internal/test_runner/test:1409:7)\n    async Suite.runHook (node:internal/test_runner/test:1289:9)\n    async Suite.run (node:internal/test_runner/test:1899:7)\n    async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)\n  ...",
+    "skipReason": null,
+    "reason": "Setup supplies staging env credentials but does not provision database users/sessions or isolate auth mode. The effective environment is postgres_read, DB auth=true, NODE_ENV=development. All five expected fixture emails are absent; AuthService.login selects DB auth and returns 401 Invalid credentials. Cancelled cases never entered their test bodies because the suite login hook asserted 201.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:66",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 42,
+    "test": "POST /api/workflows/callbacks enforces duplicate idempotency no-op",
+    "suite": "Backend Batch 6 automation and AI contract endpoints",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\automation-contract.test.ts",
+    "outcome": "CANCELLED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "Automation HTTP suite login hook",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: test did not finish before its parent and was cancelled] { code: 'ERR_TEST_FAILURE', failureType: 'cancelledByParent', cause: 'test did not finish before its parent and was cancelled' }",
+    "parentHookErrorAndStack": "not ok 35 - Backend Batch 6 automation and AI contract endpoints\n  ---\n  duration_ms: 550.8851\n  type: 'suite'\n  location: 'D:\\\\yy\\\\yy\\\\sekhem-product-application-main\\\\sekhem-product-application-main\\\\backend\\\\test\\\\automation-contract.test.ts:2:4674'\n  failureType: 'hookFailed'\n  error: |-\n    Expected values to be strictly equal:\n    \n    401 !== 201\n    \n  code: 'ERR_ASSERTION'\n  name: 'AssertionError'\n  expected: 201\n  actual: 401\n  operator: 'strictEqual'\n  stack: |-\n    SuiteContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\automation-contract.test.ts:169:12)\n    process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    async TestHook.run (node:internal/test_runner/test:1409:7)\n    async Suite.runHook (node:internal/test_runner/test:1289:9)\n    async Suite.run (node:internal/test_runner/test:1899:7)\n    async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)\n  ...",
+    "skipReason": null,
+    "reason": "Setup supplies staging env credentials but does not provision database users/sessions or isolate auth mode. The effective environment is postgres_read, DB auth=true, NODE_ENV=development. All five expected fixture emails are absent; AuthService.login selects DB auth and returns 401 Invalid credentials. Cancelled cases never entered their test bodies because the suite login hook asserted 201.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:66",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 43,
+    "test": "POST /api/workflows/callbacks rejects idempotency key reuse with different payload",
+    "suite": "Backend Batch 6 automation and AI contract endpoints",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\automation-contract.test.ts",
+    "outcome": "CANCELLED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "Automation HTTP suite login hook",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: test did not finish before its parent and was cancelled] { code: 'ERR_TEST_FAILURE', failureType: 'cancelledByParent', cause: 'test did not finish before its parent and was cancelled' }",
+    "parentHookErrorAndStack": "not ok 35 - Backend Batch 6 automation and AI contract endpoints\n  ---\n  duration_ms: 550.8851\n  type: 'suite'\n  location: 'D:\\\\yy\\\\yy\\\\sekhem-product-application-main\\\\sekhem-product-application-main\\\\backend\\\\test\\\\automation-contract.test.ts:2:4674'\n  failureType: 'hookFailed'\n  error: |-\n    Expected values to be strictly equal:\n    \n    401 !== 201\n    \n  code: 'ERR_ASSERTION'\n  name: 'AssertionError'\n  expected: 201\n  actual: 401\n  operator: 'strictEqual'\n  stack: |-\n    SuiteContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\automation-contract.test.ts:169:12)\n    process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    async TestHook.run (node:internal/test_runner/test:1409:7)\n    async Suite.runHook (node:internal/test_runner/test:1289:9)\n    async Suite.run (node:internal/test_runner/test:1899:7)\n    async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)\n  ...",
+    "skipReason": null,
+    "reason": "Setup supplies staging env credentials but does not provision database users/sessions or isolate auth mode. The effective environment is postgres_read, DB auth=true, NODE_ENV=development. All five expected fixture emails are absent; AuthService.login selects DB auth and returns 401 Invalid credentials. Cancelled cases never entered their test bodies because the suite login hook asserted 201.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:66",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 44,
+    "test": "POST /api/workflows/callbacks requires safe error fields for failed callbacks",
+    "suite": "Backend Batch 6 automation and AI contract endpoints",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\automation-contract.test.ts",
+    "outcome": "CANCELLED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "Automation HTTP suite login hook",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: test did not finish before its parent and was cancelled] { code: 'ERR_TEST_FAILURE', failureType: 'cancelledByParent', cause: 'test did not finish before its parent and was cancelled' }",
+    "parentHookErrorAndStack": "not ok 35 - Backend Batch 6 automation and AI contract endpoints\n  ---\n  duration_ms: 550.8851\n  type: 'suite'\n  location: 'D:\\\\yy\\\\yy\\\\sekhem-product-application-main\\\\sekhem-product-application-main\\\\backend\\\\test\\\\automation-contract.test.ts:2:4674'\n  failureType: 'hookFailed'\n  error: |-\n    Expected values to be strictly equal:\n    \n    401 !== 201\n    \n  code: 'ERR_ASSERTION'\n  name: 'AssertionError'\n  expected: 201\n  actual: 401\n  operator: 'strictEqual'\n  stack: |-\n    SuiteContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\automation-contract.test.ts:169:12)\n    process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    async TestHook.run (node:internal/test_runner/test:1409:7)\n    async Suite.runHook (node:internal/test_runner/test:1289:9)\n    async Suite.run (node:internal/test_runner/test:1899:7)\n    async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)\n  ...",
+    "skipReason": null,
+    "reason": "Setup supplies staging env credentials but does not provision database users/sessions or isolate auth mode. The effective environment is postgres_read, DB auth=true, NODE_ENV=development. All five expected fixture emails are absent; AuthService.login selects DB auth and returns 401 Invalid credentials. Cancelled cases never entered their test bodies because the suite login hook asserted 201.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:66",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 45,
+    "test": "POST /api/workflows/callbacks requires blocker fields for blocked callbacks",
+    "suite": "Backend Batch 6 automation and AI contract endpoints",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\automation-contract.test.ts",
+    "outcome": "CANCELLED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "Automation HTTP suite login hook",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: test did not finish before its parent and was cancelled] { code: 'ERR_TEST_FAILURE', failureType: 'cancelledByParent', cause: 'test did not finish before its parent and was cancelled' }",
+    "parentHookErrorAndStack": "not ok 35 - Backend Batch 6 automation and AI contract endpoints\n  ---\n  duration_ms: 550.8851\n  type: 'suite'\n  location: 'D:\\\\yy\\\\yy\\\\sekhem-product-application-main\\\\sekhem-product-application-main\\\\backend\\\\test\\\\automation-contract.test.ts:2:4674'\n  failureType: 'hookFailed'\n  error: |-\n    Expected values to be strictly equal:\n    \n    401 !== 201\n    \n  code: 'ERR_ASSERTION'\n  name: 'AssertionError'\n  expected: 201\n  actual: 401\n  operator: 'strictEqual'\n  stack: |-\n    SuiteContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\automation-contract.test.ts:169:12)\n    process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    async TestHook.run (node:internal/test_runner/test:1409:7)\n    async Suite.runHook (node:internal/test_runner/test:1289:9)\n    async Suite.run (node:internal/test_runner/test:1899:7)\n    async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)\n  ...",
+    "skipReason": null,
+    "reason": "Setup supplies staging env credentials but does not provision database users/sessions or isolate auth mode. The effective environment is postgres_read, DB auth=true, NODE_ENV=development. All five expected fixture emails are absent; AuthService.login selects DB auth and returns 401 Invalid credentials. Cancelled cases never entered their test bodies because the suite login hook asserted 201.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:66",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 46,
+    "test": "POST /api/ai/memos/request queues a local memo placeholder",
+    "suite": "Backend Batch 6 automation and AI contract endpoints",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\automation-contract.test.ts",
+    "outcome": "CANCELLED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "Automation HTTP suite login hook",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: test did not finish before its parent and was cancelled] { code: 'ERR_TEST_FAILURE', failureType: 'cancelledByParent', cause: 'test did not finish before its parent and was cancelled' }",
+    "parentHookErrorAndStack": "not ok 35 - Backend Batch 6 automation and AI contract endpoints\n  ---\n  duration_ms: 550.8851\n  type: 'suite'\n  location: 'D:\\\\yy\\\\yy\\\\sekhem-product-application-main\\\\sekhem-product-application-main\\\\backend\\\\test\\\\automation-contract.test.ts:2:4674'\n  failureType: 'hookFailed'\n  error: |-\n    Expected values to be strictly equal:\n    \n    401 !== 201\n    \n  code: 'ERR_ASSERTION'\n  name: 'AssertionError'\n  expected: 201\n  actual: 401\n  operator: 'strictEqual'\n  stack: |-\n    SuiteContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\automation-contract.test.ts:169:12)\n    process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    async TestHook.run (node:internal/test_runner/test:1409:7)\n    async Suite.runHook (node:internal/test_runner/test:1289:9)\n    async Suite.run (node:internal/test_runner/test:1899:7)\n    async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)\n  ...",
+    "skipReason": null,
+    "reason": "Setup supplies staging env credentials but does not provision database users/sessions or isolate auth mode. The effective environment is postgres_read, DB auth=true, NODE_ENV=development. All five expected fixture emails are absent; AuthService.login selects DB auth and returns 401 Invalid credentials. Cancelled cases never entered their test bodies because the suite login hook asserted 201.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:66",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 47,
+    "test": "GET /api/ai/memos/:id returns a local memo placeholder",
+    "suite": "Backend Batch 6 automation and AI contract endpoints",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\automation-contract.test.ts",
+    "outcome": "CANCELLED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "Automation HTTP suite login hook",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: test did not finish before its parent and was cancelled] { code: 'ERR_TEST_FAILURE', failureType: 'cancelledByParent', cause: 'test did not finish before its parent and was cancelled' }",
+    "parentHookErrorAndStack": "not ok 35 - Backend Batch 6 automation and AI contract endpoints\n  ---\n  duration_ms: 550.8851\n  type: 'suite'\n  location: 'D:\\\\yy\\\\yy\\\\sekhem-product-application-main\\\\sekhem-product-application-main\\\\backend\\\\test\\\\automation-contract.test.ts:2:4674'\n  failureType: 'hookFailed'\n  error: |-\n    Expected values to be strictly equal:\n    \n    401 !== 201\n    \n  code: 'ERR_ASSERTION'\n  name: 'AssertionError'\n  expected: 201\n  actual: 401\n  operator: 'strictEqual'\n  stack: |-\n    SuiteContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\automation-contract.test.ts:169:12)\n    process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    async TestHook.run (node:internal/test_runner/test:1409:7)\n    async Suite.runHook (node:internal/test_runner/test:1289:9)\n    async Suite.run (node:internal/test_runner/test:1899:7)\n    async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)\n  ...",
+    "skipReason": null,
+    "reason": "Setup supplies staging env credentials but does not provision database users/sessions or isolate auth mode. The effective environment is postgres_read, DB auth=true, NODE_ENV=development. All five expected fixture emails are absent; AuthService.login selects DB auth and returns 401 Invalid credentials. Cancelled cases never entered their test bodies because the suite login hook asserted 201.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:66",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 48,
+    "test": "POST /api/system/events records a local system event",
+    "suite": "Backend Batch 6 automation and AI contract endpoints",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\automation-contract.test.ts",
+    "outcome": "CANCELLED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "Automation HTTP suite login hook",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: test did not finish before its parent and was cancelled] { code: 'ERR_TEST_FAILURE', failureType: 'cancelledByParent', cause: 'test did not finish before its parent and was cancelled' }",
+    "parentHookErrorAndStack": "not ok 35 - Backend Batch 6 automation and AI contract endpoints\n  ---\n  duration_ms: 550.8851\n  type: 'suite'\n  location: 'D:\\\\yy\\\\yy\\\\sekhem-product-application-main\\\\sekhem-product-application-main\\\\backend\\\\test\\\\automation-contract.test.ts:2:4674'\n  failureType: 'hookFailed'\n  error: |-\n    Expected values to be strictly equal:\n    \n    401 !== 201\n    \n  code: 'ERR_ASSERTION'\n  name: 'AssertionError'\n  expected: 201\n  actual: 401\n  operator: 'strictEqual'\n  stack: |-\n    SuiteContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\automation-contract.test.ts:169:12)\n    process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    async TestHook.run (node:internal/test_runner/test:1409:7)\n    async Suite.runHook (node:internal/test_runner/test:1289:9)\n    async Suite.run (node:internal/test_runner/test:1899:7)\n    async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)\n  ...",
+    "skipReason": null,
+    "reason": "Setup supplies staging env credentials but does not provision database users/sessions or isolate auth mode. The effective environment is postgres_read, DB auth=true, NODE_ENV=development. All five expected fixture emails are absent; AuthService.login selects DB auth and returns 401 Invalid credentials. Cancelled cases never entered their test bodies because the suite login hook asserted 201.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:66",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 49,
+    "test": "invalid workflow event returns normalized error",
+    "suite": "Backend Batch 6 automation and AI contract endpoints",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\automation-contract.test.ts",
+    "outcome": "CANCELLED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "Automation HTTP suite login hook",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: test did not finish before its parent and was cancelled] { code: 'ERR_TEST_FAILURE', failureType: 'cancelledByParent', cause: 'test did not finish before its parent and was cancelled' }",
+    "parentHookErrorAndStack": "not ok 35 - Backend Batch 6 automation and AI contract endpoints\n  ---\n  duration_ms: 550.8851\n  type: 'suite'\n  location: 'D:\\\\yy\\\\yy\\\\sekhem-product-application-main\\\\sekhem-product-application-main\\\\backend\\\\test\\\\automation-contract.test.ts:2:4674'\n  failureType: 'hookFailed'\n  error: |-\n    Expected values to be strictly equal:\n    \n    401 !== 201\n    \n  code: 'ERR_ASSERTION'\n  name: 'AssertionError'\n  expected: 201\n  actual: 401\n  operator: 'strictEqual'\n  stack: |-\n    SuiteContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\automation-contract.test.ts:169:12)\n    process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    async TestHook.run (node:internal/test_runner/test:1409:7)\n    async Suite.runHook (node:internal/test_runner/test:1289:9)\n    async Suite.run (node:internal/test_runner/test:1899:7)\n    async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)\n  ...",
+    "skipReason": null,
+    "reason": "Setup supplies staging env credentials but does not provision database users/sessions or isolate auth mode. The effective environment is postgres_read, DB auth=true, NODE_ENV=development. All five expected fixture emails are absent; AuthService.login selects DB auth and returns 401 Invalid credentials. Cancelled cases never entered their test bodies because the suite login hook asserted 201.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:66",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 50,
+    "test": "invalid AI memo request returns normalized error",
+    "suite": "Backend Batch 6 automation and AI contract endpoints",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\automation-contract.test.ts",
+    "outcome": "CANCELLED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "Automation HTTP suite login hook",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: test did not finish before its parent and was cancelled] { code: 'ERR_TEST_FAILURE', failureType: 'cancelledByParent', cause: 'test did not finish before its parent and was cancelled' }",
+    "parentHookErrorAndStack": "not ok 35 - Backend Batch 6 automation and AI contract endpoints\n  ---\n  duration_ms: 550.8851\n  type: 'suite'\n  location: 'D:\\\\yy\\\\yy\\\\sekhem-product-application-main\\\\sekhem-product-application-main\\\\backend\\\\test\\\\automation-contract.test.ts:2:4674'\n  failureType: 'hookFailed'\n  error: |-\n    Expected values to be strictly equal:\n    \n    401 !== 201\n    \n  code: 'ERR_ASSERTION'\n  name: 'AssertionError'\n  expected: 201\n  actual: 401\n  operator: 'strictEqual'\n  stack: |-\n    SuiteContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\automation-contract.test.ts:169:12)\n    process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    async TestHook.run (node:internal/test_runner/test:1409:7)\n    async Suite.runHook (node:internal/test_runner/test:1289:9)\n    async Suite.run (node:internal/test_runner/test:1899:7)\n    async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)\n  ...",
+    "skipReason": null,
+    "reason": "Setup supplies staging env credentials but does not provision database users/sessions or isolate auth mode. The effective environment is postgres_read, DB auth=true, NODE_ENV=development. All five expected fixture emails are absent; AuthService.login selects DB auth and returns 401 Invalid credentials. Cancelled cases never entered their test bodies because the suite login hook asserted 201.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:66",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 51,
+    "test": "invalid system event returns normalized error",
+    "suite": "Backend Batch 6 automation and AI contract endpoints",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\automation-contract.test.ts",
+    "outcome": "CANCELLED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "Automation HTTP suite login hook",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: test did not finish before its parent and was cancelled] { code: 'ERR_TEST_FAILURE', failureType: 'cancelledByParent', cause: 'test did not finish before its parent and was cancelled' }",
+    "parentHookErrorAndStack": "not ok 35 - Backend Batch 6 automation and AI contract endpoints\n  ---\n  duration_ms: 550.8851\n  type: 'suite'\n  location: 'D:\\\\yy\\\\yy\\\\sekhem-product-application-main\\\\sekhem-product-application-main\\\\backend\\\\test\\\\automation-contract.test.ts:2:4674'\n  failureType: 'hookFailed'\n  error: |-\n    Expected values to be strictly equal:\n    \n    401 !== 201\n    \n  code: 'ERR_ASSERTION'\n  name: 'AssertionError'\n  expected: 201\n  actual: 401\n  operator: 'strictEqual'\n  stack: |-\n    SuiteContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\automation-contract.test.ts:169:12)\n    process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    async TestHook.run (node:internal/test_runner/test:1409:7)\n    async Suite.runHook (node:internal/test_runner/test:1289:9)\n    async Suite.run (node:internal/test_runner/test:1899:7)\n    async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)\n  ...",
+    "skipReason": null,
+    "reason": "Setup supplies staging env credentials but does not provision database users/sessions or isolate auth mode. The effective environment is postgres_read, DB auth=true, NODE_ENV=development. All five expected fixture emails are absent; AuthService.login selects DB auth and returns 401 Invalid credentials. Cancelled cases never entered their test bodies because the suite login hook asserted 201.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:66",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 52,
+    "test": "rejects an escaping symlink",
+    "suite": "Execution Plane Foundation (5D-A)",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\execution-plane.test.ts",
+    "outcome": "FAILED",
+    "classification": "PRE_EXISTING",
+    "affectedModule": "Legacy execution-plane tests / Windows symlink privilege / source-text assertion",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: EPERM: operation not permitted, symlink 'C:\\Users\\youse\\AppData\\Local\\Temp\\sekhem-5d-a-outside-n0H3p7\\secret.txt' -> 'C:\\Users\\youse\\AppData\\Local\\Temp\\sekhem-5d-a-aHKVSl\\src\\escape.txt'] {\n  code: 'ERR_TEST_FAILURE',\n  failureType: 'testCodeFailure',\n  cause: Error: EPERM: operation not permitted, symlink 'C:\\Users\\youse\\AppData\\Local\\Temp\\sekhem-5d-a-outside-n0H3p7\\secret.txt' -> 'C:\\Users\\youse\\AppData\\Local\\Temp\\sekhem-5d-a-aHKVSl\\src\\escape.txt'\n      at async symlink (node:internal/fs/promises:1707:10)\n      at async TestContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\execution-plane.test.ts:115:7)\n      at async Test.run (node:internal/test_runner/test:1409:7)\n      at async Suite.processPendingSubtests (node:internal/test_runner/test:974:7) {\n    errno: -4048,\n    code: 'EPERM',\n    syscall: 'symlink',\n    path: 'C:\\\\Users\\\\youse\\\\AppData\\\\Local\\\\Temp\\\\sekhem-5d-a-outside-n0H3p7\\\\secret.txt',\n    dest: 'C:\\\\Users\\\\youse\\\\AppData\\\\Local\\\\Temp\\\\sekhem-5d-a-aHKVSl\\\\src\\\\escape.txt'\n  }\n}",
+    "parentHookErrorAndStack": null,
+    "skipReason": null,
+    "reason": "Known pre-runtime Windows file-symlink creation fails EPERM before capability behavior can be exercised.",
+    "evidence": [
+      "docs/phase-0a-control-loop.md:117",
+      "docs/sekhem-mvp-repair-report.md:133",
+      "Pre-runtime and current source/test SHA256 equality"
+    ]
+  },
+  {
+    "id": 53,
+    "test": "has a non-destructive cancellation contract and a disabled PowerShell executor",
+    "suite": "Execution Plane Foundation (5D-A)",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\execution-plane.test.ts",
+    "outcome": "FAILED",
+    "classification": "PRE_EXISTING",
+    "affectedModule": "Legacy execution-plane tests / Windows symlink privilege / source-text assertion",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: Expected values to be strictly equal:\n\ntrue !== false\n] {\n  code: 'ERR_TEST_FAILURE',\n  failureType: 'testCodeFailure',\n  cause: AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  true !== false\n  \n      at TestContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\execution-plane.test.ts:148:12)\n      at async Test.run (node:internal/test_runner/test:1409:7)\n      at async Suite.processPendingSubtests (node:internal/test_runner/test:974:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: true,\n    expected: false,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n}",
+    "parentHookErrorAndStack": null,
+    "skipReason": null,
+    "reason": "Known pre-runtime regex incorrectly matches the powershell.execute capability identifier; the legacy executor remains disabled.",
+    "evidence": [
+      "docs/phase-0a-control-loop.md:117",
+      "docs/sekhem-mvp-repair-report.md:133",
+      "Pre-runtime and current source/test SHA256 equality"
+    ]
+  },
+  {
+    "id": 54,
+    "test": "returns wrapped authenticated 200 response for GET /api/projects",
+    "suite": "Backend Batch 2 HTTP smoke tests",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\http-smoke.test.ts",
+    "outcome": "FAILED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "Product HTTP read fixtures",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: Expected values to be strictly equal:\n\n401 !== 200\n] {\n  code: 'ERR_TEST_FAILURE',\n  failureType: 'testCodeFailure',\n  cause: AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  401 !== 200\n  \n      at TestContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\http-smoke.test.ts:140:14)\n      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n      at async Test.run (node:internal/test_runner/test:1409:7)\n      at async Suite.processPendingSubtests (node:internal/test_runner/test:974:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: 401,\n    expected: 200,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n}",
+    "parentHookErrorAndStack": null,
+    "skipReason": null,
+    "reason": "Test fabricates a signature-only cookie for a nonexistent fixture user, without a durable session or organization. Current database auth correctly rejects it with 401, before the asserted product operation. Read-only probes confirmed all three fixture users are absent and that signature extraction succeeds while durable validation returns 401 User not found.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:132",
+      "backend/src/auth/authz.guard.ts",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 55,
+    "test": "returns wrapped authenticated 200 response for GET /api/projects/project-community-sonic-sovereign/dashboard",
+    "suite": "Backend Batch 2 HTTP smoke tests",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\http-smoke.test.ts",
+    "outcome": "FAILED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "Product HTTP read fixtures",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: Expected values to be strictly equal:\n\n401 !== 200\n] {\n  code: 'ERR_TEST_FAILURE',\n  failureType: 'testCodeFailure',\n  cause: AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  401 !== 200\n  \n      at TestContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\http-smoke.test.ts:140:14)\n      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n      at async Test.run (node:internal/test_runner/test:1409:7)\n      at async Suite.processPendingSubtests (node:internal/test_runner/test:974:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: 401,\n    expected: 200,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n}",
+    "parentHookErrorAndStack": null,
+    "skipReason": null,
+    "reason": "Test fabricates a signature-only cookie for a nonexistent fixture user, without a durable session or organization. Current database auth correctly rejects it with 401, before the asserted product operation. Read-only probes confirmed all three fixture users are absent and that signature extraction succeeds while durable validation returns 401 User not found.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:132",
+      "backend/src/auth/authz.guard.ts",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 56,
+    "test": "returns wrapped authenticated 200 response for GET /api/modules",
+    "suite": "Backend Batch 2 HTTP smoke tests",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\http-smoke.test.ts",
+    "outcome": "FAILED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "Product HTTP read fixtures",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: Expected values to be strictly equal:\n\n401 !== 200\n] {\n  code: 'ERR_TEST_FAILURE',\n  failureType: 'testCodeFailure',\n  cause: AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  401 !== 200\n  \n      at TestContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\http-smoke.test.ts:140:14)\n      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n      at async Test.run (node:internal/test_runner/test:1409:7)\n      at async Suite.processPendingSubtests (node:internal/test_runner/test:974:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: 401,\n    expected: 200,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n}",
+    "parentHookErrorAndStack": null,
+    "skipReason": null,
+    "reason": "Test fabricates a signature-only cookie for a nonexistent fixture user, without a durable session or organization. Current database auth correctly rejects it with 401, before the asserted product operation. Read-only probes confirmed all three fixture users are absent and that signature extraction succeeds while durable validation returns 401 User not found.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:132",
+      "backend/src/auth/authz.guard.ts",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 57,
+    "test": "returns wrapped authenticated 200 response for GET /api/modules/rd-radar",
+    "suite": "Backend Batch 2 HTTP smoke tests",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\http-smoke.test.ts",
+    "outcome": "FAILED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "Product HTTP read fixtures",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: Expected values to be strictly equal:\n\n401 !== 200\n] {\n  code: 'ERR_TEST_FAILURE',\n  failureType: 'testCodeFailure',\n  cause: AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  401 !== 200\n  \n      at TestContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\http-smoke.test.ts:140:14)\n      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n      at async Test.run (node:internal/test_runner/test:1409:7)\n      at async Suite.processPendingSubtests (node:internal/test_runner/test:974:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: 401,\n    expected: 200,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n}",
+    "parentHookErrorAndStack": null,
+    "skipReason": null,
+    "reason": "Test fabricates a signature-only cookie for a nonexistent fixture user, without a durable session or organization. Current database auth correctly rejects it with 401, before the asserted product operation. Read-only probes confirmed all three fixture users are absent and that signature extraction succeeds while durable validation returns 401 User not found.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:132",
+      "backend/src/auth/authz.guard.ts",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 58,
+    "test": "returns wrapped authenticated 200 response for GET /api/initiatives",
+    "suite": "Backend Batch 2 HTTP smoke tests",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\http-smoke.test.ts",
+    "outcome": "FAILED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "Product HTTP read fixtures",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: Expected values to be strictly equal:\n\n401 !== 200\n] {\n  code: 'ERR_TEST_FAILURE',\n  failureType: 'testCodeFailure',\n  cause: AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  401 !== 200\n  \n      at TestContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\http-smoke.test.ts:140:14)\n      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n      at async Test.run (node:internal/test_runner/test:1409:7)\n      at async Suite.processPendingSubtests (node:internal/test_runner/test:974:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: 401,\n    expected: 200,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n}",
+    "parentHookErrorAndStack": null,
+    "skipReason": null,
+    "reason": "Test fabricates a signature-only cookie for a nonexistent fixture user, without a durable session or organization. Current database auth correctly rejects it with 401, before the asserted product operation. Read-only probes confirmed all three fixture users are absent and that signature extraction succeeds while durable validation returns 401 User not found.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:132",
+      "backend/src/auth/authz.guard.ts",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 59,
+    "test": "returns wrapped authenticated 200 response for GET /api/initiatives/evpn-bgp-validation-pack",
+    "suite": "Backend Batch 2 HTTP smoke tests",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\http-smoke.test.ts",
+    "outcome": "FAILED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "Product HTTP read fixtures",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: Expected values to be strictly equal:\n\n401 !== 200\n] {\n  code: 'ERR_TEST_FAILURE',\n  failureType: 'testCodeFailure',\n  cause: AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  401 !== 200\n  \n      at TestContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\http-smoke.test.ts:140:14)\n      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n      at async Test.run (node:internal/test_runner/test:1409:7)\n      at async Suite.processPendingSubtests (node:internal/test_runner/test:974:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: 401,\n    expected: 200,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n}",
+    "parentHookErrorAndStack": null,
+    "skipReason": null,
+    "reason": "Test fabricates a signature-only cookie for a nonexistent fixture user, without a durable session or organization. Current database auth correctly rejects it with 401, before the asserted product operation. Read-only probes confirmed all three fixture users are absent and that signature extraction succeeds while durable validation returns 401 User not found.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:132",
+      "backend/src/auth/authz.guard.ts",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 60,
+    "test": "returns wrapped authenticated 200 response for GET /api/initiatives/evpn-bgp-validation-pack/tasks",
+    "suite": "Backend Batch 2 HTTP smoke tests",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\http-smoke.test.ts",
+    "outcome": "FAILED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "Product HTTP read fixtures",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: Expected values to be strictly equal:\n\n401 !== 200\n] {\n  code: 'ERR_TEST_FAILURE',\n  failureType: 'testCodeFailure',\n  cause: AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  401 !== 200\n  \n      at TestContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\http-smoke.test.ts:140:14)\n      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n      at async Test.run (node:internal/test_runner/test:1409:7)\n      at async Suite.processPendingSubtests (node:internal/test_runner/test:974:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: 401,\n    expected: 200,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n}",
+    "parentHookErrorAndStack": null,
+    "skipReason": null,
+    "reason": "Test fabricates a signature-only cookie for a nonexistent fixture user, without a durable session or organization. Current database auth correctly rejects it with 401, before the asserted product operation. Read-only probes confirmed all three fixture users are absent and that signature extraction succeeds while durable validation returns 401 User not found.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:132",
+      "backend/src/auth/authz.guard.ts",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 61,
+    "test": "returns wrapped authenticated 200 response for GET /api/initiatives/evpn-bgp-validation-pack/activity",
+    "suite": "Backend Batch 2 HTTP smoke tests",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\http-smoke.test.ts",
+    "outcome": "FAILED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "Product HTTP read fixtures",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: Expected values to be strictly equal:\n\n401 !== 200\n] {\n  code: 'ERR_TEST_FAILURE',\n  failureType: 'testCodeFailure',\n  cause: AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  401 !== 200\n  \n      at TestContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\http-smoke.test.ts:140:14)\n      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n      at async Test.run (node:internal/test_runner/test:1409:7)\n      at async Suite.processPendingSubtests (node:internal/test_runner/test:974:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: 401,\n    expected: 200,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n}",
+    "parentHookErrorAndStack": null,
+    "skipReason": null,
+    "reason": "Test fabricates a signature-only cookie for a nonexistent fixture user, without a durable session or organization. Current database auth correctly rejects it with 401, before the asserted product operation. Read-only probes confirmed all three fixture users are absent and that signature extraction succeeds while durable validation returns 401 User not found.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:132",
+      "backend/src/auth/authz.guard.ts",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 62,
+    "test": "returns wrapped authenticated 200 response for GET /api/initiatives/evpn-bgp-validation-pack/blockers",
+    "suite": "Backend Batch 2 HTTP smoke tests",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\http-smoke.test.ts",
+    "outcome": "FAILED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "Product HTTP read fixtures",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: Expected values to be strictly equal:\n\n401 !== 200\n] {\n  code: 'ERR_TEST_FAILURE',\n  failureType: 'testCodeFailure',\n  cause: AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  401 !== 200\n  \n      at TestContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\http-smoke.test.ts:140:14)\n      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n      at async Test.run (node:internal/test_runner/test:1409:7)\n      at async Suite.processPendingSubtests (node:internal/test_runner/test:974:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: 401,\n    expected: 200,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n}",
+    "parentHookErrorAndStack": null,
+    "skipReason": null,
+    "reason": "Test fabricates a signature-only cookie for a nonexistent fixture user, without a durable session or organization. Current database auth correctly rejects it with 401, before the asserted product operation. Read-only probes confirmed all three fixture users are absent and that signature extraction succeeds while durable validation returns 401 User not found.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:132",
+      "backend/src/auth/authz.guard.ts",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 63,
+    "test": "returns wrapped authenticated 200 response for GET /api/approvals",
+    "suite": "Backend Batch 2 HTTP smoke tests",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\http-smoke.test.ts",
+    "outcome": "FAILED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "Product HTTP read fixtures",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: Expected values to be strictly equal:\n\n401 !== 200\n] {\n  code: 'ERR_TEST_FAILURE',\n  failureType: 'testCodeFailure',\n  cause: AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  401 !== 200\n  \n      at TestContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\http-smoke.test.ts:140:14)\n      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n      at async Test.run (node:internal/test_runner/test:1409:7)\n      at async Suite.processPendingSubtests (node:internal/test_runner/test:974:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: 401,\n    expected: 200,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n}",
+    "parentHookErrorAndStack": null,
+    "skipReason": null,
+    "reason": "Test fabricates a signature-only cookie for a nonexistent fixture user, without a durable session or organization. Current database auth correctly rejects it with 401, before the asserted product operation. Read-only probes confirmed all three fixture users are absent and that signature extraction succeeds while durable validation returns 401 User not found.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:132",
+      "backend/src/auth/authz.guard.ts",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 64,
+    "test": "returns wrapped authenticated 200 response for GET /api/security-gates/security-gate-evpn-bgp",
+    "suite": "Backend Batch 2 HTTP smoke tests",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\http-smoke.test.ts",
+    "outcome": "FAILED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "Product HTTP read fixtures",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: Expected values to be strictly equal:\n\n401 !== 200\n] {\n  code: 'ERR_TEST_FAILURE',\n  failureType: 'testCodeFailure',\n  cause: AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  401 !== 200\n  \n      at TestContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\http-smoke.test.ts:140:14)\n      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n      at async Test.run (node:internal/test_runner/test:1409:7)\n      at async Suite.processPendingSubtests (node:internal/test_runner/test:974:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: 401,\n    expected: 200,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n}",
+    "parentHookErrorAndStack": null,
+    "skipReason": null,
+    "reason": "Test fabricates a signature-only cookie for a nonexistent fixture user, without a durable session or organization. Current database auth correctly rejects it with 401, before the asserted product operation. Read-only probes confirmed all three fixture users are absent and that signature extraction succeeds while durable validation returns 401 User not found.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:132",
+      "backend/src/auth/authz.guard.ts",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 65,
+    "test": "returns wrapped authenticated 200 response for GET /api/release-candidates",
+    "suite": "Backend Batch 2 HTTP smoke tests",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\http-smoke.test.ts",
+    "outcome": "FAILED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "Product HTTP read fixtures",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: Expected values to be strictly equal:\n\n401 !== 200\n] {\n  code: 'ERR_TEST_FAILURE',\n  failureType: 'testCodeFailure',\n  cause: AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  401 !== 200\n  \n      at TestContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\http-smoke.test.ts:140:14)\n      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n      at async Test.run (node:internal/test_runner/test:1409:7)\n      at async Suite.processPendingSubtests (node:internal/test_runner/test:974:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: 401,\n    expected: 200,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n}",
+    "parentHookErrorAndStack": null,
+    "skipReason": null,
+    "reason": "Test fabricates a signature-only cookie for a nonexistent fixture user, without a durable session or organization. Current database auth correctly rejects it with 401, before the asserted product operation. Read-only probes confirmed all three fixture users are absent and that signature extraction succeeds while durable validation returns 401 User not found.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:132",
+      "backend/src/auth/authz.guard.ts",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 66,
+    "test": "returns wrapped authenticated 200 response for GET /api/release-candidates/release-candidate-evpn-bgp-001",
+    "suite": "Backend Batch 2 HTTP smoke tests",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\http-smoke.test.ts",
+    "outcome": "FAILED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "Product HTTP read fixtures",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: Expected values to be strictly equal:\n\n401 !== 200\n] {\n  code: 'ERR_TEST_FAILURE',\n  failureType: 'testCodeFailure',\n  cause: AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  401 !== 200\n  \n      at TestContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\http-smoke.test.ts:140:14)\n      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n      at async Test.run (node:internal/test_runner/test:1409:7)\n      at async Suite.processPendingSubtests (node:internal/test_runner/test:974:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: 401,\n    expected: 200,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n}",
+    "parentHookErrorAndStack": null,
+    "skipReason": null,
+    "reason": "Test fabricates a signature-only cookie for a nonexistent fixture user, without a durable session or organization. Current database auth correctly rejects it with 401, before the asserted product operation. Read-only probes confirmed all three fixture users are absent and that signature extraction succeeds while durable validation returns 401 User not found.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:132",
+      "backend/src/auth/authz.guard.ts",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 67,
+    "test": "returns wrapped authenticated 200 response for GET /api/blockers",
+    "suite": "Backend Batch 2 HTTP smoke tests",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\http-smoke.test.ts",
+    "outcome": "FAILED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "Product HTTP read fixtures",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: Expected values to be strictly equal:\n\n401 !== 200\n] {\n  code: 'ERR_TEST_FAILURE',\n  failureType: 'testCodeFailure',\n  cause: AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  401 !== 200\n  \n      at TestContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\http-smoke.test.ts:140:14)\n      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n      at async Test.run (node:internal/test_runner/test:1409:7)\n      at async Suite.processPendingSubtests (node:internal/test_runner/test:974:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: 401,\n    expected: 200,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n}",
+    "parentHookErrorAndStack": null,
+    "skipReason": null,
+    "reason": "Test fabricates a signature-only cookie for a nonexistent fixture user, without a durable session or organization. Current database auth correctly rejects it with 401, before the asserted product operation. Read-only probes confirmed all three fixture users are absent and that signature extraction succeeds while durable validation returns 401 User not found.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:132",
+      "backend/src/auth/authz.guard.ts",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 68,
+    "test": "returns wrapped authenticated 200 response for GET /api/audit-events",
+    "suite": "Backend Batch 2 HTTP smoke tests",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\http-smoke.test.ts",
+    "outcome": "FAILED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "Product HTTP read fixtures",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: Expected values to be strictly equal:\n\n401 !== 200\n] {\n  code: 'ERR_TEST_FAILURE',\n  failureType: 'testCodeFailure',\n  cause: AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  401 !== 200\n  \n      at TestContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\http-smoke.test.ts:140:14)\n      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n      at async Test.run (node:internal/test_runner/test:1409:7)\n      at async Suite.processPendingSubtests (node:internal/test_runner/test:974:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: 401,\n    expected: 200,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n}",
+    "parentHookErrorAndStack": null,
+    "skipReason": null,
+    "reason": "Test fabricates a signature-only cookie for a nonexistent fixture user, without a durable session or organization. Current database auth correctly rejects it with 401, before the asserted product operation. Read-only probes confirmed all three fixture users are absent and that signature extraction succeeds while durable validation returns 401 User not found.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:132",
+      "backend/src/auth/authz.guard.ts",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 69,
+    "test": "returns arrays for approved authenticated list endpoints",
+    "suite": "Backend Batch 2 HTTP smoke tests",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\http-smoke.test.ts",
+    "outcome": "FAILED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "Product HTTP read fixtures",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: Expected values to be strictly equal:\n\n401 !== 200\n] {\n  code: 'ERR_TEST_FAILURE',\n  failureType: 'testCodeFailure',\n  cause: AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  401 !== 200\n  \n      at TestContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\http-smoke.test.ts:185:14)\n      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n      at async Test.run (node:internal/test_runner/test:1409:7)\n      at async Suite.processPendingSubtests (node:internal/test_runner/test:974:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: 401,\n    expected: 200,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n}",
+    "parentHookErrorAndStack": null,
+    "skipReason": null,
+    "reason": "Test fabricates a signature-only cookie for a nonexistent fixture user, without a durable session or organization. Current database auth correctly rejects it with 401, before the asserted product operation. Read-only probes confirmed all three fixture users are absent and that signature extraction succeeds while durable validation returns 401 User not found.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:132",
+      "backend/src/auth/authz.guard.ts",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 70,
+    "test": "returns normalized not found errors for authenticated requests",
+    "suite": "Backend Batch 2 HTTP smoke tests",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\http-smoke.test.ts",
+    "outcome": "FAILED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "Product HTTP read fixtures",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: Expected values to be strictly equal:\n\n401 !== 404\n] {\n  code: 'ERR_TEST_FAILURE',\n  failureType: 'testCodeFailure',\n  cause: AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  401 !== 404\n  \n      at TestContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\http-smoke.test.ts:194:12)\n      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n      at async Test.run (node:internal/test_runner/test:1409:7)\n      at async Suite.processPendingSubtests (node:internal/test_runner/test:974:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: 401,\n    expected: 404,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n}",
+    "parentHookErrorAndStack": null,
+    "skipReason": null,
+    "reason": "Test fabricates a signature-only cookie for a nonexistent fixture user, without a durable session or organization. Current database auth correctly rejects it with 401, before the asserted product operation. Read-only probes confirmed all three fixture users are absent and that signature extraction succeeds while durable validation returns 401 User not found.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:132",
+      "backend/src/auth/authz.guard.ts",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 71,
+    "test": "creates a draft-only handoff with authenticated audit actor",
+    "suite": "Backend Batch 5 HTTP write endpoint tests",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\http-write.test.ts",
+    "outcome": "FAILED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "Product HTTP write fixtures",
+    "errorAndStack": "Error [ERR_TEST_FAILURE]: Expected values to be strictly equal:\n\nfalse !== true\n\n    at async Promise.all (index 0) {\n  code: 'ERR_TEST_FAILURE',\n  failureType: 'testCodeFailure',\n  cause: AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  false !== true\n  \n      at assertWriteSuccess (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\http-write.test.ts:57:10)\n      at TestContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\http-write.test.ts:142:5)\n      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n      at async Test.run (node:internal/test_runner/test:1409:7)\n      at async Promise.all (index 0)\n      at async Suite.run (node:internal/test_runner/test:1905:7)\n      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: false,\n    expected: true,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n}",
+    "parentHookErrorAndStack": null,
+    "skipReason": null,
+    "reason": "Test fabricates a signature-only cookie for a nonexistent fixture user, without a durable session or organization. Current database auth correctly rejects it with 401, before the asserted product operation. Read-only probes confirmed all three fixture users are absent and that signature extraction succeeds while durable validation returns 401 User not found.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:132",
+      "backend/src/auth/authz.guard.ts",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 72,
+    "test": "starts initiative with authenticated audit actor",
+    "suite": "Backend Batch 5 HTTP write endpoint tests",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\http-write.test.ts",
+    "outcome": "FAILED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "Product HTTP write fixtures",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: Expected values to be strictly equal:\n\nfalse !== true\n] {\n  code: 'ERR_TEST_FAILURE',\n  failureType: 'testCodeFailure',\n  cause: AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  false !== true\n  \n      at assertWriteSuccess (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\http-write.test.ts:57:10)\n      at TestContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\http-write.test.ts:154:5)\n      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n      at async Test.run (node:internal/test_runner/test:1409:7)\n      at async Suite.processPendingSubtests (node:internal/test_runner/test:974:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: false,\n    expected: true,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n}",
+    "parentHookErrorAndStack": null,
+    "skipReason": null,
+    "reason": "Test fabricates a signature-only cookie for a nonexistent fixture user, without a durable session or organization. Current database auth correctly rejects it with 401, before the asserted product operation. Read-only probes confirmed all three fixture users are absent and that signature extraction succeeds while durable validation returns 401 User not found.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:132",
+      "backend/src/auth/authz.guard.ts",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 73,
+    "test": "creates and decides approval while ignoring spoofed audit actor fields",
+    "suite": "Backend Batch 5 HTTP write endpoint tests",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\http-write.test.ts",
+    "outcome": "FAILED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "Product HTTP write fixtures",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: Expected values to be strictly equal:\n\nfalse !== true\n] {\n  code: 'ERR_TEST_FAILURE',\n  failureType: 'testCodeFailure',\n  cause: AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  false !== true\n  \n      at assertWriteSuccess (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\http-write.test.ts:57:10)\n      at TestContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\http-write.test.ts:171:5)\n      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n      at async Test.run (node:internal/test_runner/test:1409:7)\n      at async Suite.processPendingSubtests (node:internal/test_runner/test:974:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: false,\n    expected: true,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n}",
+    "parentHookErrorAndStack": null,
+    "skipReason": null,
+    "reason": "Test fabricates a signature-only cookie for a nonexistent fixture user, without a durable session or organization. Current database auth correctly rejects it with 401, before the asserted product operation. Read-only probes confirmed all three fixture users are absent and that signature extraction succeeds while durable validation returns 401 User not found.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:132",
+      "backend/src/auth/authz.guard.ts",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 74,
+    "test": "selects execution path with matching approval and authenticated audit actor",
+    "suite": "Backend Batch 5 HTTP write endpoint tests",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\http-write.test.ts",
+    "outcome": "FAILED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "Product HTTP write fixtures",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: Expected values to be strictly equal:\n\nfalse !== true\n] {\n  code: 'ERR_TEST_FAILURE',\n  failureType: 'testCodeFailure',\n  cause: AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  false !== true\n  \n      at assertWriteSuccess (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\http-write.test.ts:57:10)\n      at TestContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\http-write.test.ts:200:5)\n      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n      at async Test.run (node:internal/test_runner/test:1409:7)\n      at async Suite.processPendingSubtests (node:internal/test_runner/test:974:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: false,\n    expected: true,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n}",
+    "parentHookErrorAndStack": null,
+    "skipReason": null,
+    "reason": "Test fabricates a signature-only cookie for a nonexistent fixture user, without a durable session or organization. Current database auth correctly rejects it with 401, before the asserted product operation. Read-only probes confirmed all three fixture users are absent and that signature extraction succeeds while durable validation returns 401 User not found.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:132",
+      "backend/src/auth/authz.guard.ts",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 75,
+    "test": "updates task status with authenticated audit actor",
+    "suite": "Backend Batch 5 HTTP write endpoint tests",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\http-write.test.ts",
+    "outcome": "FAILED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "Product HTTP write fixtures",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: Expected values to be strictly equal:\n\nfalse !== true\n] {\n  code: 'ERR_TEST_FAILURE',\n  failureType: 'testCodeFailure',\n  cause: AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  false !== true\n  \n      at assertWriteSuccess (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\http-write.test.ts:57:10)\n      at TestContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\http-write.test.ts:231:5)\n      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n      at async Test.run (node:internal/test_runner/test:1409:7)\n      at async Suite.processPendingSubtests (node:internal/test_runner/test:974:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: false,\n    expected: true,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n}",
+    "parentHookErrorAndStack": null,
+    "skipReason": null,
+    "reason": "Test fabricates a signature-only cookie for a nonexistent fixture user, without a durable session or organization. Current database auth correctly rejects it with 401, before the asserted product operation. Read-only probes confirmed all three fixture users are absent and that signature extraction succeeds while durable validation returns 401 User not found.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:132",
+      "backend/src/auth/authz.guard.ts",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 76,
+    "test": "creates blocker with authenticated audit actor",
+    "suite": "Backend Batch 5 HTTP write endpoint tests",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\http-write.test.ts",
+    "outcome": "FAILED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "Product HTTP write fixtures",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: Expected values to be strictly equal:\n\nfalse !== true\n] {\n  code: 'ERR_TEST_FAILURE',\n  failureType: 'testCodeFailure',\n  cause: AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  false !== true\n  \n      at assertWriteSuccess (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\http-write.test.ts:57:10)\n      at TestContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\http-write.test.ts:251:5)\n      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n      at async Test.run (node:internal/test_runner/test:1409:7)\n      at async Suite.processPendingSubtests (node:internal/test_runner/test:974:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: false,\n    expected: true,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n}",
+    "parentHookErrorAndStack": null,
+    "skipReason": null,
+    "reason": "Test fabricates a signature-only cookie for a nonexistent fixture user, without a durable session or organization. Current database auth correctly rejects it with 401, before the asserted product operation. Read-only probes confirmed all three fixture users are absent and that signature extraction succeeds while durable validation returns 401 User not found.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:132",
+      "backend/src/auth/authz.guard.ts",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 77,
+    "test": "assistant client actor fields are ignored for authenticated PM approval decision",
+    "suite": "Backend Batch 5 HTTP write endpoint tests",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\http-write.test.ts",
+    "outcome": "FAILED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "Product HTTP write fixtures",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: Expected values to be strictly equal:\n\nfalse !== true\n] {\n  code: 'ERR_TEST_FAILURE',\n  failureType: 'testCodeFailure',\n  cause: AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  false !== true\n  \n      at assertWriteSuccess (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\http-write.test.ts:57:10)\n      at TestContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\http-write.test.ts:272:5)\n      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n      at async Test.run (node:internal/test_runner/test:1409:7)\n      at async Suite.processPendingSubtests (node:internal/test_runner/test:974:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: false,\n    expected: true,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n}",
+    "parentHookErrorAndStack": null,
+    "skipReason": null,
+    "reason": "Test fabricates a signature-only cookie for a nonexistent fixture user, without a durable session or organization. Current database auth correctly rejects it with 401, before the asserted product operation. Read-only probes confirmed all three fixture users are absent and that signature extraction succeeds while durable validation returns 401 User not found.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:132",
+      "backend/src/auth/authz.guard.ts",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 78,
+    "test": "returns wrapped authenticated response for GET /api/rd-radar/status",
+    "suite": "R&D Radar API smoke tests",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\rd-radar.http.test.ts",
+    "outcome": "FAILED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "R&D Radar HTTP fixtures",
+    "errorAndStack": "Error [ERR_TEST_FAILURE]: Expected values to be strictly equal:\n\n401 !== 200\n\n    at async Promise.all (index 0) {\n  code: 'ERR_TEST_FAILURE',\n  failureType: 'testCodeFailure',\n  cause: AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  401 !== 200\n  \n      at TestContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\rd-radar.http.test.ts:159:14)\n      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n      at async Test.run (node:internal/test_runner/test:1409:7)\n      at async Promise.all (index 0)\n      at async Suite.run (node:internal/test_runner/test:1905:7)\n      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: 401,\n    expected: 200,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n}",
+    "parentHookErrorAndStack": null,
+    "skipReason": null,
+    "reason": "Test fabricates a signature-only cookie for a nonexistent fixture user, without a durable session or organization. Current database auth correctly rejects it with 401, before the asserted product operation. Read-only probes confirmed all three fixture users are absent and that signature extraction succeeds while durable validation returns 401 User not found.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:132",
+      "backend/src/auth/authz.guard.ts",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 79,
+    "test": "returns wrapped authenticated response for GET /api/rd-radar/evidence",
+    "suite": "R&D Radar API smoke tests",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\rd-radar.http.test.ts",
+    "outcome": "FAILED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "R&D Radar HTTP fixtures",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: Expected values to be strictly equal:\n\n401 !== 200\n] {\n  code: 'ERR_TEST_FAILURE',\n  failureType: 'testCodeFailure',\n  cause: AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  401 !== 200\n  \n      at TestContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\rd-radar.http.test.ts:159:14)\n      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n      at async Test.run (node:internal/test_runner/test:1409:7)\n      at async Suite.processPendingSubtests (node:internal/test_runner/test:974:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: 401,\n    expected: 200,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n}",
+    "parentHookErrorAndStack": null,
+    "skipReason": null,
+    "reason": "Test fabricates a signature-only cookie for a nonexistent fixture user, without a durable session or organization. Current database auth correctly rejects it with 401, before the asserted product operation. Read-only probes confirmed all three fixture users are absent and that signature extraction succeeds while durable validation returns 401 User not found.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:132",
+      "backend/src/auth/authz.guard.ts",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 80,
+    "test": "returns wrapped authenticated response for GET /api/rd-radar/evidence-reviews",
+    "suite": "R&D Radar API smoke tests",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\rd-radar.http.test.ts",
+    "outcome": "FAILED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "R&D Radar HTTP fixtures",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: Expected values to be strictly equal:\n\n401 !== 200\n] {\n  code: 'ERR_TEST_FAILURE',\n  failureType: 'testCodeFailure',\n  cause: AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  401 !== 200\n  \n      at TestContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\rd-radar.http.test.ts:159:14)\n      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n      at async Test.run (node:internal/test_runner/test:1409:7)\n      at async Suite.processPendingSubtests (node:internal/test_runner/test:974:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: 401,\n    expected: 200,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n}",
+    "parentHookErrorAndStack": null,
+    "skipReason": null,
+    "reason": "Test fabricates a signature-only cookie for a nonexistent fixture user, without a durable session or organization. Current database auth correctly rejects it with 401, before the asserted product operation. Read-only probes confirmed all three fixture users are absent and that signature extraction succeeds while durable validation returns 401 User not found.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:132",
+      "backend/src/auth/authz.guard.ts",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 81,
+    "test": "returns wrapped authenticated response for GET /api/rd-radar/candidates",
+    "suite": "R&D Radar API smoke tests",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\rd-radar.http.test.ts",
+    "outcome": "FAILED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "R&D Radar HTTP fixtures",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: Expected values to be strictly equal:\n\n401 !== 200\n] {\n  code: 'ERR_TEST_FAILURE',\n  failureType: 'testCodeFailure',\n  cause: AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  401 !== 200\n  \n      at TestContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\rd-radar.http.test.ts:159:14)\n      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n      at async Test.run (node:internal/test_runner/test:1409:7)\n      at async Suite.processPendingSubtests (node:internal/test_runner/test:974:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: 401,\n    expected: 200,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n}",
+    "parentHookErrorAndStack": null,
+    "skipReason": null,
+    "reason": "Test fabricates a signature-only cookie for a nonexistent fixture user, without a durable session or organization. Current database auth correctly rejects it with 401, before the asserted product operation. Read-only probes confirmed all three fixture users are absent and that signature extraction succeeds while durable validation returns 401 User not found.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:132",
+      "backend/src/auth/authz.guard.ts",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 82,
+    "test": "returns wrapped authenticated response for GET /api/rd-radar/pm-decisions",
+    "suite": "R&D Radar API smoke tests",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\rd-radar.http.test.ts",
+    "outcome": "FAILED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "R&D Radar HTTP fixtures",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: Expected values to be strictly equal:\n\n401 !== 200\n] {\n  code: 'ERR_TEST_FAILURE',\n  failureType: 'testCodeFailure',\n  cause: AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  401 !== 200\n  \n      at TestContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\rd-radar.http.test.ts:159:14)\n      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n      at async Test.run (node:internal/test_runner/test:1409:7)\n      at async Suite.processPendingSubtests (node:internal/test_runner/test:974:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: 401,\n    expected: 200,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n}",
+    "parentHookErrorAndStack": null,
+    "skipReason": null,
+    "reason": "Test fabricates a signature-only cookie for a nonexistent fixture user, without a durable session or organization. Current database auth correctly rejects it with 401, before the asserted product operation. Read-only probes confirmed all three fixture users are absent and that signature extraction succeeds while durable validation returns 401 User not found.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:132",
+      "backend/src/auth/authz.guard.ts",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 83,
+    "test": "returns wrapped authenticated response for GET /api/rd-radar/workflow-runs",
+    "suite": "R&D Radar API smoke tests",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\rd-radar.http.test.ts",
+    "outcome": "FAILED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "R&D Radar HTTP fixtures",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: Expected values to be strictly equal:\n\n401 !== 200\n] {\n  code: 'ERR_TEST_FAILURE',\n  failureType: 'testCodeFailure',\n  cause: AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  401 !== 200\n  \n      at TestContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\rd-radar.http.test.ts:159:14)\n      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n      at async Test.run (node:internal/test_runner/test:1409:7)\n      at async Suite.processPendingSubtests (node:internal/test_runner/test:974:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: 401,\n    expected: 200,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n}",
+    "parentHookErrorAndStack": null,
+    "skipReason": null,
+    "reason": "Test fabricates a signature-only cookie for a nonexistent fixture user, without a durable session or organization. Current database auth correctly rejects it with 401, before the asserted product operation. Read-only probes confirmed all three fixture users are absent and that signature extraction succeeds while durable validation returns 401 User not found.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:132",
+      "backend/src/auth/authz.guard.ts",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 84,
+    "test": "returns wrapped authenticated response for GET /api/rd-radar/github-status",
+    "suite": "R&D Radar API smoke tests",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\rd-radar.http.test.ts",
+    "outcome": "FAILED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "R&D Radar HTTP fixtures",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: Expected values to be strictly equal:\n\n401 !== 200\n] {\n  code: 'ERR_TEST_FAILURE',\n  failureType: 'testCodeFailure',\n  cause: AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  401 !== 200\n  \n      at TestContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\rd-radar.http.test.ts:159:14)\n      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n      at async Test.run (node:internal/test_runner/test:1409:7)\n      at async Suite.processPendingSubtests (node:internal/test_runner/test:974:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: 401,\n    expected: 200,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n}",
+    "parentHookErrorAndStack": null,
+    "skipReason": null,
+    "reason": "Test fabricates a signature-only cookie for a nonexistent fixture user, without a durable session or organization. Current database auth correctly rejects it with 401, before the asserted product operation. Read-only probes confirmed all three fixture users are absent and that signature extraction succeeds while durable validation returns 401 User not found.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:132",
+      "backend/src/auth/authz.guard.ts",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 85,
+    "test": "returns wrapped authenticated response for GET /api/rd-radar/github-sonic-preview",
+    "suite": "R&D Radar API smoke tests",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\rd-radar.http.test.ts",
+    "outcome": "FAILED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "R&D Radar HTTP fixtures",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: Expected values to be strictly equal:\n\n401 !== 200\n] {\n  code: 'ERR_TEST_FAILURE',\n  failureType: 'testCodeFailure',\n  cause: AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  401 !== 200\n  \n      at TestContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\rd-radar.http.test.ts:159:14)\n      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n      at async Test.run (node:internal/test_runner/test:1409:7)\n      at async Suite.processPendingSubtests (node:internal/test_runner/test:974:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: 401,\n    expected: 200,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n}",
+    "parentHookErrorAndStack": null,
+    "skipReason": null,
+    "reason": "Test fabricates a signature-only cookie for a nonexistent fixture user, without a durable session or organization. Current database auth correctly rejects it with 401, before the asserted product operation. Read-only probes confirmed all three fixture users are absent and that signature extraction succeeds while durable validation returns 401 User not found.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:132",
+      "backend/src/auth/authz.guard.ts",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 86,
+    "test": "returns safe status and evidence fields",
+    "suite": "R&D Radar API smoke tests",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\rd-radar.http.test.ts",
+    "outcome": "FAILED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "R&D Radar HTTP fixtures",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: Expected values to be strictly equal:\n\n401 !== 200\n] {\n  code: 'ERR_TEST_FAILURE',\n  failureType: 'testCodeFailure',\n  cause: AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  401 !== 200\n  \n      at TestContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\rd-radar.http.test.ts:172:12)\n      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n      at async Test.run (node:internal/test_runner/test:1409:7)\n      at async Suite.processPendingSubtests (node:internal/test_runner/test:974:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: 401,\n    expected: 200,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n}",
+    "parentHookErrorAndStack": null,
+    "skipReason": null,
+    "reason": "Test fabricates a signature-only cookie for a nonexistent fixture user, without a durable session or organization. Current database auth correctly rejects it with 401, before the asserted product operation. Read-only probes confirmed all three fixture users are absent and that signature extraction succeeds while durable validation returns 401 User not found.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:132",
+      "backend/src/auth/authz.guard.ts",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 87,
+    "test": "creates and reads evidence reviews",
+    "suite": "R&D Radar API smoke tests",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\rd-radar.http.test.ts",
+    "outcome": "FAILED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "R&D Radar HTTP fixtures",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: Expected values to be strictly equal:\n\n401 !== 201\n] {\n  code: 'ERR_TEST_FAILURE',\n  failureType: 'testCodeFailure',\n  cause: AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  401 !== 201\n  \n      at TestContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\rd-radar.http.test.ts:190:12)\n      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n      at async Test.run (node:internal/test_runner/test:1409:7)\n      at async Suite.processPendingSubtests (node:internal/test_runner/test:974:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: 401,\n    expected: 201,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n}",
+    "parentHookErrorAndStack": null,
+    "skipReason": null,
+    "reason": "Test fabricates a signature-only cookie for a nonexistent fixture user, without a durable session or organization. Current database auth correctly rejects it with 401, before the asserted product operation. Read-only probes confirmed all three fixture users are absent and that signature extraction succeeds while durable validation returns 401 User not found.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:132",
+      "backend/src/auth/authz.guard.ts",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 88,
+    "test": "returns repository previews as read-only",
+    "suite": "R&D Radar API smoke tests",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\rd-radar.http.test.ts",
+    "outcome": "FAILED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "R&D Radar HTTP fixtures",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: Expected values to be strictly equal:\n\n401 !== 200\n] {\n  code: 'ERR_TEST_FAILURE',\n  failureType: 'testCodeFailure',\n  cause: AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  401 !== 200\n  \n      at TestContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\rd-radar.http.test.ts:206:12)\n      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n      at async Test.run (node:internal/test_runner/test:1409:7)\n      at async Suite.processPendingSubtests (node:internal/test_runner/test:974:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: 401,\n    expected: 200,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n}",
+    "parentHookErrorAndStack": null,
+    "skipReason": null,
+    "reason": "Test fabricates a signature-only cookie for a nonexistent fixture user, without a durable session or organization. Current database auth correctly rejects it with 401, before the asserted product operation. Read-only probes confirmed all three fixture users are absent and that signature extraction succeeds while durable validation returns 401 User not found.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:132",
+      "backend/src/auth/authz.guard.ts",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 89,
+    "test": "creates candidate and PM decision responses",
+    "suite": "R&D Radar API smoke tests",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\rd-radar.http.test.ts",
+    "outcome": "FAILED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "R&D Radar HTTP fixtures",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: Expected values to be strictly equal:\n\n401 !== 201\n] {\n  code: 'ERR_TEST_FAILURE',\n  failureType: 'testCodeFailure',\n  cause: AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  401 !== 201\n  \n      at TestContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\rd-radar.http.test.ts:221:12)\n      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n      at async Test.run (node:internal/test_runner/test:1409:7)\n      at async Suite.processPendingSubtests (node:internal/test_runner/test:974:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: 401,\n    expected: 201,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n}",
+    "parentHookErrorAndStack": null,
+    "skipReason": null,
+    "reason": "Test fabricates a signature-only cookie for a nonexistent fixture user, without a durable session or organization. Current database auth correctly rejects it with 401, before the asserted product operation. Read-only probes confirmed all three fixture users are absent and that signature extraction succeeds while durable validation returns 401 User not found.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:132",
+      "backend/src/auth/authz.guard.ts",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 90,
+    "test": "handles real input and workflow summaries with authenticated PM session",
+    "suite": "R&D Radar API smoke tests",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\rd-radar.http.test.ts",
+    "outcome": "FAILED",
+    "classification": "TEST_INFRASTRUCTURE",
+    "affectedModule": "R&D Radar HTTP fixtures",
+    "errorAndStack": "[Error [ERR_TEST_FAILURE]: Expected values to be strictly equal:\n\n401 !== 201\n] {\n  code: 'ERR_TEST_FAILURE',\n  failureType: 'testCodeFailure',\n  cause: AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  401 !== 201\n  \n      at TestContext.<anonymous> (D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\rd-radar.http.test.ts:247:12)\n      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n      at async Test.run (node:internal/test_runner/test:1409:7)\n      at async Suite.processPendingSubtests (node:internal/test_runner/test:974:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: 401,\n    expected: 201,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n}",
+    "parentHookErrorAndStack": null,
+    "skipReason": null,
+    "reason": "Test fabricates a signature-only cookie for a nonexistent fixture user, without a durable session or organization. Current database auth correctly rejects it with 401, before the asserted product operation. Read-only probes confirmed all three fixture users are absent and that signature extraction succeeds while durable validation returns 401 User not found.",
+    "evidence": [
+      "backend/audit/post-runtime-fixtures.test.ts",
+      "backend/src/auth/auth.service.ts:132",
+      "backend/src/auth/authz.guard.ts",
+      "backend/.runtime-state/post-audit-fixtures.tap"
+    ]
+  },
+  {
+    "id": 91,
+    "test": "runtime ledger and authorization against PostgreSQL",
+    "suite": "test",
+    "file": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\backend\\test\\trusted-runtime-persistence.test.ts",
+    "outcome": "SKIPPED",
+    "classification": "ENVIRONMENT_DEPENDENT",
+    "affectedModule": "Opt-in PostgreSQL runtime integration suite",
+    "errorAndStack": "",
+    "parentHookErrorAndStack": null,
+    "skipReason": "SEKHEM_RUNTIME_DB_TEST !== 1 (boolean skip; reporter emits no stack)",
+    "reason": "Full run explicitly leaves SEKHEM_RUNTIME_DB_TEST unset. This is intentional opt-in coverage, not an executed failure. The complete runtime suite was subsequently run with the flag set and passed.",
+    "evidence": [
+      "backend/test/trusted-runtime-persistence.test.ts:28",
+      "backend/.runtime-state/post-audit-runtime.tap"
+    ]
+  }
+]

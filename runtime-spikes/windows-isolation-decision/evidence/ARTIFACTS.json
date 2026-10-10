@@ -1,0 +1,90 @@
+{
+  "excludesSelf": true,
+  "files": [
+    {
+      "path": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\runtime-spikes\\windows-isolation-decision\\.gitignore",
+      "bytes": 7,
+      "sha256": "181314065DF2F2FDAF920B1A8B5311DAA216A2D6489A06ADA5B49CC514D89417"
+    },
+    {
+      "path": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\runtime-spikes\\windows-isolation-decision\\build.ps1",
+      "bytes": 1525,
+      "sha256": "71823098E901889EFEB8F3BE75D3BCC26A9A4B238B9F7B457B22AEA93278E7A8"
+    },
+    {
+      "path": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\runtime-spikes\\windows-isolation-decision\\build\\confinement.obj",
+      "bytes": 577928,
+      "sha256": "71B20CC7C19296C753FEE77D45E72246CEDB33722BB38E52D366EBDDF4DE51F3"
+    },
+    {
+      "path": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\runtime-spikes\\windows-isolation-decision\\build\\isolation-decision.exe",
+      "bytes": 495104,
+      "sha256": "2339383786E3889CE1BB960A5D3B0BA70C05053ECBA698D4AEA40FBEA5F5E0EC"
+    },
+    {
+      "path": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\runtime-spikes\\windows-isolation-decision\\build\\isolation-decision.obj",
+      "bytes": 1796418,
+      "sha256": "764193A89620616D23EFB1B2EC5E8F2661229E59E4EC942BB2298DABC8EC7CED"
+    },
+    {
+      "path": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\runtime-spikes\\windows-isolation-decision\\build\\manifest.json",
+      "bytes": 981,
+      "sha256": "FE2A5DE72BA5263EA473870593B06F2E56FE4D2516CE0E8AAE62A7B8CFFEE1AE"
+    },
+    {
+      "path": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\runtime-spikes\\windows-isolation-decision\\DECISION.md",
+      "bytes": 8527,
+      "sha256": "30194448A074C4E0460487FEF434527F6F685DDD387CBC6253375633CE78804E"
+    },
+    {
+      "path": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\runtime-spikes\\windows-isolation-decision\\evidence\\host-block.json",
+      "bytes": 688,
+      "sha256": "8B61F5A3A0FECD990DC68E50CEC706DBBD82AA410A6B0252B903D7D3CFF9ADB5"
+    },
+    {
+      "path": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\runtime-spikes\\windows-isolation-decision\\evidence\\protected-boundaries.json",
+      "bytes": 278,
+      "sha256": "101BA16E55CACE18D93750610D0A6284407509BB45BB79FFB14F991C31729FA1"
+    },
+    {
+      "path": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\runtime-spikes\\windows-isolation-decision\\evidence\\run-20360-102166171\\fixture-location.txt",
+      "bytes": 73,
+      "sha256": "367A5604B932BA124CC2EDFCCF0B370AC0DA5F44EFF85D169BE11F2D8DA2A557"
+    },
+    {
+      "path": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\runtime-spikes\\windows-isolation-decision\\evidence\\run-20360-102166171\\observations.jsonl",
+      "bytes": 243,
+      "sha256": "CA79D6A92960444E7F879FD809AD59CC752BD95D48D507C7F4BFEDC3CD158582"
+    },
+    {
+      "path": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\runtime-spikes\\windows-isolation-decision\\evidence\\run-20360-102166171\\races.jsonl",
+      "bytes": 0,
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    {
+      "path": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\runtime-spikes\\windows-isolation-decision\\evidence\\run-20360-102166171\\tests.jsonl",
+      "bytes": 246,
+      "sha256": "2E1AC510F810F71478A69443D77B73B8E37BDAEEE46A9234F5B0E49934444A68"
+    },
+    {
+      "path": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\runtime-spikes\\windows-isolation-decision\\fixture-support.hpp",
+      "bytes": 7471,
+      "sha256": "1E8CC8D6253DC0E0D802868A2DFF38DC654A194494303150595761EC91930D1F"
+    },
+    {
+      "path": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\runtime-spikes\\windows-isolation-decision\\isolation-decision.cpp",
+      "bytes": 27707,
+      "sha256": "DCCFC0189F2797FAD23B885458E944BA2FFBED348CD8832969DB42F291093684"
+    },
+    {
+      "path": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\runtime-spikes\\windows-isolation-decision\\README.md",
+      "bytes": 1355,
+      "sha256": "3B326679CBBFE5329BF0575C1B2CA1135CFF31A1A9C2CA9BBDF65A6BAD1B1CA3"
+    },
+    {
+      "path": "D:\\yy\\yy\\sekhem-product-application-main\\sekhem-product-application-main\\runtime-spikes\\windows-isolation-decision\\run.ps1",
+      "bytes": 261,
+      "sha256": "1C8AAF01DE10518242FEAEA30E6D10B7375F15CAF6C1B0977BFBB560D2B9E5E2"
+    }
+  ]
+}

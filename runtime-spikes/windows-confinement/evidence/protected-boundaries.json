@@ -1,0 +1,13 @@
+{
+  "method": "SHA-256 before/after content comparison",
+  "beforeFiles": 1941,
+  "afterFiles": 1941,
+  "changed": [],
+  "excluded": ["node_modules", ".git", ".next", ".pnpm-store", "runtime-spikes", "symbolic links"],
+  "productionIntegration": false,
+  "databaseOperations": false,
+  "providerCalls": false,
+  "finalRun": "run-21492-99761515",
+  "nativeBuildSucceeded": true,
+  "nativeSuiteExitCode": 1
+}

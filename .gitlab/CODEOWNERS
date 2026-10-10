@@ -1,0 +1,10 @@
+# Proposed GitLab groups. Create these private groups before enforcing approvals.
+* @sekhem/owners
+/backend/src/auth/ @sekhem/security @sekhem/owners
+/backend/src/ai-gateway/ @sekhem/ai-platform @sekhem/security
+/backend/src/repository-source/ @sekhem/ai-platform @sekhem/security
+/backend/prisma/ @sekhem/database @sekhem/security
+/.gitlab-ci.yml @sekhem/platform @sekhem/security
+/.github/workflows/ @sekhem/platform @sekhem/security
+/docs/operations/ @sekhem/platform
+/docs/security/ @sekhem/security

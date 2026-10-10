@@ -1,0 +1,15 @@
+{
+  "repository": {
+    "beforeFiles": 1941,
+    "afterFiles": 1941,
+    "changes": []
+  },
+  "originalReproducer": {
+    "beforeFiles": 39,
+    "afterFiles": 39,
+    "changes": []
+  },
+  "productionIntegration": false,
+  "providerCalls": false,
+  "databaseOperations": false
+}

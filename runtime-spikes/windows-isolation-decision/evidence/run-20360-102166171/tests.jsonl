@@ -1,0 +1,3 @@
+{"test":"B workspace ACL inherited by source file","result":"PASS","detail":"OK"}
+{"test":"B outside file has no inherited workspace grant","result":"PASS","detail":"OK"}
+{"test":"A process launch","result":"SKIP","detail":"CREATE_PROCESS_2"}

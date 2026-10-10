@@ -1,0 +1,70 @@
+# v0 sandbox internal files
+__v0_runtime_loader.js
+__v0_devtools.tsx
+__v0_jsx-dev-runtime.ts
+.snowflake/
+.v0-trash/
+.vercel/
+
+# Environment variables
+.env
+.env.*
+.env*.local
+backend/.env
+backend/.env.*
+!.env.example
+!backend/.env.example
+
+# Common ignores
+node_modules
+.next/
+.DS_Store
+tsconfig.tsbuildinfo
+*.tsbuildinfo
+backend/.runtime-state/
+runtime-windows/out/
+.v0/
+
+public/runtime/*.exe
+
+# Product Authenticode private material must never be committed.
+*.pfx
+*.p12
+*.pem.key
+*.key.pem
+
+# Generated local validation and build artifacts.
+*.log
+dist/
+backend/dist/
+.pnpm-store/
+mvp-*.jpg
+mvp-http-timing.json
+
+# Local evidence, snapshots and exploratory scripts are not source releases.
+storage/
+scratch/
+.phase*-acceptance*/
+.workspace-acceptance*/
+phase-f-rerun*/
+*.jpg
+backend_diags.txt
+backend_typecheck.txt
+frontend_diags.txt
+compile_errors.txt
+tsc_full_output.txt
+tsc-errors.txt
+typecheck_output.txt
+scratch_db.js
+
+# Generated comprehensive lint report
+mvp-comprehensive-lint.json
+
+# Local diagnostic and temporary scripts
+/backend/temp.js
+/backend/temp_events.js
+/backend/updatePassword.js
+/backend/updatePassword.ts
+
+# Generated local reports
+/mvp-comprehensive-lint.json

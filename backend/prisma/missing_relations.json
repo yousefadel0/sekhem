@@ -1,0 +1,218 @@
+[
+  {
+    "fromModel": "Project",
+    "relField": "group",
+    "toModel": "Group",
+    "config": "fields: [groupId], references: [id]"
+  },
+  {
+    "fromModel": "Project",
+    "relField": "organization",
+    "toModel": "Organization",
+    "config": "fields: [organizationId], references: [id]"
+  },
+  {
+    "fromModel": "Module",
+    "relField": "project",
+    "toModel": "Project",
+    "config": "fields: [projectId], references: [id]"
+  },
+  {
+    "fromModel": "LockedModule",
+    "relField": "module",
+    "toModel": "Module",
+    "config": "fields: [moduleId], references: [id]"
+  },
+  {
+    "fromModel": "Initiative",
+    "relField": "project",
+    "toModel": "Project",
+    "config": "fields: [projectId], references: [id]"
+  },
+  {
+    "fromModel": "Initiative",
+    "relField": "module",
+    "toModel": "Module",
+    "config": "fields: [moduleId], references: [id]"
+  },
+  {
+    "fromModel": "EvidenceSource",
+    "relField": "initiative",
+    "toModel": "Initiative",
+    "config": "fields: [initiativeId], references: [id]"
+  },
+  {
+    "fromModel": "ExecutionPath",
+    "relField": "initiative",
+    "toModel": "Initiative",
+    "config": "fields: [initiativeId], references: [id]"
+  },
+  {
+    "fromModel": "Task",
+    "relField": "initiative",
+    "toModel": "Initiative",
+    "config": "fields: [initiativeId], references: [id]"
+  },
+  {
+    "fromModel": "ActivityEvent",
+    "relField": "initiative",
+    "toModel": "Initiative",
+    "config": "fields: [initiativeId], references: [id]"
+  },
+  {
+    "fromModel": "Approval",
+    "relField": "project",
+    "toModel": "Project",
+    "config": "fields: [projectId], references: [id]"
+  },
+  {
+    "fromModel": "Approval",
+    "relField": "initiative",
+    "toModel": "Initiative",
+    "config": "fields: [initiativeId], references: [id]"
+  },
+  {
+    "fromModel": "TechnicalMemo",
+    "relField": "initiative",
+    "toModel": "Initiative",
+    "config": "fields: [initiativeId], references: [id]"
+  },
+  {
+    "fromModel": "CodeDraftWorkspace",
+    "relField": "initiative",
+    "toModel": "Initiative",
+    "config": "fields: [initiativeId], references: [id]"
+  },
+  {
+    "fromModel": "SandboxedArtifact",
+    "relField": "workspace",
+    "toModel": "CodeDraftWorkspace",
+    "config": "fields: [workspaceId], references: [id]"
+  },
+  {
+    "fromModel": "SecurityGate",
+    "relField": "initiative",
+    "toModel": "Initiative",
+    "config": "fields: [initiativeId], references: [id]"
+  },
+  {
+    "fromModel": "SecurityCheck",
+    "relField": "securityGate",
+    "toModel": "SecurityGate",
+    "config": "fields: [securityGateId], references: [id]"
+  },
+  {
+    "fromModel": "SecurityFinding",
+    "relField": "securityGate",
+    "toModel": "SecurityGate",
+    "config": "fields: [securityGateId], references: [id]"
+  },
+  {
+    "fromModel": "Blocker",
+    "relField": "project",
+    "toModel": "Project",
+    "config": "fields: [projectId], references: [id]"
+  },
+  {
+    "fromModel": "Blocker",
+    "relField": "initiative",
+    "toModel": "Initiative",
+    "config": "fields: [initiativeId], references: [id]"
+  },
+  {
+    "fromModel": "ReleaseCandidate",
+    "relField": "initiative",
+    "toModel": "Initiative",
+    "config": "fields: [initiativeId], references: [id]"
+  },
+  {
+    "fromModel": "ReleaseArtifact",
+    "relField": "releaseCandidate",
+    "toModel": "ReleaseCandidate",
+    "config": "fields: [releaseCandidateId], references: [id]"
+  },
+  {
+    "fromModel": "ReleaseApprovalChecklistItem",
+    "relField": "releaseCandidate",
+    "toModel": "ReleaseCandidate",
+    "config": "fields: [releaseCandidateId], references: [id]"
+  },
+  {
+    "fromModel": "RollbackPlan",
+    "relField": "releaseCandidate",
+    "toModel": "ReleaseCandidate",
+    "config": "fields: [releaseCandidateId], references: [id]"
+  },
+  {
+    "fromModel": "RDSignal",
+    "relField": "project",
+    "toModel": "Project",
+    "config": "fields: [projectId], references: [id]"
+  },
+  {
+    "fromModel": "ServiceStatus",
+    "relField": "node",
+    "toModel": "InfrastructureNode",
+    "config": "fields: [nodeId], references: [id]"
+  },
+  {
+    "fromModel": "RepositoryPreview",
+    "relField": "project",
+    "toModel": "Project",
+    "config": "fields: [projectId], references: [id]"
+  },
+  {
+    "fromModel": "WorkflowPreview",
+    "relField": "project",
+    "toModel": "Project",
+    "config": "fields: [projectId], references: [id]"
+  },
+  {
+    "fromModel": "KnowledgeDocument",
+    "relField": "project",
+    "toModel": "Project",
+    "config": "fields: [projectId], references: [id]"
+  },
+  {
+    "fromModel": "SupportRequest",
+    "relField": "project",
+    "toModel": "Project",
+    "config": "fields: [projectId], references: [id]"
+  },
+  {
+    "fromModel": "SupportArticle",
+    "relField": "project",
+    "toModel": "Project",
+    "config": "fields: [projectId], references: [id]"
+  },
+  {
+    "fromModel": "User",
+    "relField": "organizationRef",
+    "toModel": "Organization",
+    "config": "fields: [organizationId], references: [id]"
+  },
+  {
+    "fromModel": "UserRole",
+    "relField": "user",
+    "toModel": "User",
+    "config": "fields: [userId], references: [id]"
+  },
+  {
+    "fromModel": "UserRole",
+    "relField": "role",
+    "toModel": "Role",
+    "config": "fields: [roleId], references: [id]"
+  },
+  {
+    "fromModel": "RolePermission",
+    "relField": "role",
+    "toModel": "Role",
+    "config": "fields: [roleId], references: [id]"
+  },
+  {
+    "fromModel": "RolePermission",
+    "relField": "permission",
+    "toModel": "Permission",
+    "config": "fields: [permissionId], references: [id]"
+  }
+]

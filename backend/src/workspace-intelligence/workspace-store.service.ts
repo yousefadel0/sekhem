@@ -1,0 +1,166 @@
+import { ConflictException, Inject, Injectable, ServiceUnavailableException } from "@nestjs/common";
+import { PrismaService } from "../data-access/prisma.service";
+import { isRecord, toolDigest } from "../agent-runtime/tools/tool-contract";
+import { boundedRuntime, RUNTIME_LIMITS, type RuntimeExecution } from "../trusted-runtime/runtime.contract";
+import { RuntimeLedgerService } from "../trusted-runtime/runtime-ledger.service";
+import { WORKSPACE_PRIVATE_MODULE, type WorkspaceBinding, type WorkspaceOperation, type RuntimeEvidenceRequest, type RuntimeEvidenceReference } from "./workspace-runtime.contract";
+
+type RecordKind = "binding" | "active" | "history" | "operation" | "operationRun" | "evidenceRequest" | "evidenceReceipt";
+interface Stored<T> { format: 1; kind: RecordKind; keyDigest: string; revision: number; payloadDigest: string; payload: T }
+export const workspaceRecordId = (kind: RecordKind, key: unknown) => `ws1_${kind}_${toolDigest(key)}`;
+@Injectable()
+export class WorkspaceStoreService {
+  constructor(@Inject(PrismaService) private readonly db: PrismaService) {}
+  private transaction<T>(work: (tx: any) => Promise<T>): Promise<T> {
+    return this.db.$transaction(async tx => {
+      // Separate namespace/control lock; no runtime record or locking semantics are changed.
+      await tx.$executeRawUnsafe("SELECT pg_advisory_xact_lock(1936026472, 1953657906)");
+      return work(tx);
+    }, { maxWait: 10000, timeout: 20000 });
+  }
+  private decode<T>(row: any, kind: RecordKind, key?: unknown): Stored<T> {
+    const r = row?.metadata; boundedRuntime(r);
+    if (row?.module !== WORKSPACE_PRIVATE_MODULE || r?.format !== 1 || r.kind !== kind || row.id !== `ws1_${kind}_${r.keyDigest}` || !Number.isSafeInteger(r.revision) || r.revision < 1 ||
+      r.payloadDigest !== toolDigest(r.payload) || (key !== undefined && (r.keyDigest !== toolDigest(key) || row.id !== workspaceRecordId(kind, key)))) throw new ServiceUnavailableException("WORKSPACE_STORE_CORRUPT");
+    return structuredClone(r);
+  }
+  private async read<T>(tx: any, kind: RecordKind, key: unknown): Promise<Stored<T> | null> {
+    const row = await tx.auditEvent.findUnique({ where: { id: workspaceRecordId(kind, key) } });
+    return row ? this.decode<T>(row, kind, key) : null;
+  }
+  private async create<T>(tx: any, kind: RecordKind, key: unknown, payload: T, route: unknown = key) {
+    boundedRuntime(payload); const prior = await this.read<T>(tx, kind, key);
+    if (prior) { if (prior.payloadDigest !== toolDigest(payload)) throw new ConflictException("WORKSPACE_RECORD_CONFLICT"); return prior; }
+    const record: Stored<T> = { format: 1, kind, keyDigest: toolDigest(key), revision: 1, payloadDigest: toolDigest(payload), payload };
+    await tx.auditEvent.create({ data: { id: workspaceRecordId(kind, key), module: WORKSPACE_PRIVATE_MODULE, action: `workspace.${kind}:${toolDigest(route)}`,
+      projectId: null, initiativeId: null, actor: "workspace-store", actorType: "system", target: "private-workspace-record", metadata: record, description: "Private workspace record", sourceType: "manual", riskLevel: "low" } });
+    return record;
+  }
+  private async replace<T>(tx: any, kind: "binding" | "active", key: unknown, prior: Stored<T>, payload: T) {
+    boundedRuntime(payload);
+    const next = { ...prior, revision: prior.revision + 1, payloadDigest: toolDigest(payload), payload };
+    const result = await tx.auditEvent.updateMany({ where: { id: workspaceRecordId(kind, key), module: WORKSPACE_PRIVATE_MODULE, metadata: { path: ["revision"], equals: prior.revision } }, data: { metadata: next } });
+    if (result.count !== 1) throw new ConflictException("WORKSPACE_RECORD_CHANGED");
+    await this.create(tx, "history", [kind, key, next.revision], next);
+    return payload;
+  }
+  async createBinding(input: Omit<WorkspaceBinding, "workspaceId" | "version" | "revision" | "status" | "verifiedAt" | "verificationReceiptId" | "createdAt" | "updatedAt">, requestId: string) {
+    const key = [input.organizationId, input.userId, input.projectId, requestId], workspaceId = `workspace_${toolDigest(key)}`;
+    return this.transaction(async tx => {
+      const prior = await this.read<WorkspaceBinding>(tx, "binding", workspaceId);
+      if (prior) {
+        for (const field of Object.keys(input) as Array<keyof typeof input>) if (prior.payload[field] !== input[field]) throw new ConflictException("WORKSPACE_CREATION_CONFLICT");
+        return prior.payload;
+      }
+      const now = new Date().toISOString();
+      const activeKey = [input.organizationId, input.userId, input.projectId], active = await this.read<{ workspaceId: string; bindingVersion: number }>(tx, "active", activeKey);
+      if (active) {
+        const current = await this.read<WorkspaceBinding>(tx, "binding", active.payload.workspaceId);
+        if (!current) throw new ServiceUnavailableException("WORKSPACE_STORE_CORRUPT");
+        if (["userId", "organizationId", "projectId", "runtimeId", "runtimeFingerprint", "rootPath"].every(field => (current.payload as any)[field] === (input as any)[field])) return current.payload;
+      }
+      const binding: WorkspaceBinding = { ...input, workspaceId, version: (active?.payload.bindingVersion ?? 0) + 1, revision: 1, status: "VERIFYING", verifiedAt: null, verificationReceiptId: null, createdAt: now, updatedAt: now };
+      const row = await this.create(tx, "binding", workspaceId, binding, [input.organizationId, input.userId, input.projectId]);
+      await this.create(tx, "history", ["binding", workspaceId, 1], row);
+      const reference = { workspaceId, bindingVersion: binding.version };
+      if (active) await this.replace(tx, "active", activeKey, active, reference);
+      else { const head = await this.create(tx, "active", activeKey, reference); await this.create(tx, "history", ["active", activeKey, 1], head); }
+      return binding;
+    });
+  }
+  async getBinding(id: string): Promise<WorkspaceBinding | null> { return this.transaction(async tx => (await this.read<WorkspaceBinding>(tx, "binding", id))?.payload ?? null); }
+  /** Same binding lock used by create/replace, held until runtime dispatch commits. */
+  async assertInspectionBindingTx(tx: any, expected: { workspaceId: string; bindingVersion: number; runtimeId: string; runtimeFingerprint: string; rootPath: string; userId: string; organizationId: string; projectId: string }) {
+    await tx.$executeRawUnsafe("SELECT pg_advisory_xact_lock(1936026472, 1953657906)");
+    const b = (await this.read<WorkspaceBinding>(tx, "binding", expected.workspaceId))?.payload;
+    const active = (await this.read<{ workspaceId: string; bindingVersion: number }>(tx, "active", [expected.organizationId, expected.userId, expected.projectId]))?.payload;
+    if (!b || b.status !== "READY" || !b.verifiedAt || b.workspaceId !== active?.workspaceId || b.version !== active.bindingVersion || b.version !== expected.bindingVersion ||
+      ["userId", "organizationId", "projectId", "runtimeId", "runtimeFingerprint", "rootPath"].some(k => (b as any)[k] !== (expected as any)[k])) throw new ConflictException("WORKSPACE_BINDING_STALE");
+    return b;
+  }
+  async activeBindingTx(tx: any, userId: string, projectId: string, organizationId: string) {
+    const active = (await this.read<{ workspaceId: string }>(tx, "active", [organizationId, userId, projectId]))?.payload;
+    return active ? (await this.read<WorkspaceBinding>(tx, "binding", active.workspaceId))?.payload ?? null : null;
+  }
+  async saveInspectionTx(tx: any, operation: WorkspaceOperation, request: RuntimeEvidenceRequest) {
+    await tx.$executeRawUnsafe("SELECT pg_advisory_xact_lock(1936026472, 1953657906)");
+    await this.create(tx, "operation", operation.operationId, operation, operation.workspaceId);
+    await this.create(tx, "evidenceRequest", request.requestId, request);
+  }
+  async getActiveBinding(userId: string, projectId: string, organizationId: string): Promise<WorkspaceBinding | null> {
+    return this.transaction(async tx => { const active = await this.read<{ workspaceId: string }>(tx, "active", [organizationId, userId, projectId]);
+      if (!active) return null;
+      const binding = await this.read<WorkspaceBinding>(tx, "binding", active.payload.workspaceId);
+      if (!binding) throw new ServiceUnavailableException("WORKSPACE_STORE_CORRUPT"); return binding.payload; });
+  }
+  /** Historical folder metadata only. This method never reads source or dispatches a runtime operation. */
+  async visibility(userId: string, projectId: string, organizationId: string) {
+    return this.transaction(async tx => {
+      const binding = await this.activeBindingTx(tx, userId, projectId, organizationId);
+      if (!binding) return { binding: null, listing: null };
+      if (binding.userId !== userId || binding.projectId !== projectId || binding.organizationId !== organizationId) throw new ConflictException("WORKSPACE_BINDING_STALE");
+      const row = binding.verificationReceiptId ? await tx.auditEvent.findUnique({ where: { id: binding.verificationReceiptId } }) : null;
+      if (!row) return { binding, listing: null };
+      const e = new RuntimeLedgerService(tx).decode<RuntimeExecution>(row, "RUNTIME_EXECUTION").payload;
+      const a = e.attribution, r = e.result;
+      if (a.userId !== userId || a.organizationId !== organizationId || a.projectId !== projectId || a.runtimeId !== binding.runtimeId ||
+        a.executionId !== binding.verificationReceiptId || a.tool !== "filesystem.list" || a.validatedInput.path !== binding.rootPath ||
+        e.state !== "SUCCEEDED" || e.verificationState !== "VERIFIED" || !r || r.executionId !== a.executionId || r.operationDigest !== a.operationDigest ||
+        r.result.path !== binding.rootPath || !Array.isArray(r.result.entries) || r.result.entries.length > RUNTIME_LIMITS.entries) return { binding, listing: null };
+      const entries = r.result.entries.flatMap((entry: unknown) => {
+        if (!isRecord(entry) || typeof entry.name !== "string" || typeof entry.type !== "string" ||
+          /[\\/]/.test(entry.name) || [...entry.name].some(character => character.charCodeAt(0) < 32) ||
+          !["file", "directory", "other"].includes(entry.type)) return [];
+        return [{ name: entry.name, type: entry.type }];
+      });
+      return { binding, listing: { entries, observedAt: r.finishedAt, truncated: r.truncated } };
+    });
+  }
+  async listBindings(userId: string, projectId: string, organizationId: string): Promise<WorkspaceBinding[]> {
+    return this.transaction(async tx => (await tx.auditEvent.findMany({ where: { module: WORKSPACE_PRIVATE_MODULE, action: `workspace.binding:${toolDigest([organizationId, userId, projectId])}` }, orderBy: { createdAt: "desc" }, take: 100 }))
+      .map((row: any) => this.decode<WorkspaceBinding>(row, "binding").payload));
+  }
+  /** A folder/device change creates a new binding. These immutable coordinates never retarget an old proposal. */
+  async updateBinding(id: string, revision: number, patch: Pick<WorkspaceBinding, "status"> & Partial<Pick<WorkspaceBinding, "verifiedAt" | "verificationReceiptId">>) {
+    return this.transaction(async tx => {
+      if (Object.keys(patch).some(k => !["status", "verifiedAt", "verificationReceiptId"].includes(k))) throw new ConflictException("WORKSPACE_TARGET_IMMUTABLE");
+      const prior = await this.read<WorkspaceBinding>(tx, "binding", id);
+      if (!prior || prior.revision !== revision) throw new ConflictException("WORKSPACE_RECORD_CHANGED");
+      return this.replace(tx, "binding", id, prior, { ...prior.payload, ...patch, revision: revision + 1, updatedAt: new Date().toISOString() });
+    });
+  }
+  async verifyBinding(binding: WorkspaceBinding, receiptId: string, verifiedAt: string) {
+    if (binding.status === "READY" && binding.verificationReceiptId === receiptId) return binding;
+    return this.updateBinding(binding.workspaceId, binding.revision, { status: "READY", verificationReceiptId: receiptId, verifiedAt });
+  }
+  async saveOperation(operation: WorkspaceOperation) { return this.transaction(async tx => {
+    const prior = await this.read<WorkspaceOperation>(tx, "operation", operation.operationId);
+    if (prior) { const old = omitFields(prior.payload, ["createdAt"]), next = omitFields(operation, ["createdAt"]);
+      if (toolDigest(old) !== toolDigest(next)) throw new ConflictException("WORKSPACE_OPERATION_CONFLICT"); return prior.payload; }
+    await this.create(tx, "operationRun", operation.runId, { operationId: operation.operationId });
+    return (await this.create(tx, "operation", operation.operationId, operation, operation.workspaceId)).payload;
+  }); }
+  async getOperation(id: string): Promise<WorkspaceOperation | null> { return this.transaction(async tx => (await this.read<WorkspaceOperation>(tx, "operation", id))?.payload ?? null); }
+  async saveEvidenceRequest(request: RuntimeEvidenceRequest) { return this.transaction(async tx => (await this.create(tx, "evidenceRequest", request.requestId, request)).payload); }
+  async getEvidenceRequest(id: string) { return this.transaction(async tx => (await this.read<RuntimeEvidenceRequest>(tx, "evidenceRequest", id))?.payload ?? null); }
+  async saveEvidenceReceipt(reference: RuntimeEvidenceReference) { return this.transaction(async tx => (await this.create(tx, "evidenceReceipt", reference.requestId, reference)).payload); }
+  async getEvidenceReceipt(id: string) { return this.transaction(async tx => (await this.read<RuntimeEvidenceReference>(tx, "evidenceReceipt", id))?.payload ?? null); }
+  /** UI observations never implicitly enter model history. The private association, not message-supplied metadata, identifies these runs. */
+  async modelMessages<T extends { metadata?: any }>(messages: T[]): Promise<T[]> {
+    return this.transaction(tx => this.modelMessagesTx(tx, messages));
+  }
+  async modelMessagesTx<T extends { metadata?: any }>(tx: any, messages: T[]): Promise<T[]> {
+      const result: T[] = [];
+      for (const message of messages) {
+        const runId = message.metadata?.agentRunId;
+        if (typeof runId === "string" && await this.read(tx, "operationRun", runId)) continue;
+        result.push(message);
+      }
+      return result;
+  }
+  async listOperations(workspaceId: string): Promise<WorkspaceOperation[]> {
+    return this.transaction(async tx => (await tx.auditEvent.findMany({ where: { module: WORKSPACE_PRIVATE_MODULE, action: `workspace.operation:${toolDigest(workspaceId)}` }, orderBy: { createdAt: "desc" }, take: 100 }))
+      .map((row: any) => this.decode<WorkspaceOperation>(row, "operation").payload));
+  }
+}
+import { omitFields } from "../common/omit-fields";

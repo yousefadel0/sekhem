@@ -1,0 +1,127 @@
+{
+  "name": "SEKHEM Production Track - R&D Radar WorkflowRunSummary Contract",
+  "id": "prodTrackRdRadar0520112154",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "manual-internal-trigger",
+      "name": "Manual Internal Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{ json: { workflowId: 'prodTrackRdRadar0520112154', workflowName: 'SEKHEM Production Track - R&D Radar WorkflowRunSummary Contract', contractVersion: '1.0.0', triggerType: 'manual/internal', workflowStatus: 'PASS', evidenceCount: 3, reviewStatus: 'PASS', candidateId: 'candidate-csf-guided-risk-assessment-001', nextGate: 'PM_REVIEW_REQUIRED', runtimeVerificationRequired: true, forbiddenActionsObserved: false, source: 'n8n/manual-internal', executedAt: new Date().toISOString() } }];"
+      },
+      "id": "build-workflow-run-summary",
+      "name": "Build Sanitized WorkflowRunSummary",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        520,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => ({ json: { workflowId: item.json.workflowId, workflowStatus: item.json.workflowStatus, evidenceCount: item.json.evidenceCount, reviewStatus: item.json.reviewStatus, candidateId: item.json.candidateId, nextGate: item.json.nextGate, runtimeVerificationRequired: item.json.runtimeVerificationRequired, forbiddenActionsObserved: item.json.forbiddenActionsObserved, source: item.json.source, executedAt: item.json.executedAt } }));"
+      },
+      "id": "build-backend-callback-payload",
+      "name": "Build Backend Callback Payload",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        800,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.SEKHEM_BACKEND_CALLBACK_BASE_URL + '/api/rd-radar/workflow-runs' }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json) }}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": false,
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "post-backend-workflow-run-summary",
+      "name": "POST /api/rd-radar/workflow-runs",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1080,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Manual Internal Trigger": {
+      "main": [
+        [
+          {
+            "node": "Build Sanitized WorkflowRunSummary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Sanitized WorkflowRunSummary": {
+      "main": [
+        [
+          {
+            "node": "Build Backend Callback Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Backend Callback Payload": {
+      "main": [
+        [
+          {
+            "node": "POST /api/rd-radar/workflow-runs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "pinData": {},
+  "versionId": "sanitized-contract-v1",
+  "meta": {
+    "contractVersion": "1.0.0",
+    "triggerType": "manual/internal",
+    "sanitizedExport": true,
+    "callbackBaseUrl": "SEKHEM_BACKEND_CALLBACK_BASE_URL"
+  },
+  "tags": [
+    {
+      "name": "rd-radar"
+    },
+    {
+      "name": "workflow-run-summary"
+    },
+    {
+      "name": "sanitized-contract"
+    }
+  ]
+}

@@ -1,0 +1,1430 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// SSH configuration is deliberately separate from local RuntimeGrant and AgentRun authority.
+model SshTarget {
+  id             String @id
+  projectId      String
+  organizationId String
+  ownerId        String
+  version        Int
+  project        Project @relation(fields: [projectId], references: [id], onDelete: Restrict)
+  revisions      SshTargetRevision[]
+  validations    SshConnectionValidation[]
+  @@index([projectId, organizationId])
+}
+
+model SshTargetRevision {
+  targetId       String
+  version        Int
+  configuration  Json
+  digest         String
+  actorId        String
+  sessionId      String
+  requestId      String
+  requestDigest  String
+  createdAt      DateTime @default(now())
+  target         SshTarget @relation(fields: [targetId], references: [id], onDelete: Restrict)
+  @@id([targetId, version])
+  @@unique([targetId, requestId])
+}
+
+model SshConnectionValidation {
+  id             String @id
+  targetId       String
+  targetVersion  Int
+  targetDigest   String
+  requestId      String
+  requestDigest  String
+  actorId        String
+  sessionId      String
+  status         String
+  startedAt      DateTime @default(now())
+  completedAt    DateTime?
+  target         SshTarget @relation(fields: [targetId], references: [id], onDelete: Restrict)
+  @@unique([targetId, requestId])
+}
+
+model Project {
+  id                 String              @id
+  personalOwnerId    String?
+  slug               String              @unique
+  name               String
+  customerFacingName String
+  description        String?
+  status             String
+  phase              String
+  platform           String
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  groupId            String?
+  organizationId     String?
+  agentArtifacts     AgentArtifact[]
+  agentAuditRecords  AgentAuditRecord[]
+  agentInitiatives   AgentInitiative[]
+  agentRuns          AgentRun[]
+  approvals          Approval[]
+  auditEvents        AuditEvent[]
+  blockers           Blocker[]
+  conversations      Conversation[]
+  initiatives        Initiative[]
+  knowledgeDocuments KnowledgeDocument[]
+  modules            Module[]
+  group              Group?              @relation(fields: [groupId], references: [id])
+  organization       Organization?       @relation(fields: [organizationId], references: [id])
+  members            ProjectMember[]
+  sshTargets         SshTarget[]
+  rdSignals          RDSignal[]
+  repositoryPreviews RepositoryPreview[]
+  supportArticles    SupportArticle[]
+  supportRequests    SupportRequest[]
+  workflowPreviews   WorkflowPreview[]
+
+  @@index([status])
+  @@index([phase])
+  @@index([personalOwnerId])
+}
+
+model Module {
+  id                 String        @id
+  projectId          String?
+  slug               String        @unique
+  key                String        @unique
+  name               String
+  customerFacingName String
+  category           String
+  description        String
+  phase              String
+  status             String
+  isLocked           Boolean       @default(false)
+  lockReason         String?
+  route              String?
+  order              Int           @default(0)
+  capabilities       String[]      @default([])
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+  initiatives        Initiative[]
+  lockedModule       LockedModule?
+  project            Project?      @relation(fields: [projectId], references: [id])
+
+  @@index([projectId])
+  @@index([category])
+  @@index([status])
+}
+
+model LockedModule {
+  id                      String   @id
+  moduleId                String   @unique
+  activationLabel         String?
+  requirements            Json?
+  estimatedActivationTime String?
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+  module                  Module   @relation(fields: [moduleId], references: [id])
+}
+
+model Initiative {
+  id                    String               @id
+  projectId             String
+  moduleId              String?
+  slug                  String               @unique
+  title                 String
+  name                  String
+  description           String
+  status                String
+  category              String
+  businessValue         String
+  technicalRisk         RiskLevel
+  recommendedPath       String
+  tags                  String[]             @default([])
+  humanApprovalRequired Boolean              @default(false)
+  overview              Json?
+  createdAt             DateTime             @default(now())
+  lastActivityAt        DateTime             @default(now())
+  updatedAt             DateTime             @updatedAt
+  activityEvents        ActivityEvent[]
+  approvals             Approval[]
+  auditEvents           AuditEvent[]
+  blockers              Blocker[]
+  workspaces            CodeDraftWorkspace[]
+  evidence              EvidenceSource[]
+  executionPaths        ExecutionPath[]
+  module                Module?              @relation(fields: [moduleId], references: [id])
+  project               Project              @relation(fields: [projectId], references: [id])
+  releaseCandidates     ReleaseCandidate[]
+  securityGates         SecurityGate[]
+  tasks                 Task[]
+  technicalMemos        TechnicalMemo[]
+
+  @@index([projectId])
+  @@index([moduleId])
+  @@index([status])
+  @@index([technicalRisk])
+}
+
+model EvidenceSource {
+  id             String     @id
+  initiativeId   String
+  initiativeSlug String
+  type           String
+  title          String
+  source         String
+  relevance      String
+  summary        String
+  sourceType     SourceType
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+  initiative     Initiative @relation(fields: [initiativeId], references: [id])
+
+  @@index([initiativeId])
+  @@index([initiativeSlug])
+}
+
+model ExecutionPath {
+  id                String     @id
+  initiativeId      String
+  initiativeSlug    String
+  name              String
+  description       String
+  riskLevel         String
+  status            String
+  requiresApproval  Boolean    @default(false)
+  estimatedDuration String
+  deliverables      String[]   @default([])
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+  initiative        Initiative @relation(fields: [initiativeId], references: [id])
+
+  @@index([initiativeId])
+  @@index([initiativeSlug])
+}
+
+model Task {
+  id             String     @id
+  initiativeId   String
+  initiativeSlug String
+  title          String
+  description    String?
+  lane           String
+  status         String
+  priority       Priority
+  assignee       String
+  ownerRole      String?
+  dueDate        DateTime?
+  sourceType     SourceType
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+  initiative     Initiative @relation(fields: [initiativeId], references: [id])
+
+  @@index([initiativeId])
+  @@index([status])
+}
+
+model ActivityEvent {
+  id             String      @id
+  projectId      String?
+  initiativeId   String?
+  initiativeSlug String?
+  type           String
+  title          String
+  description    String
+  actor          String
+  actorType      String
+  status         String
+  sourceType     SourceType
+  createdAt      DateTime    @default(now())
+  initiative     Initiative? @relation(fields: [initiativeId], references: [id])
+
+  @@index([projectId])
+  @@index([initiativeId])
+  @@index([initiativeSlug])
+}
+
+model Approval {
+  id                    String      @id
+  projectId             String
+  initiativeId          String?
+  initiativeSlug        String?
+  title                 String
+  description           String
+  module                String
+  priority              Priority
+  status                String
+  type                  String
+  requestedBy           String
+  requestedRole         String?
+  approverRole          String?
+  requiresHumanApproval Boolean     @default(false)
+  createdAt             DateTime    @default(now())
+  dueAt                 DateTime?
+  updatedAt             DateTime    @updatedAt
+  initiative            Initiative? @relation(fields: [initiativeId], references: [id])
+  project               Project     @relation(fields: [projectId], references: [id])
+
+  @@index([projectId])
+  @@index([initiativeId])
+  @@index([status])
+}
+
+model TechnicalMemo {
+  id             String     @id
+  initiativeId   String
+  initiativeSlug String
+  generatedAt    DateTime
+  generatedBy    String
+  status         String
+  sections       Json
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+  initiative     Initiative @relation(fields: [initiativeId], references: [id])
+}
+
+model CodeDraftWorkspace {
+  id                    String              @id
+  initiativeId          String
+  initiativeSlug        String
+  name                  String
+  status                String
+  badges                String[]            @default([])
+  humanApprovalRequired Boolean             @default(false)
+  createdAt             DateTime            @default(now())
+  updatedAt             DateTime            @updatedAt
+  initiative            Initiative          @relation(fields: [initiativeId], references: [id])
+  artifacts             SandboxedArtifact[]
+}
+
+model SandboxedArtifact {
+  id           String             @id
+  workspaceId  String
+  fileName     String
+  artifactType String
+  status       String
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+  workspace    CodeDraftWorkspace @relation(fields: [workspaceId], references: [id])
+}
+
+model SecurityGate {
+  id             String            @id
+  projectId      String
+  initiativeId   String?
+  initiativeSlug String?
+  title          String
+  status         String
+  riskLevel      RiskLevel
+  summary        String
+  lastCheckedAt  DateTime?
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+  checks         SecurityCheck[]
+  findings       SecurityFinding[]
+  initiative     Initiative?       @relation(fields: [initiativeId], references: [id])
+
+  @@index([initiativeId])
+  @@index([status])
+}
+
+model SecurityCheck {
+  id             String       @id
+  securityGateId String
+  title          String
+  checkType      String
+  status         String
+  severity       RiskLevel
+  evidence       String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  securityGate   SecurityGate @relation(fields: [securityGateId], references: [id])
+}
+
+model SecurityFinding {
+  id             String       @id
+  securityGateId String
+  title          String
+  description    String
+  severity       RiskLevel
+  status         String
+  recommendation String
+  owner          String
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  securityGate   SecurityGate @relation(fields: [securityGateId], references: [id])
+}
+
+model Blocker {
+  id                               String             @id
+  projectId                        String
+  initiativeId                     String?
+  initiativeSlug                   String?
+  title                            String
+  description                      String
+  type                             String
+  severity                         RiskLevel
+  status                           String
+  cause                            String
+  owner                            String
+  evidence                         String
+  suggestedAction                  String
+  nextStep                         String
+  rollbackOption                   String
+  maxAssistantFixAttempts          Int                @default(0)
+  humanReviewRequiredAfterAttempts Boolean            @default(true)
+  createdAt                        DateTime           @default(now())
+  updatedAt                        DateTime           @updatedAt
+  initiative                       Initiative?        @relation(fields: [initiativeId], references: [id])
+  project                          Project            @relation(fields: [projectId], references: [id])
+  workflowStates                   WorkflowRunState[]
+
+  @@index([projectId])
+  @@index([initiativeId])
+  @@index([status])
+  @@index([severity])
+}
+
+model ReleaseCandidate {
+  id                String                         @id
+  projectId         String
+  initiativeId      String?
+  initiativeSlug    String?
+  version           String
+  title             String
+  description       String
+  status            String
+  securityScore     Int
+  testsPassed       Int
+  testsTotal        Int
+  changeCount       Int
+  blockingIssues    Int
+  artifactCount     Int
+  createdAt         DateTime                       @default(now())
+  updatedAt         DateTime                       @updatedAt
+  approvalChecklist ReleaseApprovalChecklistItem[]
+  artifacts         ReleaseArtifact[]
+  initiative        Initiative?                    @relation(fields: [initiativeId], references: [id])
+  rollbackPlan      RollbackPlan?
+
+  @@index([initiativeId])
+  @@index([status])
+}
+
+model ReleaseArtifact {
+  id                 String           @id
+  releaseCandidateId String
+  artifactType       String
+  fileName           String
+  status             String
+  checksum           String?
+  releaseCandidate   ReleaseCandidate @relation(fields: [releaseCandidateId], references: [id])
+}
+
+model ReleaseApprovalChecklistItem {
+  id                 String           @id
+  releaseCandidateId String
+  title              String
+  status             String
+  requiredRole       String
+  releaseCandidate   ReleaseCandidate @relation(fields: [releaseCandidateId], references: [id])
+}
+
+model RollbackPlan {
+  id                 String           @id
+  releaseCandidateId String           @unique
+  title              String
+  summary            String
+  status             String
+  releaseCandidate   ReleaseCandidate @relation(fields: [releaseCandidateId], references: [id])
+}
+
+model RDSignal {
+  id                String   @id
+  projectId         String
+  title             String
+  type              String
+  source            String
+  priority          Priority
+  summary           String
+  impact            String
+  actionRecommended String
+  processed         Boolean  @default(false)
+  tags              String[] @default([])
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  project           Project  @relation(fields: [projectId], references: [id])
+}
+
+model InfrastructureNode {
+  id        String          @id
+  projectId String
+  name      String
+  type      String
+  status    String
+  region    String
+  uptime    Float
+  cpu       Int
+  memory    Int
+  disk      Int
+  services  ServiceStatus[]
+}
+
+model ServiceStatus {
+  id            String              @id
+  nodeId        String?
+  name          String
+  status        String
+  latencyMs     Int?
+  lastCheckedAt DateTime
+  node          InfrastructureNode? @relation(fields: [nodeId], references: [id])
+}
+
+model AuditEvent {
+  id           String      @id
+  projectId    String?
+  initiativeId String?
+  timestamp    DateTime    @default(now())
+  action       String
+  actor        String
+  actorType    String      @default("user")
+  target       String
+  module       String
+  details      String?
+  description  String?
+  metadata     Json?       @default("{}")
+  createdAt    DateTime    @default(now())
+  riskLevel    RiskLevel?  @default(low)
+  sourceType   SourceType  @default(manual)
+  initiative   Initiative? @relation(fields: [initiativeId], references: [id])
+  project      Project?    @relation(fields: [projectId], references: [id])
+
+  @@index([projectId])
+  @@index([initiativeId])
+  @@index([action])
+  @@index([createdAt])
+}
+
+model RepositoryPreview {
+  id            String     @id
+  projectId     String
+  name          String
+  description   String
+  language      String?
+  healthScore   Int?
+  openItems     Int        @default(0)
+  highRiskItems Int        @default(0)
+  sourceType    SourceType @default(seed)
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  project       Project    @relation(fields: [projectId], references: [id])
+
+  @@index([projectId])
+}
+
+model WorkflowPreview {
+  id          String     @id
+  projectId   String
+  name        String
+  status      String
+  trigger     String?
+  stepSummary Json?
+  sourceType  SourceType @default(seed)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  project     Project    @relation(fields: [projectId], references: [id])
+
+  @@index([projectId])
+  @@index([status])
+}
+
+model KnowledgeDocument {
+  id         String     @id
+  projectId  String
+  title      String
+  summary    String
+  type       String
+  source     String?
+  tags       String[]   @default([])
+  sourceType SourceType @default(seed)
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  project    Project    @relation(fields: [projectId], references: [id])
+
+  @@index([projectId])
+  @@index([type])
+}
+
+model SupportRequest {
+  id          String     @id
+  projectId   String
+  title       String
+  description String
+  status      String
+  priority    Priority
+  requester   String?
+  owner       String?
+  sourceType  SourceType @default(seed)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  project     Project    @relation(fields: [projectId], references: [id])
+
+  @@index([projectId])
+  @@index([status])
+  @@index([priority])
+}
+
+model SupportArticle {
+  id         String     @id
+  projectId  String
+  title      String
+  summary    String
+  category   String
+  status     String
+  tags       String[]   @default([])
+  sourceType SourceType @default(seed)
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  project    Project    @relation(fields: [projectId], references: [id])
+
+  @@index([projectId])
+  @@index([category])
+  @@index([status])
+}
+
+model User {
+  id                      String                   @id
+  displayName             String
+  initials                String?
+  email                   String                   @unique
+  title                   String?
+  createdAt               DateTime                 @default(now())
+  updatedAt               DateTime                 @updatedAt
+  passwordHash            String?
+  organization            String?
+  organizationId          String?
+  status                  String                   @default("active")
+  sessionRevokedAt        DateTime?
+  tokenVersion            Int                      @default(1)
+  agentRuns               AgentRun[]
+  conversations           Conversation[]
+  attachments             ConversationAttachment[]
+  groupMemberships        GroupMember[]
+  organizationMemberships OrganizationMember[]
+  projectMemberships      ProjectMember[]
+  organizationRef         Organization?            @relation(fields: [organizationId], references: [id])
+  memories                UserMemory[]
+  historicalMemories      HistoricalMemoryItem[]
+  roles                   UserRole[]
+  sessions                UserSession[]
+  Workspace               Workspace[]
+}
+
+model Role {
+  id          String           @id
+  key         String           @unique
+  name        String
+  description String?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  permissions RolePermission[]
+  users       UserRole[]
+}
+
+model Permission {
+  id          String           @id
+  key         String           @unique
+  name        String
+  description String?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  roles       RolePermission[]
+}
+
+model UserRole {
+  userId    String
+  roleId    String
+  createdAt DateTime @default(now())
+  role      Role     @relation(fields: [roleId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@id([userId, roleId])
+  @@index([roleId])
+}
+
+model RolePermission {
+  roleId       String
+  permissionId String
+  createdAt    DateTime   @default(now())
+  permission   Permission @relation(fields: [permissionId], references: [id])
+  role         Role       @relation(fields: [roleId], references: [id])
+
+  @@id([roleId, permissionId])
+  @@index([permissionId])
+}
+
+model EvidenceSourceV2 {
+  id              String         @id
+  url             String         @unique
+  title           String
+  sourceType      String
+  status          String         @default("approved")
+  lastCollectedAt DateTime?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  evidenceItems   EvidenceItem[]
+}
+
+model EvidenceItem {
+  id               String           @id
+  sourceId         String
+  title            String
+  sourceUrl        String
+  sanitizedFinding String
+  collectionStatus String           @default("EVIDENCE_COLLECTED")
+  reviewerDecision String?
+  collectedAt      DateTime         @default(now())
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  source           EvidenceSourceV2 @relation(fields: [sourceId], references: [id])
+  reviews          EvidenceReview[]
+
+  @@index([sourceId])
+}
+
+model EvidenceReview {
+  id                    String       @id
+  evidenceItemId        String
+  relevance             Int
+  reliability           Int
+  freshness             Int
+  businessApplicability Int
+  reviewerDecision      String
+  reviewerRole          String       @default("pm_reviewer")
+  notes                 String?
+  createdAt             DateTime     @default(now())
+  evidenceItem          EvidenceItem @relation(fields: [evidenceItemId], references: [id])
+
+  @@index([evidenceItemId])
+}
+
+model CandidateInitiative {
+  id                          String       @id
+  candidateId                 String       @unique
+  title                       String
+  status                      String       @default("DRAFT_ONLY")
+  problemStatement            String
+  evidenceSummary             String
+  expectedBusinessValue       String
+  nextGate                    String       @default("PM_REVIEW_REQUIRED")
+  requiresPMApproval          Boolean      @default(true)
+  runtimeVerificationRequired Boolean      @default(true)
+  createdAsDraftOnly          Boolean      @default(true)
+  requiredAdditionalEvidence  Json         @default("[]")
+  uncertaintyRisks            Json         @default("[]")
+  createdAt                   DateTime     @default(now())
+  updatedAt                   DateTime     @updatedAt
+  pmDecisions                 PMDecision[]
+
+  @@index([status])
+}
+
+model PMDecision {
+  id                          String              @id
+  candidateId                 String
+  decision                    String
+  decisionReason              String
+  approvedScopeIfAny          String?
+  nextGate                    String
+  runtimeVerificationRequired Boolean             @default(true)
+  createdAt                   DateTime            @default(now())
+  candidate                   CandidateInitiative @relation(fields: [candidateId], references: [candidateId])
+
+  @@index([candidateId])
+}
+
+model WorkflowRunSummary {
+  id                          String   @id
+  workflowName                String
+  workflowId                  String?
+  executionId                 String?
+  workflowStatus              String
+  evidenceCount               Int      @default(0)
+  reviewStatus                String
+  candidateId                 String?
+  nextGate                    String
+  runtimeVerificationRequired Boolean  @default(true)
+  forbiddenActionsObserved    Boolean  @default(false)
+  sanitizedOutput             Json     @default("{}")
+  workflowActive              Boolean  @default(false)
+  triggerType                 String   @default("manual/internal only")
+  createdAt                   DateTime @default(now())
+
+  @@index([candidateId])
+}
+
+model GitHubIntegrationStatus {
+  id                     String   @id
+  repoFullName           String
+  branch                 String
+  integrationStatus      String   @default("read-only/demo-safe")
+  requiredCheckName      String   @default("Backend CI / install-build-lint-test-prisma")
+  latestCheckStatus      String?
+  branchProtectionStatus String   @default("manual_policy_active_until_github_team_or_enterprise_upgrade")
+  writeActionsExecuted   Boolean  @default(false)
+  checkedAt              DateTime @default(now())
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+
+  @@index([repoFullName, branch])
+}
+
+model AiProviderConfiguration {
+  id                         String                 @id
+  displayName                String
+  providerType               String
+  baseUrl                    String
+  encryptedApiKey            String?
+  enabled                    Boolean                @default(false)
+  healthState                String                 @default("untested")
+  defaultTimeoutMs           Int                    @default(30000)
+  createdAt                  DateTime               @default(now())
+  updatedAt                  DateTime               @updatedAt
+  structuredOutputDialect    String?
+  structuredOutputVerifiedAt DateTime?
+  models                     AiModelConfiguration[]
+  analysisRuns               RDRadarAnalysisRun[]
+
+  @@index([enabled])
+}
+
+model AiModelConfiguration {
+  id                 String                  @id
+  providerId         String
+  modelId            String
+  displayName        String
+  enabled            Boolean                 @default(true)
+  defaultForProvider Boolean                 @default(false)
+  contextWindow      Int
+  maxOutputTokens    Int
+  supportedTasks     String[]
+  createdAt          DateTime                @default(now())
+  updatedAt          DateTime                @updatedAt
+  provider           AiProviderConfiguration @relation(fields: [providerId], references: [id])
+  analysisRuns       RDRadarAnalysisRun[]
+
+  @@unique([providerId, modelId])
+  @@index([providerId, enabled])
+}
+
+model RepositoryConnection {
+  id                   String               @id
+  displayName          String
+  providerType         String
+  repositoryIdentifier String
+  encryptedCredential  String?
+  defaultBranch        String
+  allowedBranches      String[]
+  includePaths         String[]
+  excludePaths         String[]
+  maximumFileBytes     Int                  @default(131072)
+  maximumTotalBytes    Int                  @default(1048576)
+  maximumFileCount     Int                  @default(100)
+  timeoutMs            Int                  @default(15000)
+  enabled              Boolean              @default(false)
+  createdAt            DateTime             @default(now())
+  updatedAt            DateTime             @updatedAt
+  analysisRuns         RDRadarAnalysisRun[]
+
+  @@index([providerType, enabled])
+}
+
+model RDRadarAnalysisRun {
+  id                     String                  @id
+  repositoryConnectionId String
+  providerId             String
+  modelId                String
+  requestedRef           String
+  commitSha              String?
+  analysisPurpose        String
+  promptVersion          String                  @default("rd-radar-analysis.v1")
+  status                 String                  @default("RUNNING")
+  sanitizedFailureReason String?
+  result                 Json                    @default("{}")
+  evidenceItemIds        String[]                @default([])
+  candidateId            String?
+  cancellationRequested  Boolean                 @default(false)
+  startedAt              DateTime                @default(now())
+  completedAt            DateTime?
+  createdAt              DateTime                @default(now())
+  updatedAt              DateTime                @updatedAt
+  model                  AiModelConfiguration    @relation(fields: [modelId], references: [id])
+  provider               AiProviderConfiguration @relation(fields: [providerId], references: [id])
+  repositoryConnection   RepositoryConnection    @relation(fields: [repositoryConnectionId], references: [id])
+
+  @@index([status, createdAt])
+  @@index([repositoryConnectionId, commitSha])
+}
+
+model ConfigurationAuditEvent {
+  id               String   @id
+  actor            String
+  action           String
+  resourceType     String
+  resourceId       String
+  sanitizedDetails Json     @default("{}")
+  createdAt        DateTime @default(now())
+
+  @@index([resourceType, resourceId, createdAt])
+}
+
+model WorkflowRun {
+  id             String                        @id
+  eventType      String
+  status         String
+  projectId      String
+  initiativeSlug String?
+  requestedBy    String
+  requestedRole  String
+  note           String
+  createdAt      DateTime                      @default(now())
+  updatedAt      DateTime                      @default(now()) @updatedAt
+  callbacks      WorkflowCallback[]
+  idempotencies  WorkflowCallbackIdempotency[]
+  runStates      WorkflowRunState[]
+
+  @@index([status])
+  @@index([projectId])
+  @@index([initiativeSlug])
+}
+
+model WorkflowCallback {
+  id             String                        @id
+  workflowRunId  String
+  issueId        String
+  taskId         String?
+  step           String
+  status         String
+  resultSummary  String?
+  evidence       Json                          @default("[]")
+  error          Json?
+  blocker        Json?
+  idempotencyKey String
+  occurredAt     DateTime
+  payloadHash    String
+  acceptedAt     DateTime                      @default(now())
+  workflowRun    WorkflowRun                   @relation(fields: [workflowRunId], references: [id])
+  idempotencies  WorkflowCallbackIdempotency[]
+
+  @@index([workflowRunId])
+  @@index([issueId])
+  @@index([status])
+}
+
+model WorkflowRunState {
+  id            String      @id
+  workflowRunId String
+  status        String
+  step          String
+  resultSummary String?
+  evidence      Json        @default("[]")
+  error         Json?
+  blocker       Json?
+  blockerId     String?
+  occurredAt    DateTime
+  createdAt     DateTime    @default(now())
+  blockerRef    Blocker?    @relation(fields: [blockerId], references: [id])
+  workflowRun   WorkflowRun @relation(fields: [workflowRunId], references: [id])
+
+  @@index([workflowRunId])
+  @@index([status])
+  @@index([blockerId])
+}
+
+model WorkflowCallbackIdempotency {
+  workflowRunId  String
+  idempotencyKey String
+  payloadHash    String
+  callbackId     String
+  createdAt      DateTime         @default(now())
+  callback       WorkflowCallback @relation(fields: [callbackId], references: [id])
+  workflowRun    WorkflowRun      @relation(fields: [workflowRunId], references: [id])
+
+  @@id([workflowRunId, idempotencyKey])
+}
+
+model Organization {
+  id          String               @id @default(cuid())
+  slug        String               @unique
+  name        String
+  description String?
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
+  groups      Group[]
+  members     OrganizationMember[]
+  projects    Project[]
+  users       User[]
+}
+
+model OrganizationMember {
+  id             String       @id @default(cuid())
+  organizationId String
+  userId         String
+  role           String       @default("member")
+  createdAt      DateTime     @default(now())
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, userId])
+  @@index([userId])
+  @@index([organizationId])
+}
+
+model UserSession {
+  id        String    @id @default(cuid())
+  userId    String
+  tokenHash String    @unique
+  ipAddress String?
+  userAgent String?
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([tokenHash])
+  @@index([revokedAt, expiresAt])
+}
+
+model Group {
+  id             String        @id @default(cuid())
+  organizationId String?
+  slug           String        @unique
+  name           String
+  description    String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+  members        GroupMember[]
+  projects       Project[]
+}
+
+model GroupMember {
+  id        String   @id @default(cuid())
+  groupId   String
+  userId    String
+  role      String   @default("member")
+  createdAt DateTime @default(now())
+  group     Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([groupId, userId])
+  @@index([userId])
+}
+
+model ProjectMember {
+  id        String   @id @default(cuid())
+  projectId String
+  userId    String
+  role      String   @default("Viewer")
+  createdAt DateTime @default(now())
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, userId])
+  @@index([userId])
+  @@index([projectId])
+}
+
+model Conversation {
+  id          String                   @id @default(cuid())
+  projectId   String
+  userId      String
+  title       String
+  status      String                   @default("active")
+  metadata    Json                     @default("{}")
+  createdAt   DateTime                 @default(now())
+  updatedAt   DateTime                 @updatedAt
+  agentRuns   AgentRun[]
+  project     Project                  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user        User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  attachments ConversationAttachment[]
+  messages    ConversationMessage[]
+
+  @@index([projectId])
+  @@index([userId])
+}
+
+model ConversationMessage {
+  id             String       @id @default(cuid())
+  conversationId String
+  senderId       String
+  senderType     String
+  content        String
+  metadata       Json         @default("{}")
+  createdAt      DateTime     @default(now())
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId])
+}
+
+model ConversationAttachment {
+  id               String       @id @default(cuid())
+  conversationId   String
+  userId           String
+  fileName         String
+  mimeType         String
+  fileSize         Int
+  category         String
+  storageKey       String
+  extractedText    String?
+  hasExtractedText Boolean      @default(false)
+  isScanned        Boolean      @default(false)
+  metadata         Json         @default("{}")
+  createdAt        DateTime     @default(now())
+  conversation     Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  user             User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId])
+  @@index([userId])
+}
+
+/// *
+///  * UserMemory stores persistent, explicit, high-confidence user facts.
+///  * Scoped strictly by userId. One active value per canonical key per user.
+///  * Memory survives browser sessions and conversation boundaries.
+///  * sourceConversationId is an informational audit field only (no FK enforcement).
+model UserMemory {
+  id                   String   @id @default(cuid())
+  userId               String
+  key                  String
+  value                String
+  sourceConversationId String?
+  confidence           Float    @default(1.0)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @default(now()) @updatedAt
+  user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, key])
+  @@index([userId])
+}
+
+model HistoricalMemoryItem {
+  id                   String @id
+  revision             Int @default(1)
+  derivationKey        String @unique
+  userId               String
+  scope                String
+  organizationId       String?
+  projectId            String?
+  workspaceId          String?
+  bindingVersion       Int?
+  entity               String
+  aliases              String[]
+  summary              String
+  category             String
+  sourceEventAt        DateTime
+  sourceConversationId String
+  sourceMessageId      String
+  sourceDigest         String
+  sourceRevision       String
+  extractorVersion     String
+  derivedAt            DateTime @default(now())
+  retentionState       String @default("ACTIVE")
+  sourceDeleted        Boolean @default(false)
+  searchDocument       Unsupported("tsvector")? @default(dbgenerated())
+  user                 User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, scope, organizationId, projectId, entity, sourceEventAt])
+  @@index([userId, sourceConversationId])
+}
+
+model AgentRun {
+  id                 String             @id @default(cuid())
+  conversationId     String
+  projectId          String
+  userId             String
+  agentName          String             @default("SekhemEngineer")
+  title              String
+  status             String             @default("QUEUED")
+  eventSeq           Int                @default(0)
+  eventTerminalSeq   Int?
+  planVersion        Int                @default(1)
+  currentStepIndex   Int                @default(0)
+  progressPercent    Int                @default(0)
+  pausedAt           DateTime?
+  startedAt          DateTime?
+  completedAt        DateTime?
+  failureReason      String?
+  cancellationReason String?
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+  approvals          AgentApproval[]
+  artifacts          AgentArtifact[]
+  auditRecords       AgentAuditRecord[]
+  plans              AgentPlan[]
+  conversation       Conversation       @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  project            Project            @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user               User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  events             AgentRunEvent[]
+
+  @@index([projectId])
+  @@index([conversationId])
+  @@index([status])
+}
+
+model AgentPlan {
+  id               String   @id @default(cuid())
+  agentRunId       String
+  version          Int      @default(1)
+  summary          String
+  steps            Json     @default("[]")
+  requiresApproval Boolean  @default(false)
+  status           String   @default("DRAFT")
+  reviewedBy       String?
+  reviewNotes      String?
+  createdAt        DateTime @default(now())
+  agentRun         AgentRun @relation(fields: [agentRunId], references: [id], onDelete: Cascade)
+
+  @@index([agentRunId])
+}
+
+model AgentRunEvent {
+  id         String   @id @default(cuid())
+  agentRunId String
+  seq        Int      @default(0)
+  stepIndex  Int?
+  eventType  String
+  actor      String   @default("agent")
+  payload    Json     @default("{}")
+  timestamp  DateTime @default(now())
+  agentRun   AgentRun @relation(fields: [agentRunId], references: [id], onDelete: Cascade)
+
+  @@unique([agentRunId, seq])
+}
+
+model AgentApproval {
+  id           String    @id @default(cuid())
+  agentRunId   String
+  approvalType String
+  status       String    @default("PENDING")
+  requestedBy  String
+  requiredRole String    @default("Technical Reviewer")
+  decidedBy    String?
+  decision     String?
+  notes        String?
+  revisedPlan  Json?
+  dueAt        DateTime?
+  createdAt    DateTime  @default(now())
+  decidedAt    DateTime?
+  agentRun     AgentRun  @relation(fields: [agentRunId], references: [id], onDelete: Cascade)
+
+  @@index([agentRunId, status])
+}
+
+model AgentArtifact {
+  id             String   @id @default(cuid())
+  agentRunId     String
+  projectId      String
+  title          String
+  artifactType   String
+  content        String
+  summary        String?
+  isCustomerSafe Boolean  @default(true)
+  version        Int      @default(1)
+  metadata       Json     @default("{}")
+  createdAt      DateTime @default(now())
+  agentRun       AgentRun @relation(fields: [agentRunId], references: [id], onDelete: Cascade)
+  project        Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([agentRunId])
+  @@index([projectId])
+}
+
+model AgentAuditRecord {
+  id         String   @id @default(cuid())
+  agentRunId String
+  projectId  String
+  eventType  String
+  actor      String
+  actorRole  String?
+  details    Json     @default("{}")
+  timestamp  DateTime @default(now())
+  agentRun   AgentRun @relation(fields: [agentRunId], references: [id], onDelete: Cascade)
+  project    Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([agentRunId])
+  @@index([projectId, timestamp])
+}
+
+model Workspace {
+  id        String   @id
+  userId    String
+  name      String
+  rootPath  String
+  status    String   @default("active")
+  createdAt DateTime @default(now())
+  updatedAt DateTime
+  User      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, status])
+}
+
+enum RiskLevel {
+  low
+  medium
+  high
+  critical
+}
+
+enum Priority {
+  low
+  medium
+  high
+  critical
+}
+
+enum SourceType {
+  seed
+  manual
+  workflow
+  ai
+  backend_aggregate
+}
+
+// Restored from 20260920000000_add_agent_initiative_runtime; no new database migration.
+enum AgentInitiativeStatus {
+  DRAFT
+  PROPOSED
+  APPROVED
+  ACTIVE
+  PAUSED
+  BLOCKED
+  COMPLETED
+  REJECTED
+  SUPERSEDED
+}
+
+enum AgentInitiativeVersionStatus {
+  DRAFT
+  PROPOSED
+  APPROVED
+  REJECTED
+  SUPERSEDED
+}
+
+enum AgentInitiativeTaskStatus {
+  TODO
+  READY
+  RUNNING
+  PAUSED
+  BLOCKED
+  FAILED
+  VERIFIED
+  DONE
+  CANCELED
+}
+
+model AgentInitiative {
+  id               String @id
+  projectId        String
+  workspaceId      String?
+  conversationId   String?
+  title            String
+  objective        String
+  problem          String?
+  scope            Json @default("{}")
+  constraints      Json @default("[]")
+  status           AgentInitiativeStatus @default(DRAFT)
+  currentVersionId String?
+  createdBy        String
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @default(now())
+  project          Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  versions         AgentInitiativeVersion[]
+  plans            AgentInitiativePlan[]
+  tasks            AgentInitiativeTask[]
+  decisions        AgentInitiativeDecision[]
+
+  @@index([projectId, updatedAt])
+  @@index([createdBy])
+  @@index([status])
+}
+
+model AgentInitiativeVersion {
+  id              String @id
+  initiativeId    String
+  version         Int
+  status          AgentInitiativeVersionStatus @default(DRAFT)
+  evidence        Json @default("[]")
+  architecture    Json?
+  plan            Json?
+  risks           Json @default("[]")
+  dependencies    Json @default("[]")
+  successCriteria Json @default("[]")
+  decisionSummary String?
+  createdBy       String
+  createdAt       DateTime @default(now())
+  initiative      AgentInitiative @relation(fields: [initiativeId], references: [id], onDelete: Cascade)
+  plans           AgentInitiativePlan[]
+  decisions       AgentInitiativeDecision[]
+
+  @@unique([initiativeId, version])
+  @@index([initiativeId, status])
+}
+
+model AgentInitiativePlan {
+  id           String @id
+  initiativeId String
+  versionId    String
+  summary      String
+  steps        Json @default("[]")
+  status       String @default("DRAFT")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @default(now())
+  initiative   AgentInitiative @relation(fields: [initiativeId], references: [id], onDelete: Cascade)
+  version      AgentInitiativeVersion @relation(fields: [versionId], references: [id], onDelete: Cascade)
+  tasks        AgentInitiativeTask[]
+
+  @@index([initiativeId, createdAt])
+  @@index([versionId])
+}
+
+model AgentInitiativeTask {
+  id           String @id
+  initiativeId String
+  planId       String?
+  title        String
+  description  String?
+  status       AgentInitiativeTaskStatus @default(TODO)
+  position     Int @default(0)
+  evidence     Json @default("[]")
+  agentRunId   String?
+  artifacts    Json @default("[]")
+  verification Json @default("{}")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @default(now())
+  initiative   AgentInitiative @relation(fields: [initiativeId], references: [id], onDelete: Cascade)
+  plan         AgentInitiativePlan? @relation(fields: [planId], references: [id], onDelete: SetNull)
+
+  @@index([initiativeId, status])
+  @@index([planId])
+}
+
+model AgentInitiativeDecision {
+  id           String @id
+  initiativeId String
+  versionId    String
+  decision     String
+  notes        String?
+  decidedBy    String
+  createdAt    DateTime @default(now())
+  initiative   AgentInitiative @relation(fields: [initiativeId], references: [id], onDelete: Cascade)
+  version      AgentInitiativeVersion @relation(fields: [versionId], references: [id], onDelete: Cascade)
+
+  @@index([initiativeId, createdAt])
+  @@index([versionId])
+}

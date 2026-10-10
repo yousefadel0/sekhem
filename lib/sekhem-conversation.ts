@@ -1,0 +1,325 @@
+import { requestsAgentConversationTransfer } from "./conversation-transfer-intent"
+import {
+  fetchSekhemApi,
+  postSekhemApi,
+  patchSekhemApi,
+  deleteSekhemApi,
+  type FetchSekhemApiOptions
+} from "@/lib/sekhem-api"
+export type ConversationMode = "CHAT" | "AGENT" | "AUTOMATION"
+export const recoverExecutionVerification = (conversationId: string, runId: string, requestId: string) =>
+  postSekhemApi<unknown, { requestId: string }>(`/conversations/${encodeURIComponent(conversationId)}/executions/${encodeURIComponent(runId)}/recover-verification`, { requestId }, { throwOnError: true })
+export type ConversationModeContext = import("@/backend/src/conversation/conversation-mode").ConversationModeContext
+export type HistoricalContextView = import("@/backend/src/conversation/historical-context").HistoricalContextView
+export const selectHistoricalContext = (conversationId: string, sourceConversationId: string) =>
+  postSekhemApi<HistoricalContextView, { sourceConversationId: string }>(`/conversations/${encodeURIComponent(conversationId)}/historical-context`, { sourceConversationId }, { throwOnError: true })
+export const generateConversationPlan = (conversationId: string, body: { requestId: string; expectedVersion: number; instruction?: string }) =>
+  postSekhemApi<import("@/backend/src/agent-runtime/understanding/agent-understanding.types").PlanningCheckpointResponse, typeof body>(`/conversations/${encodeURIComponent(conversationId)}/plans`, body, { throwOnError: true })
+
+export interface ProjectSummaryDto {
+  id: string
+  slug: string
+  name: string
+  customerFacingName: string
+  description?: string
+  status: "active" | "planning" | "evaluation" | "draft" | "archived"
+  phase: string
+  platform: string
+}
+
+export type CreateConversationDto = {
+  mode?: ConversationMode
+  projectId: string
+  title: string
+  metadata?: Record<string, unknown>
+}
+
+export type UpdateConversationDto = {
+  title?: string
+  metadata?: Record<string, unknown>
+}
+
+export type PostMessageDto = {
+  transferToAgent?: boolean
+  runtimeEvidence?: import("./sekhem-agent").RuntimeEvidenceReference[]
+  content: string
+  senderType?: "user" | "assistant" | "system"
+  metadata?: Record<string, unknown>
+  triggerAgent?: boolean
+  chat?: boolean
+  attachmentIds?: string[]
+}
+
+export interface AttachmentDto {
+  id: string
+  conversationId: string
+  userId: string
+  fileName: string
+  mimeType: string
+  fileSize: number
+  category: "image" | "pdf" | "doc" | "other"
+  hasExtractedText: boolean
+  isScanned: boolean
+  createdAt: string
+}
+
+export interface ConversationSummaryDto {
+  mode?: ConversationMode
+  modeContext?: ConversationModeContext
+  id: string
+  projectId: string
+  userId: string
+  title: string
+  status: string
+  createdAt: string
+  updatedAt: string
+  messageCount?: number
+  metadata?: Record<string, unknown>
+}
+
+export interface ConversationMessageDto {
+  id: string
+  conversationId: string
+  senderId: string
+  senderType: string
+  content: string
+  metadata: Record<string, unknown>
+  createdAt: string
+  attachments?: AttachmentDto[]
+}
+
+export const CONVERSATION_WORKSPACE_NOTICE = "This conversation belongs to a previous workspace binding. Its history and evidence remain unchanged. Start a new Chat in the current workspace to continue."
+
+/** Presentation only: never treats a historical descriptor as the active authority. */
+export function conversationWorkspaceChanged(conversation: ConversationSummaryDto | undefined,
+  binding: import("./sekhem-agent").WorkspaceBinding | null, status: string): boolean {
+  const expected = conversation?.modeContext?.workspace
+  if (!expected) return false
+  if (status === "STALE") return true
+  if (!binding) return false // Loading/unavailable is handled separately, never authorizes a send.
+  return conversation.projectId !== binding.projectId || expected.workspaceId !== binding.id ||
+    String(expected.bindingVersion) !== binding.version || !binding.runtime ||
+    expected.runtimeId !== binding.runtime.runtimeId || expected.runtimeFingerprint !== binding.runtime.runtimeFingerprint
+}
+
+export function isConversationWorkspaceConflict(error: unknown): boolean {
+  const value = error as { status?: number; code?: string; message?: string } | null
+  return value?.status === 409 && (value.code === "CONVERSATION_WORKSPACE_CHANGED" || value.message === "CONVERSATION_WORKSPACE_CHANGED")
+}
+
+/** Tab selection only; server-side mode and binding validation remain authoritative. */
+export function resolveWorkspaceConversation(conversations: ConversationSummaryDto[], mode: ConversationMode,
+  workspace: { projectId: string; workspaceId: string; bindingVersion: string }, sourceId?: string) {
+  return conversations.find(c => c.projectId === workspace.projectId && (c.mode ?? "CHAT") === mode &&
+    c.modeContext?.workspace?.workspaceId === workspace.workspaceId && String(c.modeContext?.workspace?.bindingVersion) === workspace.bindingVersion &&
+    (mode !== "AGENT" || !sourceId || c.modeContext?.source?.conversationId === sourceId) && (mode !== "CHAT" || !sourceId || c.id === sourceId))
+}
+
+export type AgentRunStatus =
+  | "QUEUED"
+  | "PLANNING"
+  | "AWAITING_APPROVAL"
+  | "RUNNING"
+  | "PAUSED"
+  | "COMPLETED"
+  | "FAILED"
+  | "CANCELLED"
+
+export interface TriggerAgentMessageResponseDto {
+  conversationId: string
+  messageId: string
+  agentRunId: string
+  status: AgentRunStatus
+}
+
+export interface ConversationTransferDto { kind: "AGENT_TRANSFER"; conversationId: string; messageId: string; agentConversationId: string }
+export type PostMessageResponseDto = ConversationMessageDto | TriggerAgentMessageResponseDto | ConversationTransferDto
+export function isConversationTransfer(res: PostMessageResponseDto | null): res is ConversationTransferDto {
+  return !!res && "kind" in res && res.kind === "AGENT_TRANSFER" && typeof res.agentConversationId === "string" && !!res.agentConversationId
+}
+
+export function isTriggerAgentResponse(
+  res: PostMessageResponseDto | null
+): res is TriggerAgentMessageResponseDto {
+  return Boolean(res && "agentRunId" in res && typeof res.agentRunId === "string" && res.agentRunId &&
+    typeof res.conversationId === "string" && res.conversationId && typeof res.messageId === "string" && res.messageId &&
+    ["QUEUED", "PLANNING", "AWAITING_APPROVAL", "RUNNING", "PAUSED", "COMPLETED", "FAILED", "CANCELLED"].includes(res.status))
+}
+
+export interface ConversationDetailDto extends ConversationSummaryDto {
+  messages: ConversationMessageDto[]
+  agentRuns: (import("./sekhem-agent").AgentRunSummary & Partial<import("./sekhem-agent").AgentRunDetail>)[]
+  metadata: Record<string, unknown>
+}
+
+/** Correlate by message identity, never by text: identical queued messages are distinct. */
+export function acknowledgeConversationMessage(messages: ConversationMessageDto[], clientId: string, savedId: string): ConversationMessageDto[] {
+  const savedAlreadyPresent = messages.some(message => message.id === savedId)
+  return messages.flatMap(message => message.id !== clientId ? [message] : savedAlreadyPresent ? [] : [{
+    ...message, id: savedId, metadata: { ...message.metadata, clientMessageId: clientId, isQueued: false }
+  }])
+}
+
+export function reconcileConversationMessages(saved: ConversationMessageDto[], local: ConversationMessageDto[]): ConversationMessageDto[] {
+  const pending = local.filter(message =>
+    (message.id.startsWith("msg_user_opt_") || message.id.startsWith("msg_user_queued_")) &&
+    !saved.some(item => item.id === message.id || item.metadata.clientMessageId === message.id))
+  return [...saved, ...pending]
+}
+
+/**
+ * Fetch available projects using the existing GET /api/projects contract.
+ * Malformed responses are errors, not empty project lists.
+ */
+export async function fetchProjects(options?: FetchSekhemApiOptions): Promise<ProjectSummaryDto[] | null> {
+  const result = await fetchSekhemApi<ProjectSummaryDto[]>("/projects", { throwOnError: true, ...options })
+  if (!Array.isArray(result)) {
+    throw new Error("Projects response is invalid. Try again later.")
+  }
+  return result
+}
+
+/**
+ * List the authenticated user's conversations using the existing GET /api/conversations endpoint.
+ * The backend enforces authentication via AuthzGuard and filters by the authenticated userId.
+ * Optionally scoped to a projectId via query param.
+ * Returns an empty array when no conversations exist. Never fabricates data.
+ */
+export async function listConversations(
+  projectId?: string,
+  options?: FetchSekhemApiOptions
+): Promise<ConversationSummaryDto[]> {
+  const qs = projectId ? `?projectId=${encodeURIComponent(projectId)}` : ""
+  const result = await fetchSekhemApi<ConversationSummaryDto[]>(`/conversations${qs}`, { throwOnError: true, ...options })
+  if (!Array.isArray(result)) {
+    throw new Error("Conversation list response is invalid. Try again later.")
+  }
+  return result
+}
+
+/**
+ * Create a new conversation using the existing POST /api/conversations contract.
+ */
+export async function createConversation(
+  projectId: string,
+  title: string,
+  metadata?: Record<string, unknown>,
+  options?: FetchSekhemApiOptions,
+  mode: ConversationMode = "CHAT"
+): Promise<ConversationSummaryDto | null> {
+  return postSekhemApi<ConversationSummaryDto, CreateConversationDto>(
+    "/conversations",
+    {
+      projectId,
+      title,
+      mode,
+      ...(metadata ? { metadata } : {}),
+    },
+    options
+  )
+}
+
+export type PostConversationMessageOptions = FetchSekhemApiOptions & {
+  transferToAgent?: boolean
+  runtimeEvidence?: import("./sekhem-agent").RuntimeEvidenceReference[]
+  triggerAgent?: boolean
+  chat?: boolean
+  attachmentIds?: string[]
+}
+
+/**
+ * Upload a file attachment to a conversation.
+ * Reads the file buffer and posts payload to POST /api/conversations/:id/attachments.
+ */
+export async function uploadConversationAttachment(
+  conversationId: string,
+  file: File,
+  options?: FetchSekhemApiOptions
+): Promise<AttachmentDto | null> {
+  const buffer = await file.arrayBuffer()
+  const bytes = new Uint8Array(buffer)
+  let binary = ""
+  const chunkSize = 8192
+  for (let i = 0; i < bytes.byteLength; i += chunkSize) {
+    const chunk = bytes.subarray(i, i + chunkSize)
+    binary += String.fromCharCode.apply(null, chunk as unknown as number[])
+  }
+  const contentBase64 = btoa(binary)
+
+  return postSekhemApi<AttachmentDto, { fileName: string; mimeType: string; contentBase64: string }>(
+    `/conversations/${conversationId}/attachments`,
+    {
+      fileName: file.name,
+      mimeType: file.type || "application/octet-stream",
+      contentBase64,
+    },
+    options
+  )
+}
+
+/**
+ * Post a user message to an existing conversation using POST /api/conversations/:id/messages.
+ */
+export async function postConversationMessage(
+  conversationId: string,
+  content: string,
+  metadata?: Record<string, unknown>,
+  options?: PostConversationMessageOptions
+): Promise<PostMessageResponseDto | null> {
+  return postSekhemApi<PostMessageResponseDto, PostMessageDto>(
+    `/conversations/${conversationId}/messages`,
+    {
+      content,
+      senderType: "user",
+      ...(options?.transferToAgent || requestsAgentConversationTransfer(content) ? { transferToAgent: true } : {}),
+      ...(options?.triggerAgent !== undefined ? { triggerAgent: options.triggerAgent } : {}),
+      ...(options?.chat !== undefined ? { chat: options.chat } : {}),
+      ...(options?.attachmentIds !== undefined ? { attachmentIds: options.attachmentIds } : {}),
+      ...(options?.runtimeEvidence !== undefined ? { runtimeEvidence: options.runtimeEvidence } : {}),
+      ...(metadata ? { metadata } : {}),
+    },
+    options
+  )
+}
+
+/**
+ * Get conversation details and message history using GET /api/conversations/:id.
+ */
+export async function getConversation(
+  conversationId: string,
+  options?: FetchSekhemApiOptions
+): Promise<ConversationDetailDto | null> {
+  return fetchSekhemApi<ConversationDetailDto>(`/conversations/${conversationId}`, options)
+}
+
+/**
+ * Update conversation title or metadata using PATCH /api/conversations/:id.
+ */
+export async function updateConversation(
+  conversationId: string,
+  dto: UpdateConversationDto,
+  options?: FetchSekhemApiOptions
+): Promise<ConversationSummaryDto | null> {
+  return patchSekhemApi<ConversationSummaryDto, UpdateConversationDto>(
+    `/conversations/${conversationId}`,
+    dto,
+    options
+  )
+}
+
+/**
+ * Delete a conversation and cascade associated resources using DELETE /api/conversations/:id.
+ */
+export async function deleteConversation(
+  conversationId: string,
+  options?: FetchSekhemApiOptions
+): Promise<{ deleted: boolean; id: string } | null> {
+  return deleteSekhemApi<{ deleted: boolean; id: string }>(
+    `/conversations/${conversationId}`,
+    options
+  )
+}
+
+export const decideChangeReview = (conversationId: string, body: ReturnType<typeof import("./change-review").changeDecisionBody>) =>
+  postSekhemApi<{ revision: number; digest: string }, typeof body>(
+    `/conversations/${encodeURIComponent(conversationId)}/change-decisions`, body, { throwOnError: true });

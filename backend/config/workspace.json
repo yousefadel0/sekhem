@@ -1,0 +1,7 @@
+{
+  "version": 1,
+  "id": "sekhem-source",
+  "projectId": "project-community-sonic-sovereign",
+  "name": "SEKHEM source workspace",
+  "root": "../.."
+}

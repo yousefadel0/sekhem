@@ -1,0 +1,85 @@
+name: Runtime Windows signed release
+
+# Signs with the existing runtime-windows/build.ps1 and sign-file.ps1.
+# The product private key never belongs in git. Supply it only via runner store
+# enrollment or ephemeral CI secrets (PFX import into CurrentUser\My).
+on:
+  workflow_dispatch:
+    inputs:
+      runtime_url:
+        description: HTTPS Runtime origin (path /)
+        required: true
+        default: https://localhost:7443
+      web_url:
+        description: Web origin (HTTPS, or loopback HTTP for local MVP)
+        required: true
+        default: http://localhost:3000
+      trusted_ca:
+        description: Optional public PEM path in the repo (never a private key)
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+
+jobs:
+  sign-and-verify:
+    name: sign-verify-windows-runtime
+    runs-on: [self-hosted, windows, sekhem-signing]
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Require Node 24.21.0
+        run: |
+          $v = node --version
+          if ($v -ne 'v24.21.0') { throw "Signing runner must use Node v24.21.0; found $v" }
+
+      - name: Signing preflight
+        env:
+          SEKHEM_CODE_SIGN_THUMBPRINT: ${{ secrets.SEKHEM_CODE_SIGN_THUMBPRINT }}
+        run: |
+          if ($env:SEKHEM_CODE_SIGN_THUMBPRINT -notmatch '^[A-Fa-f0-9]{40}$') {
+            throw 'Repository secret SEKHEM_CODE_SIGN_THUMBPRINT must be the 40-hex product certificate thumbprint. Do not store a PFX in git.'
+          }
+          & .\runtime-windows\signing-preflight.ps1 -CertificateThumbprint $env:SEKHEM_CODE_SIGN_THUMBPRINT
+
+      - name: Build signed installer
+        env:
+          SEKHEM_CODE_SIGN_THUMBPRINT: ${{ secrets.SEKHEM_CODE_SIGN_THUMBPRINT }}
+          SEKHEM_TIMESTAMP_URL: ${{ secrets.SEKHEM_TIMESTAMP_URL }}
+          SEKHEM_SIGNTOOL_PATH: ${{ secrets.SEKHEM_SIGNTOOL_PATH }}
+          SEKHEM_INNO_COMPILER: ${{ secrets.SEKHEM_INNO_COMPILER }}
+        run: |
+          if ($env:SEKHEM_TIMESTAMP_URL -notmatch '^https?://[A-Za-z0-9./:_-]+$') { throw 'Secret SEKHEM_TIMESTAMP_URL must match sign-file.ps1' }
+          if (-not (Test-Path -LiteralPath $env:SEKHEM_SIGNTOOL_PATH)) { throw 'Secret SEKHEM_SIGNTOOL_PATH is missing on this runner' }
+          $inno = $env:SEKHEM_INNO_COMPILER
+          if (-not $inno) { $inno = Join-Path $env:GITHUB_WORKSPACE 'runtime-windows\out\build-tools\inno\ISCC.exe' }
+          $args = @{
+            RuntimeUrl = '${{ inputs.runtime_url }}'
+            WebUrl = '${{ inputs.web_url }}'
+            SignToolPath = $env:SEKHEM_SIGNTOOL_PATH
+            CertificateThumbprint = $env:SEKHEM_CODE_SIGN_THUMBPRINT
+            TimestampUrl = $env:SEKHEM_TIMESTAMP_URL
+            InnoCompiler = $inno
+          }
+          $ca = '${{ inputs.trusted_ca }}'.Trim()
+          if ($ca) { $args.TrustedCa = Join-Path $env:GITHUB_WORKSPACE $ca }
+          & .\runtime-windows\build.ps1 @args
+
+      - name: Verify published release
+        env:
+          SEKHEM_CODE_SIGN_THUMBPRINT: ${{ secrets.SEKHEM_CODE_SIGN_THUMBPRINT }}
+          SEKHEM_SIGNTOOL_PATH: ${{ secrets.SEKHEM_SIGNTOOL_PATH }}
+        run: |
+          $payload = Get-ChildItem -LiteralPath .\runtime-windows\out -Directory -Filter 'build-*' |
+            Sort-Object LastWriteTime -Descending |
+            Select-Object -First 1
+          if (-not $payload) { throw 'No build-* payload directory' }
+          & .\runtime-windows\verify-release.ps1 `
+            -SignToolPath $env:SEKHEM_SIGNTOOL_PATH `
+            -CertificateThumbprint $env:SEKHEM_CODE_SIGN_THUMBPRINT `
+            -PayloadDirectory (Join-Path $payload.FullName 'payload')

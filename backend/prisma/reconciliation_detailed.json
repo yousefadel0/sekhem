@@ -1,0 +1,322 @@
+[
+  {
+    "model": "Project",
+    "status": "MIGRATED",
+    "missingCols": []
+  },
+  {
+    "model": "Module",
+    "status": "MIGRATED",
+    "missingCols": []
+  },
+  {
+    "model": "LockedModule",
+    "status": "MIGRATED",
+    "missingCols": []
+  },
+  {
+    "model": "Initiative",
+    "status": "MIGRATED",
+    "missingCols": []
+  },
+  {
+    "model": "EvidenceSource",
+    "status": "MIGRATED",
+    "missingCols": []
+  },
+  {
+    "model": "ExecutionPath",
+    "status": "MIGRATED",
+    "missingCols": []
+  },
+  {
+    "model": "Task",
+    "status": "MIGRATED",
+    "missingCols": []
+  },
+  {
+    "model": "ActivityEvent",
+    "status": "MIGRATED",
+    "missingCols": []
+  },
+  {
+    "model": "Approval",
+    "status": "MIGRATED",
+    "missingCols": []
+  },
+  {
+    "model": "TechnicalMemo",
+    "status": "MIGRATED",
+    "missingCols": []
+  },
+  {
+    "model": "CodeDraftWorkspace",
+    "status": "MIGRATED",
+    "missingCols": []
+  },
+  {
+    "model": "SandboxedArtifact",
+    "status": "MIGRATED",
+    "missingCols": []
+  },
+  {
+    "model": "SecurityGate",
+    "status": "MIGRATED",
+    "missingCols": []
+  },
+  {
+    "model": "SecurityCheck",
+    "status": "MIGRATED",
+    "missingCols": []
+  },
+  {
+    "model": "SecurityFinding",
+    "status": "MIGRATED",
+    "missingCols": []
+  },
+  {
+    "model": "Blocker",
+    "status": "MIGRATED",
+    "missingCols": []
+  },
+  {
+    "model": "ReleaseCandidate",
+    "status": "MIGRATED",
+    "missingCols": []
+  },
+  {
+    "model": "ReleaseArtifact",
+    "status": "MIGRATED",
+    "missingCols": []
+  },
+  {
+    "model": "ReleaseApprovalChecklistItem",
+    "status": "MIGRATED",
+    "missingCols": []
+  },
+  {
+    "model": "RollbackPlan",
+    "status": "MIGRATED",
+    "missingCols": []
+  },
+  {
+    "model": "RDSignal",
+    "status": "MIGRATED",
+    "missingCols": []
+  },
+  {
+    "model": "InfrastructureNode",
+    "status": "MIGRATED",
+    "missingCols": []
+  },
+  {
+    "model": "ServiceStatus",
+    "status": "MIGRATED",
+    "missingCols": []
+  },
+  {
+    "model": "AuditEvent",
+    "status": "MIGRATED",
+    "missingCols": []
+  },
+  {
+    "model": "RepositoryPreview",
+    "status": "MIGRATED",
+    "missingCols": []
+  },
+  {
+    "model": "WorkflowPreview",
+    "status": "MIGRATED",
+    "missingCols": []
+  },
+  {
+    "model": "KnowledgeDocument",
+    "status": "MIGRATED",
+    "missingCols": []
+  },
+  {
+    "model": "SupportRequest",
+    "status": "MIGRATED",
+    "missingCols": []
+  },
+  {
+    "model": "SupportArticle",
+    "status": "MIGRATED",
+    "missingCols": []
+  },
+  {
+    "model": "User",
+    "status": "MIGRATED",
+    "missingCols": []
+  },
+  {
+    "model": "Role",
+    "status": "MIGRATED",
+    "missingCols": []
+  },
+  {
+    "model": "Permission",
+    "status": "MIGRATED",
+    "missingCols": []
+  },
+  {
+    "model": "UserRole",
+    "status": "MIGRATED",
+    "missingCols": []
+  },
+  {
+    "model": "RolePermission",
+    "status": "MIGRATED",
+    "missingCols": []
+  },
+  {
+    "model": "EvidenceSourceV2",
+    "status": "MIGRATED",
+    "missingCols": []
+  },
+  {
+    "model": "EvidenceItem",
+    "status": "MIGRATED",
+    "missingCols": []
+  },
+  {
+    "model": "EvidenceReview",
+    "status": "MIGRATED",
+    "missingCols": []
+  },
+  {
+    "model": "CandidateInitiative",
+    "status": "MIGRATED",
+    "missingCols": []
+  },
+  {
+    "model": "PMDecision",
+    "status": "MIGRATED",
+    "missingCols": []
+  },
+  {
+    "model": "WorkflowRunSummary",
+    "status": "MIGRATED",
+    "missingCols": []
+  },
+  {
+    "model": "GitHubIntegrationStatus",
+    "status": "MIGRATED",
+    "missingCols": []
+  },
+  {
+    "model": "AiProviderConfiguration",
+    "status": "MIGRATED",
+    "missingCols": []
+  },
+  {
+    "model": "AiModelConfiguration",
+    "status": "MIGRATED",
+    "missingCols": []
+  },
+  {
+    "model": "RepositoryConnection",
+    "status": "MIGRATED",
+    "missingCols": []
+  },
+  {
+    "model": "RDRadarAnalysisRun",
+    "status": "MIGRATED",
+    "missingCols": []
+  },
+  {
+    "model": "ConfigurationAuditEvent",
+    "status": "MIGRATED",
+    "missingCols": []
+  },
+  {
+    "model": "WorkflowRun",
+    "status": "MIGRATED",
+    "missingCols": []
+  },
+  {
+    "model": "WorkflowCallback",
+    "status": "MIGRATED",
+    "missingCols": []
+  },
+  {
+    "model": "WorkflowRunState",
+    "status": "MIGRATED",
+    "missingCols": []
+  },
+  {
+    "model": "WorkflowCallbackIdempotency",
+    "status": "MIGRATED",
+    "missingCols": []
+  },
+  {
+    "model": "Organization",
+    "status": "MIGRATED",
+    "missingCols": []
+  },
+  {
+    "model": "OrganizationMember",
+    "status": "MIGRATED",
+    "missingCols": []
+  },
+  {
+    "model": "UserSession",
+    "status": "MIGRATED",
+    "missingCols": []
+  },
+  {
+    "model": "Group",
+    "status": "MIGRATED",
+    "missingCols": []
+  },
+  {
+    "model": "GroupMember",
+    "status": "MIGRATED",
+    "missingCols": []
+  },
+  {
+    "model": "ProjectMember",
+    "status": "MIGRATED",
+    "missingCols": []
+  },
+  {
+    "model": "Conversation",
+    "status": "MIGRATED",
+    "missingCols": []
+  },
+  {
+    "model": "ConversationMessage",
+    "status": "MIGRATED",
+    "missingCols": []
+  },
+  {
+    "model": "AgentRun",
+    "status": "MIGRATED",
+    "missingCols": []
+  },
+  {
+    "model": "AgentPlan",
+    "status": "MIGRATED",
+    "missingCols": []
+  },
+  {
+    "model": "AgentRunEvent",
+    "status": "MIGRATED",
+    "missingCols": []
+  },
+  {
+    "model": "AgentApproval",
+    "status": "MIGRATED",
+    "missingCols": []
+  },
+  {
+    "model": "AgentArtifact",
+    "status": "MIGRATED",
+    "missingCols": []
+  },
+  {
+    "model": "AgentAuditRecord",
+    "status": "MIGRATED",
+    "missingCols": []
+  }
+]

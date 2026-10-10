@@ -1,0 +1,484 @@
+{
+  "models": [
+    {
+      "name": "Project",
+      "status": "MISSING",
+      "details": "No CREATE TABLE statement in any migration",
+      "fieldCount": 30,
+      "indexCount": 2
+    },
+    {
+      "name": "Module",
+      "status": "MISSING",
+      "details": "No CREATE TABLE statement in any migration",
+      "fieldCount": 20,
+      "indexCount": 3
+    },
+    {
+      "name": "LockedModule",
+      "status": "MISSING",
+      "details": "No CREATE TABLE statement in any migration",
+      "fieldCount": 8,
+      "indexCount": 0
+    },
+    {
+      "name": "Initiative",
+      "status": "MISSING",
+      "details": "No CREATE TABLE statement in any migration",
+      "fieldCount": 31,
+      "indexCount": 4
+    },
+    {
+      "name": "EvidenceSource",
+      "status": "MISSING",
+      "details": "No CREATE TABLE statement in any migration",
+      "fieldCount": 12,
+      "indexCount": 2
+    },
+    {
+      "name": "ExecutionPath",
+      "status": "MISSING",
+      "details": "No CREATE TABLE statement in any migration",
+      "fieldCount": 13,
+      "indexCount": 2
+    },
+    {
+      "name": "Task",
+      "status": "MISSING",
+      "details": "No CREATE TABLE statement in any migration",
+      "fieldCount": 15,
+      "indexCount": 2
+    },
+    {
+      "name": "ActivityEvent",
+      "status": "MISSING",
+      "details": "No CREATE TABLE statement in any migration",
+      "fieldCount": 13,
+      "indexCount": 3
+    },
+    {
+      "name": "Approval",
+      "status": "MISSING",
+      "details": "No CREATE TABLE statement in any migration",
+      "fieldCount": 19,
+      "indexCount": 3
+    },
+    {
+      "name": "TechnicalMemo",
+      "status": "MISSING",
+      "details": "No CREATE TABLE statement in any migration",
+      "fieldCount": 10,
+      "indexCount": 0
+    },
+    {
+      "name": "CodeDraftWorkspace",
+      "status": "MISSING",
+      "details": "No CREATE TABLE statement in any migration",
+      "fieldCount": 11,
+      "indexCount": 0
+    },
+    {
+      "name": "SandboxedArtifact",
+      "status": "MISSING",
+      "details": "No CREATE TABLE statement in any migration",
+      "fieldCount": 8,
+      "indexCount": 0
+    },
+    {
+      "name": "SecurityGate",
+      "status": "MISSING",
+      "details": "No CREATE TABLE statement in any migration",
+      "fieldCount": 14,
+      "indexCount": 2
+    },
+    {
+      "name": "SecurityCheck",
+      "status": "MISSING",
+      "details": "No CREATE TABLE statement in any migration",
+      "fieldCount": 10,
+      "indexCount": 0
+    },
+    {
+      "name": "SecurityFinding",
+      "status": "MISSING",
+      "details": "No CREATE TABLE statement in any migration",
+      "fieldCount": 11,
+      "indexCount": 0
+    },
+    {
+      "name": "Blocker",
+      "status": "MISSING",
+      "details": "No CREATE TABLE statement in any migration",
+      "fieldCount": 22,
+      "indexCount": 4
+    },
+    {
+      "name": "ReleaseCandidate",
+      "status": "MISSING",
+      "details": "No CREATE TABLE statement in any migration",
+      "fieldCount": 20,
+      "indexCount": 2
+    },
+    {
+      "name": "ReleaseArtifact",
+      "status": "MISSING",
+      "details": "No CREATE TABLE statement in any migration",
+      "fieldCount": 7,
+      "indexCount": 0
+    },
+    {
+      "name": "ReleaseApprovalChecklistItem",
+      "status": "MISSING",
+      "details": "No CREATE TABLE statement in any migration",
+      "fieldCount": 6,
+      "indexCount": 0
+    },
+    {
+      "name": "RollbackPlan",
+      "status": "MISSING",
+      "details": "No CREATE TABLE statement in any migration",
+      "fieldCount": 6,
+      "indexCount": 0
+    },
+    {
+      "name": "RDSignal",
+      "status": "MISSING",
+      "details": "No CREATE TABLE statement in any migration",
+      "fieldCount": 14,
+      "indexCount": 0
+    },
+    {
+      "name": "InfrastructureNode",
+      "status": "MISSING",
+      "details": "No CREATE TABLE statement in any migration",
+      "fieldCount": 11,
+      "indexCount": 0
+    },
+    {
+      "name": "ServiceStatus",
+      "status": "MISSING",
+      "details": "No CREATE TABLE statement in any migration",
+      "fieldCount": 7,
+      "indexCount": 0
+    },
+    {
+      "name": "AuditEvent",
+      "status": "MISSING",
+      "details": "No CREATE TABLE statement in any migration",
+      "fieldCount": 12,
+      "indexCount": 0
+    },
+    {
+      "name": "RepositoryPreview",
+      "status": "MISSING",
+      "details": "No CREATE TABLE statement in any migration",
+      "fieldCount": 12,
+      "indexCount": 1
+    },
+    {
+      "name": "WorkflowPreview",
+      "status": "MISSING",
+      "details": "No CREATE TABLE statement in any migration",
+      "fieldCount": 10,
+      "indexCount": 2
+    },
+    {
+      "name": "KnowledgeDocument",
+      "status": "MISSING",
+      "details": "No CREATE TABLE statement in any migration",
+      "fieldCount": 11,
+      "indexCount": 2
+    },
+    {
+      "name": "SupportRequest",
+      "status": "MISSING",
+      "details": "No CREATE TABLE statement in any migration",
+      "fieldCount": 12,
+      "indexCount": 3
+    },
+    {
+      "name": "SupportArticle",
+      "status": "MISSING",
+      "details": "No CREATE TABLE statement in any migration",
+      "fieldCount": 11,
+      "indexCount": 3
+    },
+    {
+      "name": "User",
+      "status": "MISSING",
+      "details": "No CREATE TABLE statement in any migration",
+      "fieldCount": 21,
+      "indexCount": 0
+    },
+    {
+      "name": "Role",
+      "status": "MISSING",
+      "details": "No CREATE TABLE statement in any migration",
+      "fieldCount": 8,
+      "indexCount": 0
+    },
+    {
+      "name": "Permission",
+      "status": "MISSING",
+      "details": "No CREATE TABLE statement in any migration",
+      "fieldCount": 7,
+      "indexCount": 0
+    },
+    {
+      "name": "UserRole",
+      "status": "MISSING",
+      "details": "No CREATE TABLE statement in any migration",
+      "fieldCount": 5,
+      "indexCount": 2
+    },
+    {
+      "name": "RolePermission",
+      "status": "MISSING",
+      "details": "No CREATE TABLE statement in any migration",
+      "fieldCount": 5,
+      "indexCount": 2
+    },
+    {
+      "name": "EvidenceSourceV2",
+      "status": "MIGRATED",
+      "details": "Created in: 20260520112500_add_rd_radar_persistence",
+      "fieldCount": 9,
+      "indexCount": 0
+    },
+    {
+      "name": "EvidenceItem",
+      "status": "MIGRATED",
+      "details": "Created in: 20260520112500_add_rd_radar_persistence",
+      "fieldCount": 12,
+      "indexCount": 1
+    },
+    {
+      "name": "EvidenceReview",
+      "status": "MIGRATED",
+      "details": "Created in: 20260520112500_add_rd_radar_persistence",
+      "fieldCount": 11,
+      "indexCount": 1
+    },
+    {
+      "name": "CandidateInitiative",
+      "status": "MIGRATED",
+      "details": "Created in: 20260520112500_add_rd_radar_persistence",
+      "fieldCount": 16,
+      "indexCount": 1
+    },
+    {
+      "name": "PMDecision",
+      "status": "MIGRATED",
+      "details": "Created in: 20260520112500_add_rd_radar_persistence",
+      "fieldCount": 9,
+      "indexCount": 1
+    },
+    {
+      "name": "WorkflowRunSummary",
+      "status": "MIGRATED",
+      "details": "Created in: 20260520112500_add_rd_radar_persistence",
+      "fieldCount": 12,
+      "indexCount": 0
+    },
+    {
+      "name": "GitHubIntegrationStatus",
+      "status": "MIGRATED",
+      "details": "Created in: 20260520112500_add_rd_radar_persistence",
+      "fieldCount": 11,
+      "indexCount": 1
+    },
+    {
+      "name": "AiProviderConfiguration",
+      "status": "MIGRATED",
+      "details": "Created in: 20260815190000_add_rd_radar_v1_local_llm",
+      "fieldCount": 14,
+      "indexCount": 1
+    },
+    {
+      "name": "AiModelConfiguration",
+      "status": "MIGRATED",
+      "details": "Created in: 20260815190000_add_rd_radar_v1_local_llm",
+      "fieldCount": 13,
+      "indexCount": 2
+    },
+    {
+      "name": "RepositoryConnection",
+      "status": "MIGRATED",
+      "details": "Created in: 20260815190000_add_rd_radar_v1_local_llm",
+      "fieldCount": 17,
+      "indexCount": 1
+    },
+    {
+      "name": "RDRadarAnalysisRun",
+      "status": "MIGRATED",
+      "details": "Created in: 20260815190000_add_rd_radar_v1_local_llm",
+      "fieldCount": 11,
+      "indexCount": 0
+    },
+    {
+      "name": "ConfigurationAuditEvent",
+      "status": "MIGRATED",
+      "details": "Created in: 20260815190000_add_rd_radar_v1_local_llm",
+      "fieldCount": 6,
+      "indexCount": 0
+    },
+    {
+      "name": "WorkflowRun",
+      "status": "MIGRATED",
+      "details": "Created in: 20260609000000_add_workflow_runtime_persistence",
+      "fieldCount": 13,
+      "indexCount": 3
+    },
+    {
+      "name": "WorkflowCallback",
+      "status": "MIGRATED",
+      "details": "Created in: 20260609000000_add_workflow_runtime_persistence",
+      "fieldCount": 16,
+      "indexCount": 3
+    },
+    {
+      "name": "WorkflowRunState",
+      "status": "MIGRATED",
+      "details": "Created in: 20260609000000_add_workflow_runtime_persistence",
+      "fieldCount": 13,
+      "indexCount": 3
+    },
+    {
+      "name": "WorkflowCallbackIdempotency",
+      "status": "MIGRATED",
+      "details": "Created in: 20260609000000_add_workflow_runtime_persistence",
+      "fieldCount": 7,
+      "indexCount": 1
+    },
+    {
+      "name": "Organization",
+      "status": "MIGRATED",
+      "details": "Created in: 20260906000000_add_agentic_multiuser_platform",
+      "fieldCount": 10,
+      "indexCount": 0
+    },
+    {
+      "name": "OrganizationMember",
+      "status": "MIGRATED",
+      "details": "Created in: 20260906000000_add_agentic_multiuser_platform",
+      "fieldCount": 7,
+      "indexCount": 3
+    },
+    {
+      "name": "UserSession",
+      "status": "MIGRATED",
+      "details": "Created in: 20260906000000_add_agentic_multiuser_platform",
+      "fieldCount": 9,
+      "indexCount": 3
+    },
+    {
+      "name": "Group",
+      "status": "MIGRATED",
+      "details": "Created in: 20260906000000_add_agentic_multiuser_platform",
+      "fieldCount": 10,
+      "indexCount": 0
+    },
+    {
+      "name": "GroupMember",
+      "status": "MIGRATED",
+      "details": "Created in: 20260906000000_add_agentic_multiuser_platform",
+      "fieldCount": 7,
+      "indexCount": 2
+    },
+    {
+      "name": "ProjectMember",
+      "status": "MIGRATED",
+      "details": "Created in: 20260906000000_add_agentic_multiuser_platform",
+      "fieldCount": 7,
+      "indexCount": 3
+    },
+    {
+      "name": "Conversation",
+      "status": "MIGRATED",
+      "details": "Created in: 20260906000000_add_agentic_multiuser_platform",
+      "fieldCount": 6,
+      "indexCount": 0
+    },
+    {
+      "name": "ConversationMessage",
+      "status": "MIGRATED",
+      "details": "Created in: 20260906000000_add_agentic_multiuser_platform",
+      "fieldCount": 6,
+      "indexCount": 0
+    },
+    {
+      "name": "AgentRun",
+      "status": "MIGRATED",
+      "details": "Created in: 20260906000000_add_agentic_multiuser_platform",
+      "fieldCount": 25,
+      "indexCount": 3
+    },
+    {
+      "name": "AgentPlan",
+      "status": "MIGRATED",
+      "details": "Created in: 20260906000000_add_agentic_multiuser_platform",
+      "fieldCount": 11,
+      "indexCount": 1
+    },
+    {
+      "name": "AgentRunEvent",
+      "status": "MIGRATED",
+      "details": "Created in: 20260906000000_add_agentic_multiuser_platform",
+      "fieldCount": 6,
+      "indexCount": 0
+    },
+    {
+      "name": "AgentApproval",
+      "status": "MIGRATED",
+      "details": "Created in: 20260906000000_add_agentic_multiuser_platform",
+      "fieldCount": 14,
+      "indexCount": 1
+    },
+    {
+      "name": "AgentArtifact",
+      "status": "MIGRATED",
+      "details": "Created in: 20260906000000_add_agentic_multiuser_platform",
+      "fieldCount": 10,
+      "indexCount": 0
+    },
+    {
+      "name": "AgentAuditRecord",
+      "status": "MIGRATED",
+      "details": "Created in: 20260906000000_add_agentic_multiuser_platform",
+      "fieldCount": 7,
+      "indexCount": 0
+    }
+  ],
+  "tablesInMigrations": [
+    "EvidenceSourceV2",
+    "EvidenceItem",
+    "EvidenceReview",
+    "CandidateInitiative",
+    "PMDecision",
+    "WorkflowRunSummary",
+    "GitHubIntegrationStatus",
+    "WorkflowRun",
+    "WorkflowCallback",
+    "WorkflowRunState",
+    "WorkflowCallbackIdempotency",
+    "AiProviderConfiguration",
+    "AiModelConfiguration",
+    "RepositoryConnection",
+    "RDRadarAnalysisRun",
+    "ConfigurationAuditEvent",
+    "Organization",
+    "OrganizationMember",
+    "UserSession",
+    "Group",
+    "GroupMember",
+    "ProjectMember",
+    "Conversation",
+    "ConversationMessage",
+    "AgentRun",
+    "AgentPlan",
+    "AgentRunEvent",
+    "AgentApproval",
+    "AgentArtifact",
+    "AgentAuditRecord"
+  ]
+}

@@ -1,0 +1,753 @@
+{
+  "date": "2026-09-23",
+  "comparison": {
+    "postImplementationFiles": 1313,
+    "changedSinceImplementation": [],
+    "baselineLimit": "Pre-runtime SHA256 manifest, not a runnable source checkout; closest recorded pre-runtime tests are in docs/phase-0a-control-loop.md."
+  },
+  "protectedFiles": [
+    {
+      "path": ".env.example",
+      "unchanged": true,
+      "beforeSha256": "a37b12ec2ee127b21c6edd16678faa1ccbc3c2db66f183f8030b0837f228c16b",
+      "currentSha256": "a37b12ec2ee127b21c6edd16678faa1ccbc3c2db66f183f8030b0837f228c16b"
+    },
+    {
+      "path": ".env.local",
+      "unchanged": true,
+      "beforeSha256": "a37b12ec2ee127b21c6edd16678faa1ccbc3c2db66f183f8030b0837f228c16b",
+      "currentSha256": "a37b12ec2ee127b21c6edd16678faa1ccbc3c2db66f183f8030b0837f228c16b"
+    },
+    {
+      "path": ".node-version",
+      "unchanged": true,
+      "beforeSha256": "f14b4987904bcb5814e4459a057ed4d20f58a633152288a761214dcd28780b56",
+      "currentSha256": "f14b4987904bcb5814e4459a057ed4d20f58a633152288a761214dcd28780b56"
+    },
+    {
+      "path": "backend\\.env",
+      "unchanged": true,
+      "beforeSha256": "bfe3d24617fe9d70fbd3eac0d0e6ee9092cfa50fc6925663fb4f260596fed6c8",
+      "currentSha256": "bfe3d24617fe9d70fbd3eac0d0e6ee9092cfa50fc6925663fb4f260596fed6c8"
+    },
+    {
+      "path": "backend\\.env.example",
+      "unchanged": true,
+      "beforeSha256": "f6963e9735ec3171203fe26533887bbd0ec98e0910659429c50ea33c8014cd74",
+      "currentSha256": "f6963e9735ec3171203fe26533887bbd0ec98e0910659429c50ea33c8014cd74"
+    },
+    {
+      "path": "backend\\package.json",
+      "unchanged": true,
+      "beforeSha256": "f390584ee98c749ec488226d3a5b8df9784662e3de059f7a566371334d7131aa",
+      "currentSha256": "f390584ee98c749ec488226d3a5b8df9784662e3de059f7a566371334d7131aa"
+    },
+    {
+      "path": "backend\\pnpm-lock.yaml",
+      "unchanged": true,
+      "beforeSha256": "66471dbaa6db153407234c3352f8d060a59178b8b972682ebb87614e6a42f699",
+      "currentSha256": "66471dbaa6db153407234c3352f8d060a59178b8b972682ebb87614e6a42f699"
+    },
+    {
+      "path": "backend\\prisma\\migrations\\20260101000000_baseline_core_schema\\migration.sql",
+      "unchanged": true,
+      "beforeSha256": "f53a8abbf1643303fc1be72e2bcea97b0e16d5efb17651439ae9d57fb3eacaa1",
+      "currentSha256": "f53a8abbf1643303fc1be72e2bcea97b0e16d5efb17651439ae9d57fb3eacaa1"
+    },
+    {
+      "path": "backend\\prisma\\migrations\\20260520112500_add_rd_radar_persistence\\migration.sql",
+      "unchanged": true,
+      "beforeSha256": "9304ba09f21252ed7749224fd1716f2562024039b98718b953464a4fbbd2a227",
+      "currentSha256": "9304ba09f21252ed7749224fd1716f2562024039b98718b953464a4fbbd2a227"
+    },
+    {
+      "path": "backend\\prisma\\migrations\\20260609000000_add_workflow_runtime_persistence\\migration.sql",
+      "unchanged": true,
+      "beforeSha256": "fc5021c71cc85f7b30bbe708b88189784a58926db0d459e6e5ad52fd40d0b732",
+      "currentSha256": "fc5021c71cc85f7b30bbe708b88189784a58926db0d459e6e5ad52fd40d0b732"
+    },
+    {
+      "path": "backend\\prisma\\migrations\\20260815190000_add_rd_radar_v1_local_llm\\migration.sql",
+      "unchanged": true,
+      "beforeSha256": "850496e224a68f425195f1bce7428a1fc570a9341b91f3377bef4d58d415abf4",
+      "currentSha256": "850496e224a68f425195f1bce7428a1fc570a9341b91f3377bef4d58d415abf4"
+    },
+    {
+      "path": "backend\\prisma\\migrations\\20260829153000_add_provider_structured_output_dialect\\migration.sql",
+      "unchanged": true,
+      "beforeSha256": "343e933a0ce4ff79229e68df3880d0092236aea9d76e20ed4c47dda768d5dbcc",
+      "currentSha256": "343e933a0ce4ff79229e68df3880d0092236aea9d76e20ed4c47dda768d5dbcc"
+    },
+    {
+      "path": "backend\\prisma\\migrations\\20260906000000_add_agentic_multiuser_platform\\migration.sql",
+      "unchanged": true,
+      "beforeSha256": "92c075b74e2c82385c1ee2823d99026ab1a034547fb27ae338c766f0a75ad002",
+      "currentSha256": "92c075b74e2c82385c1ee2823d99026ab1a034547fb27ae338c766f0a75ad002"
+    },
+    {
+      "path": "backend\\prisma\\migrations\\20260917000000_add_user_memory\\migration.sql",
+      "unchanged": true,
+      "beforeSha256": "faabfa8d8de286143feb303ec0986a5241e8f2458ed63d10dbfdb41763b8d3af",
+      "currentSha256": "faabfa8d8de286143feb303ec0986a5241e8f2458ed63d10dbfdb41763b8d3af"
+    },
+    {
+      "path": "backend\\prisma\\migrations\\20260917120000_add_conversation_attachment\\migration.sql",
+      "unchanged": true,
+      "beforeSha256": "7d8d5befe5f7a5c1040ebd28246b83d2ca85a2c0e6eb98bb61c611db10e01d95",
+      "currentSha256": "7d8d5befe5f7a5c1040ebd28246b83d2ca85a2c0e6eb98bb61c611db10e01d95"
+    },
+    {
+      "path": "backend\\prisma\\migrations\\20260920000000_add_agent_initiative_runtime\\migration.sql",
+      "unchanged": true,
+      "beforeSha256": "21eacfe545e41466377a066f0c937e7d8242d44cb040df8459fb2c59845125fe",
+      "currentSha256": "21eacfe545e41466377a066f0c937e7d8242d44cb040df8459fb2c59845125fe"
+    },
+    {
+      "path": "backend\\prisma\\missing_relations.json",
+      "unchanged": true,
+      "beforeSha256": "5129b4152feba8c1a88aa03371462213053d83b4baee3157abef75eaf672988c",
+      "currentSha256": "5129b4152feba8c1a88aa03371462213053d83b4baee3157abef75eaf672988c"
+    },
+    {
+      "path": "backend\\prisma\\reconciliation_detailed.json",
+      "unchanged": true,
+      "beforeSha256": "e78045c45f13b6f9b50eb67b9384979be5204e20cc983d97aa9bd17ccab6c881",
+      "currentSha256": "e78045c45f13b6f9b50eb67b9384979be5204e20cc983d97aa9bd17ccab6c881"
+    },
+    {
+      "path": "backend\\prisma\\reconciliation_matrix.json",
+      "unchanged": true,
+      "beforeSha256": "1945082bf6da244c6a47d203734cf59967ab3d9639d00af77db81af200b4e705",
+      "currentSha256": "1945082bf6da244c6a47d203734cf59967ab3d9639d00af77db81af200b4e705"
+    },
+    {
+      "path": "backend\\prisma\\schema.prisma",
+      "unchanged": true,
+      "beforeSha256": "6834bb403165f4ebeba8208f211d1bfec6517422d8e81572391dcb41e09a82fb",
+      "currentSha256": "6834bb403165f4ebeba8208f211d1bfec6517422d8e81572391dcb41e09a82fb"
+    },
+    {
+      "path": "backend\\prisma\\seed.ts",
+      "unchanged": true,
+      "beforeSha256": "8a7615e9ac43086dd435a39897873405cbc4b0218119a226de9a3ec5062b877f",
+      "currentSha256": "8a7615e9ac43086dd435a39897873405cbc4b0218119a226de9a3ec5062b877f"
+    },
+    {
+      "path": "backend\\src\\ai-gateway\\ai-gateway-policy.dto.ts",
+      "unchanged": true,
+      "beforeSha256": "eaf1f7c8b47127137a722e524a4162b69e38ebf66caa3a5d6521ea1d75085fff",
+      "currentSha256": "eaf1f7c8b47127137a722e524a4162b69e38ebf66caa3a5d6521ea1d75085fff"
+    },
+    {
+      "path": "backend\\src\\ai-gateway\\ai-gateway-policy.service.ts",
+      "unchanged": true,
+      "beforeSha256": "8572baab5f9b4c23e0b92869b59f62b46c3437f2a0b7f42a3db10d69d375378c",
+      "currentSha256": "8572baab5f9b4c23e0b92869b59f62b46c3437f2a0b7f42a3db10d69d375378c"
+    },
+    {
+      "path": "backend\\src\\ai-gateway\\ai-gateway-provider-settings.dto.ts",
+      "unchanged": true,
+      "beforeSha256": "b4cad2461460894b08d0e198d5581cb3983cf9ccf9898ce634bd5d7374f8bf15",
+      "currentSha256": "b4cad2461460894b08d0e198d5581cb3983cf9ccf9898ce634bd5d7374f8bf15"
+    },
+    {
+      "path": "backend\\src\\ai-gateway\\ai-gateway-provider-settings.service.ts",
+      "unchanged": true,
+      "beforeSha256": "facac04b5063fc764548b7103b7b59e98f4a34958f8b856674663876a30e39d5",
+      "currentSha256": "facac04b5063fc764548b7103b7b59e98f4a34958f8b856674663876a30e39d5"
+    },
+    {
+      "path": "backend\\src\\ai-gateway\\ai-gateway.controller.ts",
+      "unchanged": true,
+      "beforeSha256": "bd94de7b0a9a286d56f6b2a44695d60b49b71f565fc7fc0cd48efd1b86a100b2",
+      "currentSha256": "bd94de7b0a9a286d56f6b2a44695d60b49b71f565fc7fc0cd48efd1b86a100b2"
+    },
+    {
+      "path": "backend\\src\\ai-gateway\\ai-gateway.dto.ts",
+      "unchanged": true,
+      "beforeSha256": "606b428ed8c7eddb7c9ed5537a8f7d1d08adbea24700cd2a385dca623462c75c",
+      "currentSha256": "606b428ed8c7eddb7c9ed5537a8f7d1d08adbea24700cd2a385dca623462c75c"
+    },
+    {
+      "path": "backend\\src\\ai-gateway\\ai-gateway.service.ts",
+      "unchanged": true,
+      "beforeSha256": "988d166ed4393a0a35f378e8726e9e4ad86d56e8d513ec20046a381bf8593824",
+      "currentSha256": "988d166ed4393a0a35f378e8726e9e4ad86d56e8d513ec20046a381bf8593824"
+    },
+    {
+      "path": "backend\\src\\ai-gateway\\assistant-answer.contract.ts",
+      "unchanged": true,
+      "beforeSha256": "5415979f866a420d9d2f2d900caef14a773fb84c6c1ff448c8ce8f2e8c4f5268",
+      "currentSha256": "5415979f866a420d9d2f2d900caef14a773fb84c6c1ff448c8ce8f2e8c4f5268"
+    },
+    {
+      "path": "backend\\src\\ai-gateway\\assistant-context-budget.ts",
+      "unchanged": true,
+      "beforeSha256": "e0ebbe686ec1e02475ded1fb3c0028dd478df796eff98f1e7c608c9b5c72576f",
+      "currentSha256": "e0ebbe686ec1e02475ded1fb3c0028dd478df796eff98f1e7c608c9b5c72576f"
+    },
+    {
+      "path": "backend\\src\\ai-gateway\\llm-json.parser.ts",
+      "unchanged": true,
+      "beforeSha256": "97d03f2ae67af7a979747b2a53f747ab35867ee4141acbc3394716c45d6470e0",
+      "currentSha256": "97d03f2ae67af7a979747b2a53f747ab35867ee4141acbc3394716c45d6470e0"
+    },
+    {
+      "path": "backend\\src\\ai-gateway\\provider-adapter.registry.ts",
+      "unchanged": true,
+      "beforeSha256": "310fa39d27fb576f8fc063708b48e878d02fe66591212f5fecd56968c2255216",
+      "currentSha256": "310fa39d27fb576f8fc063708b48e878d02fe66591212f5fecd56968c2255216"
+    },
+    {
+      "path": "backend\\src\\ai-gateway\\provider-diagnostic.ts",
+      "unchanged": true,
+      "beforeSha256": "0ded1679a380e3a425b2dec35875135276aa77180074c165a062199e6f2c974d",
+      "currentSha256": "0ded1679a380e3a425b2dec35875135276aa77180074c165a062199e6f2c974d"
+    },
+    {
+      "path": "backend\\src\\ai-gateway\\provider-execution.adapter.ts",
+      "unchanged": true,
+      "beforeSha256": "ffe50e76132fb02d3634b844c1c77a4ce7230f0473fc71a3e5ee78c80e6f9bc9",
+      "currentSha256": "ffe50e76132fb02d3634b844c1c77a4ce7230f0473fc71a3e5ee78c80e6f9bc9"
+    },
+    {
+      "path": "backend\\src\\ai-gateway\\provider-url.policy.ts",
+      "unchanged": true,
+      "beforeSha256": "58dab0fde4db713d5f7cac845043cc43fe6d77a4bc082c71f799380c8ef04aab",
+      "currentSha256": "58dab0fde4db713d5f7cac845043cc43fe6d77a4bc082c71f799380c8ef04aab"
+    },
+    {
+      "path": "backend\\src\\ai-gateway\\providers\\ai-gateway-provider-mode.ts",
+      "unchanged": true,
+      "beforeSha256": "7d26d748a3b7ee8f4b31e3314cf699db8963eb7df122cbc8235b2eecb7eb3093",
+      "currentSha256": "7d26d748a3b7ee8f4b31e3314cf699db8963eb7df122cbc8235b2eecb7eb3093"
+    },
+    {
+      "path": "backend\\src\\ai-gateway\\providers\\ai-gateway-provider.adapter.ts",
+      "unchanged": true,
+      "beforeSha256": "3cf46f0eb2ba85436e2a16a0c77a494ec8be7a977e3f5c7ae3c11bbc5ba770d6",
+      "currentSha256": "3cf46f0eb2ba85436e2a16a0c77a494ec8be7a977e3f5c7ae3c11bbc5ba770d6"
+    },
+    {
+      "path": "backend\\src\\ai-gateway\\providers\\mock-ai-gateway-provider.adapter.ts",
+      "unchanged": true,
+      "beforeSha256": "37442da60ed97af5217b80b00725067e7366c7b589c22b1ff18f18e0d1f28b4a",
+      "currentSha256": "37442da60ed97af5217b80b00725067e7366c7b589c22b1ff18f18e0d1f28b4a"
+    },
+    {
+      "path": "backend\\src\\ai-gateway\\providers\\openai\\openai-dry-run-provider.adapter.ts",
+      "unchanged": true,
+      "beforeSha256": "e37bbf77e1f89f7abd215e16f8477fd9510a9ac5b310a1c099e2bd34b96f6ac1",
+      "currentSha256": "e37bbf77e1f89f7abd215e16f8477fd9510a9ac5b310a1c099e2bd34b96f6ac1"
+    },
+    {
+      "path": "backend\\src\\ai-gateway\\providers\\openai\\openai-text-preview.transport.ts",
+      "unchanged": true,
+      "beforeSha256": "0e51a81f535cd33ca17efd2f5ec7fe80ffb91f4e21fd791ef65e5aaf24b357f4",
+      "currentSha256": "0e51a81f535cd33ca17efd2f5ec7fe80ffb91f4e21fd791ef65e5aaf24b357f4"
+    },
+    {
+      "path": "backend\\src\\ai-gateway\\providers\\vllm-openai-compatible.adapter.ts",
+      "unchanged": true,
+      "beforeSha256": "8b48788278954a913e478311cbc93b8a5f946d35b30db692b4ca0368ed9f1f66",
+      "currentSha256": "8b48788278954a913e478311cbc93b8a5f946d35b30db692b4ca0368ed9f1f66"
+    },
+    {
+      "path": "backend\\src\\ai-gateway\\rd-radar-output.schema.ts",
+      "unchanged": true,
+      "beforeSha256": "13aa3ebf1be79058decdc81f51828ff70c6243fc8a5895a4a1b688cc7db2f4a6",
+      "currentSha256": "13aa3ebf1be79058decdc81f51828ff70c6243fc8a5895a4a1b688cc7db2f4a6"
+    },
+    {
+      "path": "backend\\src\\ai-gateway\\runtime-configuration.dto.ts",
+      "unchanged": true,
+      "beforeSha256": "5a0a5c197630eb9e4be57b3df5164e582062d33400df1f610159f523ce713d45",
+      "currentSha256": "5a0a5c197630eb9e4be57b3df5164e582062d33400df1f610159f523ce713d45"
+    },
+    {
+      "path": "backend\\src\\ai-gateway\\runtime-configuration.service.ts",
+      "unchanged": true,
+      "beforeSha256": "3fcedee947bfa1fb2bbcd7c855240696d947a063f52c3d1bbe0d25994d3927b7",
+      "currentSha256": "3fcedee947bfa1fb2bbcd7c855240696d947a063f52c3d1bbe0d25994d3927b7"
+    },
+    {
+      "path": "backend\\src\\ai-gateway\\sekhem-assistant-identity.ts",
+      "unchanged": true,
+      "beforeSha256": "f4e0e92ad3030e3d6df9658493957ed89b66ac261b03de79c78d121b7bdc57a5",
+      "currentSha256": "f4e0e92ad3030e3d6df9658493957ed89b66ac261b03de79c78d121b7bdc57a5"
+    },
+    {
+      "path": "backend\\src\\audit\\audit.service.ts",
+      "unchanged": true,
+      "beforeSha256": "efd920ebb1cc4fc566a4f7c104d70d60bb24abe2293daab2e913b95c5ea554d8",
+      "currentSha256": "efd920ebb1cc4fc566a4f7c104d70d60bb24abe2293daab2e913b95c5ea554d8"
+    },
+    {
+      "path": "backend\\src\\auth\\auth.controller.ts",
+      "unchanged": true,
+      "beforeSha256": "497fafb2c7cb86a6921c9dfb8495cae0326a4eab447449a01f599568347e8eef",
+      "currentSha256": "497fafb2c7cb86a6921c9dfb8495cae0326a4eab447449a01f599568347e8eef"
+    },
+    {
+      "path": "backend\\src\\auth\\auth.dto.ts",
+      "unchanged": true,
+      "beforeSha256": "5635d545cd95bcf32bc4a1f6c448d78066788bab03c7ace69dbf871994684961",
+      "currentSha256": "5635d545cd95bcf32bc4a1f6c448d78066788bab03c7ace69dbf871994684961"
+    },
+    {
+      "path": "backend\\src\\auth\\auth.service.ts",
+      "unchanged": true,
+      "beforeSha256": "d9333c127164ce172b6d50aebf1be4b985ac0e54b2c4f3c928541c1e4c466596",
+      "currentSha256": "d9333c127164ce172b6d50aebf1be4b985ac0e54b2c4f3c928541c1e4c466596"
+    },
+    {
+      "path": "backend\\src\\auth\\authz.constants.ts",
+      "unchanged": true,
+      "beforeSha256": "afab2d55cf47b369644cc58e50cd4f49f34115a5e42ec5dbffbc5c29420a23e2",
+      "currentSha256": "afab2d55cf47b369644cc58e50cd4f49f34115a5e42ec5dbffbc5c29420a23e2"
+    },
+    {
+      "path": "backend\\src\\auth\\authz.guard.ts",
+      "unchanged": true,
+      "beforeSha256": "fefc3d27920290bf5f93408a154cd2046fe90dc622194e33a5ac76539aaa1b1f",
+      "currentSha256": "fefc3d27920290bf5f93408a154cd2046fe90dc622194e33a5ac76539aaa1b1f"
+    },
+    {
+      "path": "backend\\src\\auth\\machine-callback.guard.ts",
+      "unchanged": true,
+      "beforeSha256": "aee7a1c5b0675cc2593123e436105e2f075f1593b7107821c99e290d69bbcfe9",
+      "currentSha256": "aee7a1c5b0675cc2593123e436105e2f075f1593b7107821c99e290d69bbcfe9"
+    },
+    {
+      "path": "backend\\src\\auth\\project-access.service.ts",
+      "unchanged": true,
+      "beforeSha256": "1dc60ba9b402f39069e4c57859e6bfba907ae6f24231d299a3390c3ef82ccd79",
+      "currentSha256": "1dc60ba9b402f39069e4c57859e6bfba907ae6f24231d299a3390c3ef82ccd79"
+    },
+    {
+      "path": "backend\\src\\auth\\resource-authz.service.ts",
+      "unchanged": true,
+      "beforeSha256": "5c744981d1b9ff9e57e520d9cfb1ee41d9fc9260ad5488d9872ac57c2321f9ed",
+      "currentSha256": "5c744981d1b9ff9e57e520d9cfb1ee41d9fc9260ad5488d9872ac57c2321f9ed"
+    },
+    {
+      "path": "backend\\src\\auth\\roles.decorator.ts",
+      "unchanged": true,
+      "beforeSha256": "b4b04fb6a63fdb9a34d134297e5a77d4a0d9d504bed6a30f544e532822c0a42c",
+      "currentSha256": "b4b04fb6a63fdb9a34d134297e5a77d4a0d9d504bed6a30f544e532822c0a42c"
+    },
+    {
+      "path": "package.json",
+      "unchanged": true,
+      "beforeSha256": "9635b772b7d8e703bb4e994c799b6be8ae7cc06007d86b9c846bebfb31475b1d",
+      "currentSha256": "9635b772b7d8e703bb4e994c799b6be8ae7cc06007d86b9c846bebfb31475b1d"
+    },
+    {
+      "path": "pnpm-lock.yaml",
+      "unchanged": true,
+      "beforeSha256": "bacf578a3cf262d8f99f74334ce1b88d9e97e61590d0f886dcdfd1e2c7f7a4cc",
+      "currentSha256": "bacf578a3cf262d8f99f74334ce1b88d9e97e61590d0f886dcdfd1e2c7f7a4cc"
+    }
+  ],
+  "nonpassTestFiles": [
+    {
+      "path": "backend\\test\\ai-gateway-provider-settings.test.ts",
+      "preRuntimeExists": true,
+      "preRuntimeSha256": "4f17f3a2d4a0394484339647962fcc841c644256d372225867cdcb39d3f72a34",
+      "currentSha256": "4f17f3a2d4a0394484339647962fcc841c644256d372225867cdcb39d3f72a34",
+      "unchangedSincePreRuntime": true
+    },
+    {
+      "path": "backend\\test\\ai-patch.http.test.ts",
+      "preRuntimeExists": true,
+      "preRuntimeSha256": "70694e100f0408466d4421ab1c4a0e440a255abb694555c3895799079ae91145",
+      "currentSha256": "70694e100f0408466d4421ab1c4a0e440a255abb694555c3895799079ae91145",
+      "unchangedSincePreRuntime": true
+    },
+    {
+      "path": "backend\\test\\auth-rbac.http.test.ts",
+      "preRuntimeExists": true,
+      "preRuntimeSha256": "6ca6f0d15e153912d3f068acfeb05abb7630749aea359d36902502b7db173688",
+      "currentSha256": "6ca6f0d15e153912d3f068acfeb05abb7630749aea359d36902502b7db173688",
+      "unchangedSincePreRuntime": true
+    },
+    {
+      "path": "backend\\test\\auth-service-contract.test.ts",
+      "preRuntimeExists": true,
+      "preRuntimeSha256": "2d3be018371f47bc0e99aa7eca99264ffaaabbde2694c920982304396f39a18c",
+      "currentSha256": "2d3be018371f47bc0e99aa7eca99264ffaaabbde2694c920982304396f39a18c",
+      "unchangedSincePreRuntime": true
+    },
+    {
+      "path": "backend\\test\\auth.http.test.ts",
+      "preRuntimeExists": true,
+      "preRuntimeSha256": "6017a1f728771d0c5ac91e54b64183ca2f19948f571797e06a4f3a9159cd0fd3",
+      "currentSha256": "6017a1f728771d0c5ac91e54b64183ca2f19948f571797e06a4f3a9159cd0fd3",
+      "unchangedSincePreRuntime": true
+    },
+    {
+      "path": "backend\\test\\automation-contract.test.ts",
+      "preRuntimeExists": true,
+      "preRuntimeSha256": "2ca43cdc44e9e06b7dc84602107d1b09079bcdb19015bc2261356d037e2d657f",
+      "currentSha256": "2ca43cdc44e9e06b7dc84602107d1b09079bcdb19015bc2261356d037e2d657f",
+      "unchangedSincePreRuntime": true
+    },
+    {
+      "path": "backend\\test\\execution-plane.test.ts",
+      "preRuntimeExists": true,
+      "preRuntimeSha256": "20548f001c84872137c3b0fde6f4bb717d7a0099e2622a8333c61363042a7294",
+      "currentSha256": "20548f001c84872137c3b0fde6f4bb717d7a0099e2622a8333c61363042a7294",
+      "unchangedSincePreRuntime": true
+    },
+    {
+      "path": "backend\\test\\http-smoke.test.ts",
+      "preRuntimeExists": true,
+      "preRuntimeSha256": "aa36a227c516710aff1772cdcc9b6f76cad72a58c5a7c1b80570613d5c8335c5",
+      "currentSha256": "aa36a227c516710aff1772cdcc9b6f76cad72a58c5a7c1b80570613d5c8335c5",
+      "unchangedSincePreRuntime": true
+    },
+    {
+      "path": "backend\\test\\http-write.test.ts",
+      "preRuntimeExists": true,
+      "preRuntimeSha256": "9993995945fc225dfed7fe1e2d1f9febe372322bf4b885651a0b55c24099d262",
+      "currentSha256": "9993995945fc225dfed7fe1e2d1f9febe372322bf4b885651a0b55c24099d262",
+      "unchangedSincePreRuntime": true
+    },
+    {
+      "path": "backend\\test\\rd-radar.http.test.ts",
+      "preRuntimeExists": true,
+      "preRuntimeSha256": "da3931657635d4c4817c8567e73d9fa31c85ee72fe37c9b4836023b518668a57",
+      "currentSha256": "da3931657635d4c4817c8567e73d9fa31c85ee72fe37c9b4836023b518668a57",
+      "unchangedSincePreRuntime": true
+    },
+    {
+      "path": "backend\\test\\trusted-runtime-persistence.test.ts",
+      "preRuntimeExists": false,
+      "preRuntimeSha256": null,
+      "currentSha256": "9bbf1f1cbd7d12c9dad72a03e23afcb59f591accb03d0c7afc2c94037717766e",
+      "unchangedSincePreRuntime": null
+    }
+  ],
+  "runtimeInventory": [
+    {
+      "path": ".gitignore",
+      "status": "MODIFIED",
+      "category": "A. Required Runtime implementation",
+      "preRuntimeSha256": "9228165d212d289032cd7cff06e2e3ba53348bfc2ae62f7513fd16d624641f30",
+      "postImplementationSha256": "1e5b8977ca8f099a3b7ea2863384deea635f9ff3d6061da8737e8baed3a1e4de",
+      "auditSha256": "1e5b8977ca8f099a3b7ea2863384deea635f9ff3d6061da8737e8baed3a1e4de"
+    },
+    {
+      "path": "app\\page.tsx",
+      "status": "MODIFIED",
+      "category": "C. Required UI",
+      "preRuntimeSha256": "e9ba2b66898d415eeac364513d928ffcfb9be1d29ab57ad488bc2475b932d8b1",
+      "postImplementationSha256": "5a508e53bb0f4c875d96f97fe0f7b170702868efc686a56c0d626c284b919e96",
+      "auditSha256": "5a508e53bb0f4c875d96f97fe0f7b170702868efc686a56c0d626c284b919e96"
+    },
+    {
+      "path": "app\\workspace.css",
+      "status": "MODIFIED",
+      "category": "C. Required UI",
+      "preRuntimeSha256": "c36b826f0386a792c9cb08535214d7980e8a0044682ee03f177bec98dbe37b1a",
+      "postImplementationSha256": "02b9756b407edb83da505e52815931d39af08ef83b0bbc01b1961b331be2ae55",
+      "auditSha256": "02b9756b407edb83da505e52815931d39af08ef83b0bbc01b1961b331be2ae55"
+    },
+    {
+      "path": "backend\\src\\agent-runtime\\agent-result.ts",
+      "status": "MODIFIED",
+      "category": "A. Required Runtime implementation",
+      "preRuntimeSha256": "50ecea753945621bd76388f3b1ae121c3c0ac4f6418a76fcb6060d545f59167c",
+      "postImplementationSha256": "43530804a7264be6bcf3910ba121bf44796d79a47710c3c9890afaf156e65ad5",
+      "auditSha256": "43530804a7264be6bcf3910ba121bf44796d79a47710c3c9890afaf156e65ad5"
+    },
+    {
+      "path": "backend\\src\\agent-runtime\\agent-runtime.module.ts",
+      "status": "MODIFIED",
+      "category": "A. Required Runtime implementation",
+      "preRuntimeSha256": "5687f29c2f38d40bfd169e7ff482129dff57ff65e8003b5e6260477408e29419",
+      "postImplementationSha256": "74ad4010f3356f70efe911c35d2dc026f92f7f2058d599d3f0086223aaed8fed",
+      "auditSha256": "74ad4010f3356f70efe911c35d2dc026f92f7f2058d599d3f0086223aaed8fed"
+    },
+    {
+      "path": "backend\\src\\agent-runtime\\agent-runtime.service.ts",
+      "status": "MODIFIED",
+      "category": "A. Required Runtime implementation",
+      "preRuntimeSha256": "f517a6f618266acf4d845a6cc23fb7469d48d6e71bea1da8eb7d53e25b1aeb7f",
+      "postImplementationSha256": "694b036839bdb9453d530251aba9e8661b696975cd24d0973aa0c7e9ec95be37",
+      "auditSha256": "694b036839bdb9453d530251aba9e8661b696975cd24d0973aa0c7e9ec95be37"
+    },
+    {
+      "path": "backend\\src\\agent-runtime\\tools\\tool-contract.ts",
+      "status": "MODIFIED",
+      "category": "A. Required Runtime implementation",
+      "preRuntimeSha256": "f0e81ba33d36ac0fe9eb1a1d1399423fad5e7fedd7e64a5be719fa090ef22584",
+      "postImplementationSha256": "b08c533da94179b50381ef641498afd9183fc2d9eafdf47d0ee1891f8560e423",
+      "auditSha256": "b08c533da94179b50381ef641498afd9183fc2d9eafdf47d0ee1891f8560e423"
+    },
+    {
+      "path": "backend\\src\\agent-runtime\\tools\\tool-registry.service.ts",
+      "status": "MODIFIED",
+      "category": "A. Required Runtime implementation",
+      "preRuntimeSha256": "61ea2951c3e7d86003721a274b95e16827a8fa77c87ccf3db12c4337984683c9",
+      "postImplementationSha256": "b236642f0e1dbc290b0c38513fc077a1a23c4c9c33bd23b1783fd2f886071028",
+      "auditSha256": "b236642f0e1dbc290b0c38513fc077a1a23c4c9c33bd23b1783fd2f886071028"
+    },
+    {
+      "path": "backend\\src\\agent-runtime\\tools\\tool-scope.service.ts",
+      "status": "MODIFIED",
+      "category": "A. Required Runtime implementation",
+      "preRuntimeSha256": "527b9315f294ff8166bb78b5f08fea64ac4411eb8a2faca17bee85a5b88c1fcf",
+      "postImplementationSha256": "20e89a69a622153360a7884961e333f850d9294e6d2c2c6e964907a8df3667f8",
+      "auditSha256": "20e89a69a622153360a7884961e333f850d9294e6d2c2c6e964907a8df3667f8"
+    },
+    {
+      "path": "backend\\src\\agent-runtime\\understanding\\agent-presentation.ts",
+      "status": "MODIFIED",
+      "category": "A. Required Runtime implementation",
+      "preRuntimeSha256": "a886f472cfc9b2799c2a4d49e227b29326c2d85e68e861d04e265b8442c25770",
+      "postImplementationSha256": "b13c15b9a4447224975be3c4b2dd6fb714f6a2ba23a28934ad1d480000477f4d",
+      "auditSha256": "b13c15b9a4447224975be3c4b2dd6fb714f6a2ba23a28934ad1d480000477f4d"
+    },
+    {
+      "path": "backend\\src\\data-access\\postgres-product-read.repository.ts",
+      "status": "MODIFIED",
+      "category": "A. Required Runtime implementation",
+      "preRuntimeSha256": "be60f90db0cc7080c7c3fc3408eaaf8b2dba4db129f36aa96ea893e74b447325",
+      "postImplementationSha256": "85feffd915ad3bcd15c16855e3bbb88ccd825e0eb5b5d8113f8468e1727af4b2",
+      "auditSha256": "85feffd915ad3bcd15c16855e3bbb88ccd825e0eb5b5d8113f8468e1727af4b2"
+    },
+    {
+      "path": "backend\\src\\main.ts",
+      "status": "MODIFIED",
+      "category": "A. Required Runtime implementation",
+      "preRuntimeSha256": "afb8c907fcd30e386b2ff7cb1e01775aa7c89a94c5c644a7d37ea731e719f8d2",
+      "postImplementationSha256": "28d9a8e368fed72406a51f5bca78a051ecb15d7472552cf55c1a57dc32715b86",
+      "auditSha256": "28d9a8e368fed72406a51f5bca78a051ecb15d7472552cf55c1a57dc32715b86"
+    },
+    {
+      "path": "backend\\test\\tool-authorization.test.ts",
+      "status": "MODIFIED",
+      "category": "B. Required tests",
+      "preRuntimeSha256": "9b19a52d1d364c19625c0728dd2bb24566c2e30b2297cfb426f8a327d61d8062",
+      "postImplementationSha256": "1c8d50b791a38d8110f6d2fd4e3792bfdef118b748d8a4c1f10c29c69d946e2b",
+      "auditSha256": "1c8d50b791a38d8110f6d2fd4e3792bfdef118b748d8a4c1f10c29c69d946e2b"
+    },
+    {
+      "path": "components\\chat\\agent-run-card.tsx",
+      "status": "MODIFIED",
+      "category": "C. Required UI",
+      "preRuntimeSha256": "0f2d7a3b1af096a6ba4706db8a47d595565e25572319a878813257d51139faf7",
+      "postImplementationSha256": "e6ed67602758ac83b2c7312350a27f223303f67bf679ca0a75f97b4f4d04c8bc",
+      "auditSha256": "e6ed67602758ac83b2c7312350a27f223303f67bf679ca0a75f97b4f4d04c8bc"
+    },
+    {
+      "path": "components\\workspace\\agent-control-card.tsx",
+      "status": "MODIFIED",
+      "category": "C. Required UI",
+      "preRuntimeSha256": "f5cb33bf0ca81032abf1e260b059e522e931989b5456eb6fafa93586f51cf2a3",
+      "postImplementationSha256": "9419450259de2ac419fffb16892efbfa3144c4ed7d185874bcf4929900cee921",
+      "auditSha256": "9419450259de2ac419fffb16892efbfa3144c4ed7d185874bcf4929900cee921"
+    },
+    {
+      "path": "components\\workspace\\agent-inspector.tsx",
+      "status": "MODIFIED",
+      "category": "C. Required UI",
+      "preRuntimeSha256": "5c74c523075c9433ae1ae48f5c30c4525afaa2fc629d4d6e47905f92dee125b6",
+      "postImplementationSha256": "99b7c917f7ac6b75151f8c1d1b8b436ab13dbb6b660f024a31afaf34abeae21b",
+      "auditSha256": "99b7c917f7ac6b75151f8c1d1b8b436ab13dbb6b660f024a31afaf34abeae21b"
+    },
+    {
+      "path": "components\\workspace\\agent-workspace.tsx",
+      "status": "MODIFIED",
+      "category": "C. Required UI",
+      "preRuntimeSha256": "06484c336f16f611b63d7c9cdee4368baf34f00a3250b1f5ff99c6854ce76a93",
+      "postImplementationSha256": "d0496c1ca633e3222400efa6618ad4d256157ec998e0cb403da4792380e2f104",
+      "auditSha256": "d0496c1ca633e3222400efa6618ad4d256157ec998e0cb403da4792380e2f104"
+    },
+    {
+      "path": "components\\workspace\\sekhem-primitives.tsx",
+      "status": "MODIFIED",
+      "category": "C. Required UI",
+      "preRuntimeSha256": "6774ed7d216e5eb104c235150938a8f0309bab314e60c50fdd0ec60ca17d1db0",
+      "postImplementationSha256": "3e64655545a51aa806c274018f7127089a49896ca5234375f1190c8d5e83bf3d",
+      "auditSha256": "3e64655545a51aa806c274018f7127089a49896ca5234375f1190c8d5e83bf3d"
+    },
+    {
+      "path": "components\\workspace\\sekhem-shell.tsx",
+      "status": "MODIFIED",
+      "category": "C. Required UI",
+      "preRuntimeSha256": "70d3a894827cc0e6e5d642120f8999982419519e8acd2b05ddbf8e5e0946ca6a",
+      "postImplementationSha256": "694513f3aa1e5bc910d9a395c294c93903d54effc501dc374542836e32372c12",
+      "auditSha256": "694513f3aa1e5bc910d9a395c294c93903d54effc501dc374542836e32372c12"
+    },
+    {
+      "path": "hooks\\useAgentRunEvents.ts",
+      "status": "MODIFIED",
+      "category": "C. Required UI",
+      "preRuntimeSha256": "67035ddfe6a7e5282a58df7c794317e1490f28c3b29ca2ebcf1e14fa1f32725d",
+      "postImplementationSha256": "44a6ac6fe39b162b057e6f1e85a280cf259e39935a1d773c527eb00f8d73aa91",
+      "auditSha256": "44a6ac6fe39b162b057e6f1e85a280cf259e39935a1d773c527eb00f8d73aa91"
+    },
+    {
+      "path": "lib\\sekhem-agent.ts",
+      "status": "MODIFIED",
+      "category": "C. Required UI",
+      "preRuntimeSha256": "58c42425ff34b551a64ac25869225585b1bac428831c44d79394a1ff8af66f69",
+      "postImplementationSha256": "c4c6942610035c29aee887648bc5ccca3cc3eb1fbfac3773efa442abc626e2b1",
+      "auditSha256": "c4c6942610035c29aee887648bc5ccca3cc3eb1fbfac3773efa442abc626e2b1"
+    },
+    {
+      "path": "test\\agent-result-presentation.test.ts",
+      "status": "MODIFIED",
+      "category": "B. Required tests",
+      "preRuntimeSha256": "810955bff123c6f0bed81d5489d3bd294a786c6b9a9156bbd51a64967ce2e243",
+      "postImplementationSha256": "e5c5ae8755f05d1e9d20521b5029f51915b4afd3b045c219b2ff880ba33c2979",
+      "auditSha256": "e5c5ae8755f05d1e9d20521b5029f51915b4afd3b045c219b2ff880ba33c2979"
+    },
+    {
+      "path": "test\\sekhem-agent-events.test.ts",
+      "status": "MODIFIED",
+      "category": "B. Required tests",
+      "preRuntimeSha256": "5079b81578785201acf0132a4f2541baaa639f454b0f528c26ee37a831ada83c",
+      "postImplementationSha256": "890f0f40b5fe6c806f598402a2ffb137ebfcbfb5ed4b1aeb4d5874b821ec04b9",
+      "auditSha256": "890f0f40b5fe6c806f598402a2ffb137ebfcbfb5ed4b1aeb4d5874b821ec04b9"
+    },
+    {
+      "path": "test\\workspace-design.test.ts",
+      "status": "MODIFIED",
+      "category": "B. Required tests",
+      "preRuntimeSha256": "c0bbbd90b1beef94a5c287c3707cefeeb9897fcba8b5aedb00695aafd5a12504",
+      "postImplementationSha256": "3345b877f4d9786c0520e31eb1d5713a4b20b44e16bcb117998adf3b8f2ba3bd",
+      "auditSha256": "3345b877f4d9786c0520e31eb1d5713a4b20b44e16bcb117998adf3b8f2ba3bd"
+    },
+    {
+      "path": "backend\\scripts\\setup-runtime-tls.ps1",
+      "status": "ADDED",
+      "category": "A. Required Runtime implementation",
+      "preRuntimeSha256": null,
+      "postImplementationSha256": "29fa8bfbc5240155b152442b682515e32d79339db780b45f57dac6093bb3c0d0",
+      "auditSha256": "29fa8bfbc5240155b152442b682515e32d79339db780b45f57dac6093bb3c0d0"
+    },
+    {
+      "path": "backend\\src\\trusted-runtime\\runtime-client.ts",
+      "status": "ADDED",
+      "category": "A. Required Runtime implementation",
+      "preRuntimeSha256": null,
+      "postImplementationSha256": "03eb8d396779cd1af3f15db09c32bc19605c8724a0f36b09b8192fa48e8ee9a5",
+      "auditSha256": "03eb8d396779cd1af3f15db09c32bc19605c8724a0f36b09b8192fa48e8ee9a5"
+    },
+    {
+      "path": "backend\\src\\trusted-runtime\\runtime-control.service.ts",
+      "status": "ADDED",
+      "category": "A. Required Runtime implementation",
+      "preRuntimeSha256": null,
+      "postImplementationSha256": "6790a71046aa61280578e59ec3412fc7bcba3f51f63876362d2cee2dd56af363",
+      "auditSha256": "6790a71046aa61280578e59ec3412fc7bcba3f51f63876362d2cee2dd56af363"
+    },
+    {
+      "path": "backend\\src\\trusted-runtime\\runtime-execution.service.ts",
+      "status": "ADDED",
+      "category": "A. Required Runtime implementation",
+      "preRuntimeSha256": null,
+      "postImplementationSha256": "6cb36e4c79e3e6a344311ac47c7fc05dbcada37664e168755d83b7c6708bd06d",
+      "auditSha256": "6cb36e4c79e3e6a344311ac47c7fc05dbcada37664e168755d83b7c6708bd06d"
+    },
+    {
+      "path": "backend\\src\\trusted-runtime\\runtime-identity.service.ts",
+      "status": "ADDED",
+      "category": "A. Required Runtime implementation",
+      "preRuntimeSha256": null,
+      "postImplementationSha256": "03fab0e95b3d55005c334e56f54e5d82b302658adf30fd05cdbcc69f1c5793ca",
+      "auditSha256": "03fab0e95b3d55005c334e56f54e5d82b302658adf30fd05cdbcc69f1c5793ca"
+    },
+    {
+      "path": "backend\\src\\trusted-runtime\\runtime-ledger.service.ts",
+      "status": "ADDED",
+      "category": "A. Required Runtime implementation",
+      "preRuntimeSha256": null,
+      "postImplementationSha256": "5e83dc22a2532c409b755f988b22f99f675391fd89345e879b6bd2b3572349a0",
+      "auditSha256": "5e83dc22a2532c409b755f988b22f99f675391fd89345e879b6bd2b3572349a0"
+    },
+    {
+      "path": "backend\\src\\trusted-runtime\\runtime-operations.ts",
+      "status": "ADDED",
+      "category": "A. Required Runtime implementation",
+      "preRuntimeSha256": null,
+      "postImplementationSha256": "863fbd389019e59ce8dcbd7d980dec8d9c0577d981533281669d17ca3635104e",
+      "auditSha256": "863fbd389019e59ce8dcbd7d980dec8d9c0577d981533281669d17ca3635104e"
+    },
+    {
+      "path": "backend\\src\\trusted-runtime\\runtime-plan.ts",
+      "status": "ADDED",
+      "category": "A. Required Runtime implementation",
+      "preRuntimeSha256": null,
+      "postImplementationSha256": "c172f349fa5dd79c19aca122e498c00a0baab95571693ebff71283f1b62ff0c0",
+      "auditSha256": "c172f349fa5dd79c19aca122e498c00a0baab95571693ebff71283f1b62ff0c0"
+    },
+    {
+      "path": "backend\\src\\trusted-runtime\\runtime-tls.ts",
+      "status": "ADDED",
+      "category": "A. Required Runtime implementation",
+      "preRuntimeSha256": null,
+      "postImplementationSha256": "ff9c65ee7ead2af6851c94f70e11f37f051e81638d79c7dbb46179d03e4ebfac",
+      "auditSha256": "ff9c65ee7ead2af6851c94f70e11f37f051e81638d79c7dbb46179d03e4ebfac"
+    },
+    {
+      "path": "backend\\src\\trusted-runtime\\runtime-tools.ts",
+      "status": "ADDED",
+      "category": "A. Required Runtime implementation",
+      "preRuntimeSha256": null,
+      "postImplementationSha256": "57e0ba2da0701df80964a3afbb0509f2258c20a6ddf477ee52657f41337a43c2",
+      "auditSha256": "57e0ba2da0701df80964a3afbb0509f2258c20a6ddf477ee52657f41337a43c2"
+    },
+    {
+      "path": "backend\\src\\trusted-runtime\\runtime.contract.ts",
+      "status": "ADDED",
+      "category": "A. Required Runtime implementation",
+      "preRuntimeSha256": null,
+      "postImplementationSha256": "cf64b056045d7317ae2bdda15f17ccc29fc173fdc54c4c0680a99e5a2fbdaec9",
+      "auditSha256": "cf64b056045d7317ae2bdda15f17ccc29fc173fdc54c4c0680a99e5a2fbdaec9"
+    },
+    {
+      "path": "backend\\src\\trusted-runtime\\runtime.controller.ts",
+      "status": "ADDED",
+      "category": "A. Required Runtime implementation",
+      "preRuntimeSha256": null,
+      "postImplementationSha256": "b1743626d0ea512f4f5b3ff87018f16fbdea0981598e21e8eb5fdaca1b35af04",
+      "auditSha256": "b1743626d0ea512f4f5b3ff87018f16fbdea0981598e21e8eb5fdaca1b35af04"
+    },
+    {
+      "path": "backend\\test\\trusted-runtime-operations.test.ts",
+      "status": "ADDED",
+      "category": "B. Required tests",
+      "preRuntimeSha256": null,
+      "postImplementationSha256": "0cfc2b0fc80e889b779e57a3bbf07a12cb527246b0a70ef07936729a49d65e94",
+      "auditSha256": "0cfc2b0fc80e889b779e57a3bbf07a12cb527246b0a70ef07936729a49d65e94"
+    },
+    {
+      "path": "backend\\test\\trusted-runtime-persistence.test.ts",
+      "status": "ADDED",
+      "category": "B. Required tests",
+      "preRuntimeSha256": null,
+      "postImplementationSha256": "9bbf1f1cbd7d12c9dad72a03e23afcb59f591accb03d0c7afc2c94037717766e",
+      "auditSha256": "9bbf1f1cbd7d12c9dad72a03e23afcb59f591accb03d0c7afc2c94037717766e"
+    },
+    {
+      "path": "backend\\test\\trusted-runtime-transport.test.ts",
+      "status": "ADDED",
+      "category": "B. Required tests",
+      "preRuntimeSha256": null,
+      "postImplementationSha256": "6905a3bbb6926ac3fd974a360c23b5fea573359edcf8af00f69f05a6654e50cc",
+      "auditSha256": "6905a3bbb6926ac3fd974a360c23b5fea573359edcf8af00f69f05a6654e50cc"
+    },
+    {
+      "path": "components\\workspace\\trusted-runtime-control.tsx",
+      "status": "ADDED",
+      "category": "C. Required UI",
+      "preRuntimeSha256": null,
+      "postImplementationSha256": "f84f6ab935200d446d859bbed84d9c9d444a42a38267f314a59dd9276a535023",
+      "auditSha256": "f84f6ab935200d446d859bbed84d9c9d444a42a38267f314a59dd9276a535023"
+    }
+  ]
+}

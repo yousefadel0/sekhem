@@ -1,0 +1,9 @@
+# R&D Radar V1 local-model configuration
+
+An Admin configures all runtime values from **Admin / Settings → AI Policy**. Create a provider with a display name, `vllm_openai_compatible` type, private HTTP(S) base URL, optional API key, and timeout. Test it, discover or manually enter a model ID, then explicitly activate it. Create a read-only GitHub, GitLab, or local repository connection with its allowed branches, include/exclude paths, limits, and optional read-only credential; test and enable it. No model, URL, repository, or credential is hardcoded.
+
+The backend requires `SEKHEM_CONFIG_MASTER_KEY` at runtime before a credential can be saved or used. It accepts a 32-byte key encoded as 64 hexadecimal characters or base64. The key is never stored in PostgreSQL. For rotation, set the new key as `SEKHEM_CONFIG_MASTER_KEY` and the old key temporarily as `SEKHEM_CONFIG_MASTER_KEY_PREVIOUS`, then replace each saved provider/repository credential through the Admin UI so it is encrypted by the new key; remove the previous key after verification.
+
+The owner runs analysis from **R&D Radar → Manual live repository analysis** by selecting repository, allowed branch, provider, model, purpose, and an optional path subset. A run is pinned to an immutable commit SHA. It creates evidence and a Candidate Draft only; PM review remains mandatory. No automatic deployment, schedule, public trigger, repository write, n8n activation, or production-readiness claim is introduced.
+
+For real validation, the Admin must enter: provider display name, vLLM base URL, optional API key, timeout, model ID/display name/context/output limits; and repository display name, provider type, identifier/URL, optional read-only credential, default/allowed branches, include/exclude paths, and limits. Begin with a small approved path subset.

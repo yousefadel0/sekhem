@@ -1,0 +1,1028 @@
+import {
+  BadRequestException,
+  ConflictException,
+  ForbiddenException,
+  forwardRef,
+  Inject,
+  Injectable,
+  Logger,
+  NotFoundException,
+  Optional,
+  ServiceUnavailableException
+} from "@nestjs/common";
+import { PrismaService } from "../data-access/prisma.service";
+import { AgentRuntimeService } from "../agent-runtime/agent-runtime.service";
+import { toolDigest } from "../agent-runtime/tools/tool-contract";
+import { assertConversationBinding, conversationMode, modeContext, parseConversationMode, protectedConversationMetadata, requestsConversationExecution, requestsConversationPlan, requestsPlanHandoff, requestsUnderstandingFollowup, transferredConversation, type ConversationModeContext } from "./conversation-mode";
+import { persistedRunOutcome, type AgentOutcome } from "../agent-runtime/agent-result";
+import { ResourceAuthorizationService } from "../auth/resource-authz.service";
+import { MemoryService } from "../memory/memory.service";
+import { AttachmentService } from "../attachment/attachment.service";
+import { AttachmentCapabilityService } from "../agent-runtime/capabilities/attachment-capability.service";
+import { AgentContextBuilderService } from "../agent-runtime/understanding/agent-context-builder.service";
+import { ExecutionModeDetectorService } from "../agent-runtime/execution-mode-detector.service";
+import { ASSISTANT_CONTEXT_LIMITS } from "../ai-gateway/assistant-context-budget";
+import { ProjectAccessService } from "../auth/project-access.service";
+import { WorkspaceBindingService } from "../workspace-intelligence/workspace-binding.service";
+import { WorkspaceStoreService } from "../workspace-intelligence/workspace-store.service";
+import { WorkspaceRuntimeService } from "../workspace-intelligence/workspace-runtime.service";
+import { isConversationAcknowledgment } from "./conversation-intent";
+import { evidenceReceipt, presentPlan, type EvidenceReceipt } from "../agent-runtime/understanding/agent-presentation";
+import { CONTROL_ARTIFACT, presentControl } from "../agent-runtime/tools/agent-control.contract";
+import { requestsWorkspace, requestsWorkspaceVisibility } from "../agent-runtime/workspace-intent";
+import type { Prisma } from "@prisma/client";
+import type { WorkspaceBinding } from "../workspace-intelligence/workspace-binding.service";
+import type { AgentContextTruncation } from "../agent-runtime/understanding/agent-understanding.types";
+import { FileIntelligenceError } from "../file-intelligence/file-intelligence.errors";
+import { diagnosticFromError } from "../ai-gateway/provider-diagnostic";
+import type { SessionClaims } from "../auth/auth.dto";
+import type { AgentRunSummaryDto } from "../agent-runtime/agent-run.dto";
+import type {
+  ConversationDetailDto,
+  ConversationMessageDto,
+  ConversationSummaryDto,
+  CreateConversationDto,
+  UpdateConversationDto,
+  PostMessageDto,
+  PostMessageResponseDto,
+  TriggerAgentMessageResponseDto
+} from "./conversation.dto";
+
+/**
+ * ConversationService
+ *
+ * Provides transactional chat and agent-orchestration persistence.
+ * Normal messages and triggered agent runs execute within a single Prisma transaction,
+ * ensuring ConversationMessage, updatedAt timestamp, and AgentRun state persist atomically.
+ * Background agent execution is strictly scheduled only after successful transaction commit.
+ */
+@Injectable()
+export class ConversationService {
+  private readonly logger = new Logger(ConversationService.name);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private prisma: any | null = null;
+
+  constructor(
+    @Optional() @Inject(PrismaService) prismaService?: PrismaService,
+    @Optional() @Inject(forwardRef(() => AgentRuntimeService)) private readonly agentRuntimeService?: AgentRuntimeService,
+    @Optional() @Inject(ResourceAuthorizationService) private readonly resourceAuthz?: ResourceAuthorizationService,
+    @Optional() @Inject(MemoryService) private readonly memoryService?: MemoryService,
+    @Optional() @Inject(AttachmentService) private readonly attachmentService?: AttachmentService,
+    @Optional() @Inject(AttachmentCapabilityService) private readonly attachmentCapabilities?: AttachmentCapabilityService,
+    @Optional() @Inject(AgentContextBuilderService) private readonly contextBuilder?: AgentContextBuilderService,
+    @Optional() @Inject(ExecutionModeDetectorService) private readonly executionModeDetector?: ExecutionModeDetectorService,
+    @Optional() @Inject(ProjectAccessService) private readonly projectAccess?: ProjectAccessService,
+    @Optional() @Inject(WorkspaceBindingService) private readonly workspaceBindings?: WorkspaceBindingService,
+    @Optional() @Inject(WorkspaceStoreService) private readonly runtimeWorkspaces?: WorkspaceStoreService,
+    @Optional() @Inject(WorkspaceRuntimeService) private readonly workspaceRuntime?: WorkspaceRuntimeService
+  ) {
+    if (prismaService) {
+      this.prisma = prismaService;
+    }
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private requirePrisma(): any {
+    if (!this.prisma) {
+      throw new ServiceUnavailableException("Database service is unavailable in this environment");
+    }
+    return this.prisma;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Create conversation
+  // ---------------------------------------------------------------------------
+
+  async createConversation(userId: string, dto: CreateConversationDto, claims?: SessionClaims): Promise<ConversationSummaryDto> {
+    if (!dto.projectId || !dto.title?.trim()) {
+      throw new BadRequestException("projectId and title are required");
+    }
+
+    const db = this.requirePrisma();
+    if (this.projectAccess) {
+      if (!claims) throw new ForbiddenException("Authenticated project context is required");
+      await this.projectAccess.assert(claims, dto.projectId, "CREATE");
+    }
+    const mode = parseConversationMode(dto.mode ?? "CHAT");
+    if (mode === "AGENT") throw new BadRequestException("AGENT_SOURCE_REQUIRED: open Agent from its source Chat");
+    const metadata: Record<string, any> = { ...protectedConversationMetadata(dto.metadata) };
+    const binding = claims && this.runtimeWorkspaces ? await this.runtimeWorkspaces.getActiveBinding(userId, dto.projectId, claims.organizationId!) : null;
+    metadata.modeContext = { version: 1, mode, organizationId: claims?.organizationId ?? "", workspace: binding ? {
+      workspaceId: binding.workspaceId, bindingVersion: binding.version, runtimeId: binding.runtimeId, runtimeFingerprint: binding.runtimeFingerprint
+    } : null } satisfies ConversationModeContext;
+    delete metadata.workspaceBinding;
+    delete metadata.runtimeWorkspace;
+    if (this.workspaceBindings && claims) {
+      const reference = await this.workspaceBindings.runtimeReference?.(claims, dto.projectId);
+      if (reference) metadata.runtimeWorkspace = reference;
+      try { metadata.workspaceBinding = (await this.workspaceBindings.resolve(claims, dto.projectId)).binding; }
+      catch (error) { if (!(error instanceof ServiceUnavailableException)) throw error; }
+    }
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+    const conv = await db.conversation.create({
+      data: {
+        id: this.newId("conv"),
+        projectId: dto.projectId,
+        userId,
+        title: dto.title.trim(),
+        status: "active",
+        metadata
+      }
+    });
+    return this.mapConvSummary(conv);
+  }
+
+  // ---------------------------------------------------------------------------
+  // List conversations for a user+project
+  // ---------------------------------------------------------------------------
+
+  async listConversations(userId: string, projectId?: string, claims?: SessionClaims): Promise<ConversationSummaryDto[]> {
+    const db = this.requirePrisma();
+    const ids = this.projectAccess && claims ? await this.projectAccess.visibleIds(claims) : undefined;
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+    const convs = await db.conversation.findMany({
+      where: {
+        userId,
+        ...(ids ? { project: { id: { in: ids } } } : {}),
+        ...(projectId && { projectId }),
+        status: "active"
+      },
+      include: {
+        _count: { select: { messages: true } }
+      },
+      orderBy: { updatedAt: "desc" as const }
+    });
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+    return convs.map((c: any) => this.mapConvSummary(c));
+  }
+
+  // ---------------------------------------------------------------------------
+  // Get conversation detail
+  // ---------------------------------------------------------------------------
+
+  async getConversation(id: string, userId: string, claims?: SessionClaims): Promise<ConversationDetailDto> {
+    const db = this.requirePrisma();
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+    const conv = await db.conversation.findUnique({
+      where: { id },
+      include: {
+        messages: { orderBy: [{ createdAt: "asc" }, { id: "asc" }] },
+        attachments: {
+          where: { userId },
+          orderBy: [{ createdAt: "asc" }, { id: "asc" }],
+          select: { id: true, conversationId: true, userId: true, fileName: true, mimeType: true, fileSize: true,
+            category: true, hasExtractedText: true, isScanned: true, createdAt: true }
+        },
+        agentRuns: {
+          select: {
+            id: true,
+            conversationId: true,
+            projectId: true,
+            agentName: true,
+            title: true,
+            status: true,
+            planVersion: true,
+            failureReason: true,
+            plans: { orderBy: { version: "desc" as const }, take: 1, select: { steps: true } },
+            // Activity display never needs raw tool/audit payloads.
+            events: { orderBy: [{ timestamp: "desc" }, { id: "desc" }], take: 100,
+              select: { id: true, agentRunId: true, eventType: true, timestamp: true } },
+            artifacts: { orderBy: [{ createdAt: "asc" }, { id: "asc" }],
+              select: { id: true, agentRunId: true, projectId: true, title: true, artifactType: true, summary: true, version: true, createdAt: true, metadata: true } },
+            approvals: { where: { status: "PENDING" },
+              select: { id: true, approvalType: true, status: true, requiredRole: true, dueAt: true } },
+            progressPercent: true,
+            startedAt: true,
+            completedAt: true,
+            createdAt: true,
+            updatedAt: true
+          },
+          orderBy: [{ createdAt: "desc" }, { id: "desc" }]
+        }
+      } satisfies Prisma.ConversationInclude
+    });
+    if (!conv) throw new NotFoundException("Conversation not found");
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    if (conv.userId !== userId) throw new NotFoundException("Conversation not found");
+    if (this.projectAccess && claims) await this.projectAccess.assert(claims, conv.projectId);
+    const detail = this.mapConvDetail(conv);
+    if (claims && this.agentRuntimeService?.inspectionView) {
+      for (const run of detail.agentRuns) run.inspection = await this.agentRuntimeService.inspectionView(run.id, claims);
+    }
+    if (claims && this.agentRuntimeService?.executionView) {
+      for (const run of detail.agentRuns) run.execution = await this.agentRuntimeService.executionView(run.id, claims);
+    }
+    return detail;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Update conversation (title / metadata / group)
+  // ---------------------------------------------------------------------------
+
+  async updateConversation(
+    id: string,
+    userId: string,
+    dto: UpdateConversationDto
+  ): Promise<ConversationSummaryDto> {
+    const db = this.requirePrisma();
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+    const conv = await db.conversation.findUnique({ where: { id } });
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    if (!conv || conv.userId !== userId) {
+      throw new NotFoundException("Conversation not found");
+    }
+
+    const data: Record<string, unknown> = {};
+    if (dto.title !== undefined) {
+      const trimmed = dto.title.trim();
+      if (!trimmed) throw new BadRequestException("title cannot be empty");
+      data.title = trimmed;
+    }
+    if (dto.metadata !== undefined) {
+      const metadata = { ...(conv.metadata ?? {}), ...protectedConversationMetadata(dto.metadata) };
+      delete metadata.workspaceBinding;
+      delete metadata.runtimeWorkspace;
+      if (conv.metadata?.runtimeWorkspace) metadata.runtimeWorkspace = conv.metadata.runtimeWorkspace;
+      if (conv.metadata?.workspaceBinding) metadata.workspaceBinding = conv.metadata.workspaceBinding;
+      data.metadata = metadata;
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+    const updated = await db.conversation.update({
+      where: { id },
+      data
+    });
+    return this.mapConvSummary(updated);
+  }
+
+  // ---------------------------------------------------------------------------
+  // Delete conversation (ownership-enforced cascade deletion)
+  // ---------------------------------------------------------------------------
+
+  async deleteConversation(
+    id: string,
+    userId: string
+  ): Promise<{ deleted: boolean; id: string }> {
+    const db = this.requirePrisma();
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+    const conv = await db.conversation.findUnique({ where: { id } });
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    if (!conv || conv.userId !== userId) {
+      throw new NotFoundException("Conversation not found");
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+    await db.conversation.delete({ where: { id } });
+    return { deleted: true, id };
+  }
+
+  // ---------------------------------------------------------------------------
+  // Post a message (single atomic transaction with optional AgentRun)
+  // ---------------------------------------------------------------------------
+
+  async postMessage(
+    conversationId: string,
+    claimsOrUserId: SessionClaims | string,
+    dto: PostMessageDto
+  ): Promise<PostMessageResponseDto> {
+    const rawIds = Array.isArray(dto.attachmentIds) ? dto.attachmentIds :
+      Array.isArray(dto.metadata?.attachmentIds) ? dto.metadata.attachmentIds : [];
+    const attachmentIds = [...new Set(rawIds.filter((id): id is string => typeof id === "string" && id.trim().length > 0))];
+    const instruction = dto.content?.trim() || (attachmentIds.length ? "Inspect the attached files." : "");
+    if (!instruction) throw new BadRequestException("content or attachments are required");
+    if (attachmentIds.length > 5) throw new BadRequestException("A message can reference at most 5 attachments");
+    if (attachmentIds.length && !this.attachmentService) throw new ServiceUnavailableException("Attachment service is unavailable");
+
+    const claims: SessionClaims = typeof claimsOrUserId === "string"
+      ? {
+        sub: claimsOrUserId,
+        sessionId: `sess-${Date.now()}`,
+        email: `${claimsOrUserId}@sekhem.test`,
+        displayName: claimsOrUserId,
+        role: "PM",
+        exp: Math.floor(Date.now() / 1000) + 3600
+      }
+      : claimsOrUserId;
+
+    const userId = claims.sub;
+    const db = this.requirePrisma();
+
+    // Determine routing: explicit flags take precedence, otherwise auto-detect execution intent
+    let shouldTrigger = dto.triggerAgent === true;
+    let shouldChat = dto.chat === true || (dto.metadata && (dto.metadata as Record<string, unknown>).chat === true);
+    if (dto.runtimeEvidence !== undefined) {
+      if (shouldChat || !shouldTrigger) throw new BadRequestException("Runtime evidence requires an explicit Agent request");
+    }
+    if (!shouldTrigger && !shouldChat) {
+      const executionIntent = await this.executionModeDetector?.isExecutionIntent(instruction) ?? false;
+      shouldTrigger = executionIntent;
+      shouldChat = !executionIntent;
+    }
+
+    if (shouldTrigger && claims.role === "Viewer") throw new ForbiddenException("Viewers are not permitted to trigger agent runs");
+
+    // Verify conversation existence and ownership
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+    const existingConv = await db.conversation.findUnique({
+      where: { id: conversationId },
+      include: { project: true }
+    });
+
+    if (!existingConv || existingConv.userId !== userId) {
+      throw new NotFoundException("Conversation not found");
+    }
+    if (this.projectAccess) await this.projectAccess.assert(claims, existingConv.projectId, "UPDATE");
+
+    // Cross-organization isolation
+    if (
+      claims.organizationId &&
+      existingConv.project?.organizationId &&
+      claims.organizationId !== existingConv.project.organizationId
+    ) {
+      throw new ForbiddenException("Cross-organization conversation access is forbidden");
+    }
+
+    // Enforce project membership authorization
+    if (this.resourceAuthz && existingConv.projectId) {
+      await this.resourceAuthz.assertAuthorized(
+        {
+          userId: claims.sub,
+          email: claims.email,
+          displayName: claims.displayName,
+          role: claims.role,
+          organizationId: claims.organizationId,
+          isSystemAdmin: claims.role === "Admin"
+        },
+        "UPDATE",
+        {
+          resourceType: "Conversation",
+          id: conversationId,
+          projectId: existingConv.projectId,
+          organizationId: claims.organizationId,
+          userId: existingConv.userId
+        }
+      );
+    }
+
+    const mode = conversationMode(existingConv);
+    if (modeContext(existingConv)?.source) await transferredConversation(db, existingConv);
+    if (dto.senderType && dto.senderType !== "user") throw new BadRequestException("MESSAGE_SENDER_INVALID");
+    if (dto.metadata && ["agentConversationId", "transfer", "modeContext", "agentRunId", "planHandoff", "planHandoffId", "certifiedUnderstanding", "planningRequest", "planningReport", "planId", "planVersion", "planDigest"].some(key => key in dto.metadata!)) throw new BadRequestException("MESSAGE_METADATA_SERVER_OWNED");
+    if (requestsWorkspaceVisibility(instruction) && !attachmentIds.length && dto.runtimeEvidence === undefined) {
+      if (!this.runtimeWorkspaces) throw new ServiceUnavailableException("Workspace metadata unavailable");
+      const visibility = this.workspaceRuntime ? await this.workspaceRuntime.context(claims, existingConv.projectId)
+        : await this.runtimeWorkspaces.visibility(userId, existingConv.projectId, claims.organizationId!);
+      const { binding, listing } = visibility;
+      if (modeContext(existingConv)?.workspace) assertConversationBinding(existingConv, binding);
+      const arabic = /[\u0600-\u06ff]/.test(instruction);
+      const names = listing?.entries.slice(0, 20).map(e => e.name).join(", ");
+      const content = !binding ? (arabic ? "مفيش مجلد مشروع مربوط حاليًا. اختار مجلد المشروع الأول." : "No project folder is selected. Select a workspace folder first.")
+        : arabic ? `المجلد المختار: ${binding.displayName}\n${binding.rootPath}\n${listing ? `آخر قائمة موثقة من التحقق من المجلد (${listing.observedAt}): ${names || "المجلد فارغ"}${listing.truncated || listing.entries.length > 20 ? " — القائمة المعروضة جزئية" : ""}.` : "مفيش قائمة ملفات موثقة متاحة للمجلد ده لسه."}\nالرد ده مبني على بيانات الربط المحفوظة؛ السؤال ده ما بدأش قراءة محتوى الملفات أو فحص جديد.`
+        : `Selected folder: ${binding.displayName}\n${binding.rootPath}\n${listing ? `Last verified folder listing (${listing.observedAt}): ${names || "empty folder"}${listing.truncated || listing.entries.length > 20 ? " — partial listing" : ""}.` : "No verified file listing is available yet."}\nThis uses saved workspace metadata. This question did not start a file-content read or a new inspection.`;
+      const availabilityNames: Record<string, string> = arabic
+        ? { READY: "متصل؛ كل عملية تخضع لفحص الصلاحيات", EXPIRED_GRANT: "إذن القراءة انتهى؛ البيانات المعروضة ملاحظة محفوظة", OFFLINE: "الجهاز غير متصل؛ البيانات المعروضة ملاحظة محفوظة", REVOKED: "تم إلغاء وصول الجهاز", UNAUTHORIZED: "الوصول غير متاح", STALE: "ربط المجلد تغير", VERIFYING: "التحقق من المجلد لم يكتمل", DIRECTORY_MISSING: "المجلد غير متاح", UNBOUND: "لم يتم اختيار مجلد" }
+        : { READY: "Connected; each operation still requires current authorization", EXPIRED_GRANT: "Read access expired; this is a saved observation", OFFLINE: "Computer offline; this is a saved observation", REVOKED: "Runtime access revoked", UNAUTHORIZED: "Access unavailable", STALE: "Workspace binding changed", VERIFYING: "Folder verification incomplete", DIRECTORY_MISSING: "Folder unavailable", UNBOUND: "No folder selected" };
+      const availability = "availability" in visibility ? `\n${availabilityNames[String(visibility.availability)] ?? (arabic ? "حالة الوصول غير متاحة" : "Access status unavailable")}.` : "";
+      return this.saveModeNotice(existingConv, claims, instruction, dto, content + availability);
+    }
+    // Acknowledgment is conversation, never an approval action or an execution retry.
+    if (isConversationAcknowledgment(instruction) && await db.agentRun.findFirst({ where: { conversationId, userId, status: "AWAITING_APPROVAL" } })) {
+      if (modeContext(existingConv)?.workspace) assertConversationBinding(existingConv, await this.runtimeWorkspaces?.getActiveBinding(userId, existingConv.projectId, claims.organizationId!));
+      return this.saveModeNotice(existingConv, claims, instruction, dto,
+        /[\u0600-\u06ff]/.test(instruction) ? "تمام. لو تقصد الموافقة على العملية المعروضة، راجع التفاصيل واضغط Approve. الرسالة دي مش موافقة، ولم يبدأ تنفيذ جديد."
+          : "To approve the displayed action, review its details and click Approve. This reply is not approval; no new execution was started.");
+    }
+    // Generic changes prepare engineering intent in this timeline. Only an explicit
+    // execute-plan command enters the existing exact-plan executor and its approval gates.
+    const engineeringIntent = dto.transferToAgent !== true && !!modeContext(existingConv)?.workspace &&
+      requestsConversationExecution(instruction) && !!this.agentRuntimeService?.planFromConversation;
+    if (mode !== "AUTOMATION" && (requestsConversationPlan(instruction) || requestsPlanHandoff(instruction) || engineeringIntent)) {
+      if (attachmentIds.length || dto.runtimeEvidence !== undefined) throw new BadRequestException("PLANNING_REQUIRES_CERTIFIED_CONTEXT");
+      const requestId = dto.metadata?.clientMessageId ?? this.newId("plan-request");
+      if (typeof requestId !== "string") throw new BadRequestException("PLANNING_REQUEST_INVALID");
+      if (requestsPlanHandoff(instruction)) {
+        if (this.agentRuntimeService?.executePlan) {
+          return this.mapMessage(await this.agentRuntimeService.executePlan(conversationId, claims, instruction, requestId));
+        }
+        if (!this.agentRuntimeService?.preparePlanHandoff) throw new ServiceUnavailableException("Plan handoff unavailable");
+        return this.mapMessage(await this.agentRuntimeService.preparePlanHandoff(conversationId, claims, instruction, requestId));
+      }
+      if (!this.agentRuntimeService?.planFromConversation) throw new ServiceUnavailableException("Planning unavailable");
+      let plan;
+      try { plan = await this.agentRuntimeService.planFromConversation(conversationId, claims, instruction, requestId); }
+      catch (error) {
+        if (!engineeringIntent || !(error instanceof ConflictException) || !error.message.startsWith("CERTIFIED_UNDERSTANDING_REQUIRED:")) throw error;
+        return this.saveModeNotice(existingConv, claims, instruction, dto,
+          "The requested change stays in this conversation. First ask me to read and analyze the relevant source so I can prepare a grounded plan. No change is authorized or executed.");
+      }
+      const run = await db.agentRun.findUnique({ where: { id: plan.runId } });
+      return { conversationId, messageId: `planning_attempt_${toolDigest([conversationId, requestId])}_message`, agentRunId: plan.runId, status: run.status };
+    }
+    // Persistent conversation mode is authoritative over per-message presentation flags.
+    if (mode === "CHAT" && (dto.transferToAgent === true || requestsConversationExecution(instruction))) {
+      return this.transferToAgent(existingConv, claims, instruction, dto, attachmentIds);
+    }
+    if (modeContext(existingConv)?.workspace) {
+      const binding = await this.runtimeWorkspaces?.getActiveBinding(userId, existingConv.projectId, claims.organizationId!);
+      assertConversationBinding(existingConv, binding);
+    }
+    if (mode === "AUTOMATION" || (mode === "AGENT" && requestsConversationExecution(instruction))) {
+      return this.saveModeNotice(existingConv, claims, instruction, dto, mode === "AUTOMATION"
+        ? "Automation is workspace-bound. Scheduling and triggers are not enabled in this milestone. No operation was started."
+        : "This conversation retains your source Chat and workspace context. Prepare a grounded plan here, then explicitly request execution of that plan. Mutation still requires a separately authorized, approved exact action. No operation was started.");
+    }
+    if (modeContext(existingConv)?.workspace && requestsWorkspace(instruction)) { shouldTrigger = true; shouldChat = false; }
+    if (shouldTrigger && claims.role === "Viewer") throw new ForbiddenException("Viewers are not permitted to trigger agent runs");
+
+    // Auxiliary memory extraction & persistence (safe failure isolation: never blocks chat)
+    if (this.memoryService && claims.sub && dto.content) {
+      try {
+        const candidates = this.memoryService.extractCandidates(instruction);
+        for (const candidate of candidates) {
+          await this.memoryService.upsertMemory(claims.sub, candidate, conversationId);
+        }
+      } catch (memErr) {
+        this.logger.warn(`Auxiliary memory processing failed: ${(memErr as Error).message}`);
+      }
+    }
+
+    // Attachment validation & categorization (strict user and conversation ownership)
+    // Resolve ownership here. Reading itself happens once through the shared,
+    // bounded Agent Context builder when reasoning is requested.
+    if (attachmentIds.length > 0 && this.attachmentService) {
+      for (const attId of attachmentIds) {
+        const att = await this.attachmentService.getAttachment(userId, attId);
+        if (att.conversationId !== conversationId) {
+          throw new ForbiddenException(`Attachment ${attId} does not belong to this conversation`);
+        }
+      }
+    }
+
+    // A follow-up in the same Chat continues its one active inspection. Explicit
+    // Chat mode and explicit evidence submissions retain their existing routing.
+    if (dto.chat !== true && dto.metadata?.chat !== true && dto.runtimeEvidence === undefined) {
+      const continued = await this.agentRuntimeService?.continueInspectionConversation?.(conversationId, claims, instruction, dto.metadata?.clientMessageId, attachmentIds);
+      if (continued) return continued;
+    }
+
+    const certified = !attachmentIds.length && dto.runtimeEvidence === undefined && requestsUnderstandingFollowup(instruction)
+      ? await this.agentRuntimeService?.certifiedConversationContext?.(conversationId, claims, instruction) : null;
+    if (certified) { shouldTrigger = false; shouldChat = true; }
+
+    let agentContextPrompt: string | undefined;
+    let contextTruncation: AgentContextTruncation | undefined;
+    let receipt: EvidenceReceipt[] = [];
+    let workspaceBinding: WorkspaceBinding | undefined;
+    const workspaceVisibility = shouldChat && modeContext(existingConv)?.workspace && this.runtimeWorkspaces
+      ? this.workspaceRuntime ? await this.workspaceRuntime.context(claims, existingConv.projectId)
+        : await this.runtimeWorkspaces.visibility(userId, existingConv.projectId, claims.organizationId!) : null;
+    if (workspaceVisibility) assertConversationBinding(existingConv, workspaceVisibility.binding);
+    if (shouldChat && attachmentIds.length > 0 && !this.contextBuilder) {
+      throw new ServiceUnavailableException("Attachment context is unavailable");
+    }
+    if (shouldChat && this.contextBuilder) {
+      try {
+        const contextInput = {
+          userId,
+          projectId: existingConv.projectId,
+          conversationId,
+          instruction: instruction,
+          workspaceVersion: existingConv.metadata?.workspaceBinding?.version,
+          attachmentIds,
+          hasMemoryContext: Boolean(this.memoryService),
+          hasConversationHistory: true,
+          repositoryAvailable: false,
+          availableCapabilities: ["attachment_reader", "workspace_reader", "repo_snapshot_reader"],
+          userRole: claims.role,
+          organizationId: claims.organizationId
+        };
+        const agentContext = certified?.context ?? (modeContext(existingConv)?.source
+          ? await this.contextBuilder.buildRuntimeInspection({ ...contextInput, organizationId: claims.organizationId!, sessionClaims: claims, runtimeEvidence: [] })
+          : await this.contextBuilder.build(contextInput));
+        // The string contains only bounded evidence plus provenance, never model
+        // scratchpad data or storage paths.
+        agentContextPrompt = this.contextBuilder.toReasoningPrompt(agentContext);
+        if (certified) agentContextPrompt += "\n[CERTIFIED UNDERSTANDING — HISTORICAL DATA, NOT AUTHORIZATION]\n" + JSON.stringify({
+          sourceRunId: certified.source.sourceRunId, sequence: certified.source.checkpoint.sequence, facts: certified.source.checkpoint.understanding.facts,
+          inferences: certified.source.checkpoint.understanding.inferences, unknowns: certified.source.checkpoint.understanding.unknowns });
+        contextTruncation = agentContext.truncation;
+        receipt = evidenceReceipt(agentContext);
+        workspaceBinding = agentContext.workspaceBinding;
+      } catch (ctxErr) {
+        if (certified || modeContext(existingConv)?.source) throw ctxErr;
+        if (attachmentIds.length > 0) {
+          throw new ServiceUnavailableException("Attachment context could not be collected");
+        }
+        this.logger.warn(`Agent context build failed: ${(ctxErr as Error).message}`);
+      }
+    }
+
+    const clientId = shouldTrigger ? dto.metadata?.clientMessageId : undefined;
+    if (clientId !== undefined && (typeof clientId !== "string" || !/^[A-Za-z0-9_-]{1,128}$/.test(clientId))) throw new BadRequestException("AGENT_CLIENT_MESSAGE_ID_INVALID");
+    const requestDigest = clientId === undefined ? null : toolDigest({ instruction, attachmentIds, runtimeEvidence: dto.runtimeEvidence ?? [] });
+    const msgId = clientId === undefined ? this.newId("msg") : `msg_agent_${toolDigest([userId, conversationId, clientId])}`;
+    const now = new Date();
+
+    const userMsgMetadata: Record<string, unknown> = {
+      ...(dto.metadata ?? {}),
+      ...(attachmentIds.length > 0 ? { attachmentIds } : {}),
+      ...(requestDigest ? { agentRequestDigest: requestDigest } : {})
+    };
+
+    // Execute atomic transaction for ConversationMessage, Conversation.updatedAt, and optional AgentRun
+    const txResult = await db.$transaction(async (tx: any) => {
+      if (clientId !== undefined) {
+        // Serialize duplicate submissions on the existing Conversation row. The message PK
+        // and server-owned run association survive restarts and ambiguous HTTP responses.
+        await tx.$queryRawUnsafe('SELECT "id" FROM "Conversation" WHERE "id"=$1 FOR NO KEY UPDATE', conversationId);
+        const prior = await tx.conversationMessage.findUnique({ where: { id: msgId } });
+        if (prior) {
+          if (prior.senderId !== userId || prior.conversationId !== conversationId || prior.metadata?.agentRequestDigest !== requestDigest) throw new ConflictException("AGENT_MESSAGE_CONFLICT");
+          const run = await tx.agentRun.findUnique({ where: { id: prior.metadata.agentRunId } });
+          if (!run || run.userId !== userId || run.projectId !== existingConv.projectId || run.conversationId !== conversationId) throw new ConflictException("AGENT_MESSAGE_RUN_CONFLICT");
+          return { msg: prior, agentRunSummary: run, duplicate: true };
+        }
+      }
+      // 1. Create ConversationMessage
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+      const msg = await tx.conversationMessage.create({
+        data: {
+          id: msgId,
+          conversationId,
+          senderId: userId,
+          senderType: dto.senderType ?? "user",
+          content: instruction,
+          metadata: userMsgMetadata
+        }
+      });
+
+      // 2. Update Conversation updatedAt timestamp
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+      await tx.conversation.update({
+        where: { id: conversationId },
+        data: { updatedAt: now, ...(workspaceBinding ? { metadata: { ...(existingConv.metadata ?? {}), workspaceBinding } } : {}) }
+      });
+
+      // 3. If triggerAgent === true, create AgentRun within this SAME transaction
+      let agentRunSummary: AgentRunSummaryDto | null = null;
+      if (shouldTrigger) {
+        if (!this.agentRuntimeService) {
+          throw new ServiceUnavailableException("AgentRuntimeService is unavailable in this environment");
+        }
+        agentRunSummary = await this.agentRuntimeService.createRunTx(tx, claims, {
+          projectId: existingConv.projectId,
+          instruction: instruction,
+          conversationId,
+          attachmentIds,
+          runtimeEvidence: dto.runtimeEvidence,
+          title: `Agent: ${instruction.slice(0, 50)}`
+        }, msgId);
+        if (clientId !== undefined) await tx.conversationMessage.update({ where: { id: msgId }, data: { metadata: { ...userMsgMetadata, agentRunId: agentRunSummary.id } } });
+      }
+
+      return { msg, agentRunSummary, duplicate: false };
+    });
+
+    // 4. Background scheduling happens ONLY after successful transaction commit
+    if (shouldTrigger && txResult.agentRunSummary && this.agentRuntimeService) {
+      if (!txResult.duplicate) this.agentRuntimeService.scheduleRunExecution(
+        txResult.agentRunSummary.id,
+        claims,
+        instruction
+      );
+
+      const triggerResponse: TriggerAgentMessageResponseDto = {
+        conversationId,
+        messageId: txResult.msg.id as string,
+        agentRunId: txResult.agentRunSummary.id,
+        status: txResult.agentRunSummary.status
+      };
+      return triggerResponse;
+    }
+
+    // 5. Dedicated conversational chat path: route directly to SEKHEM Agent and return real assistant response
+    if (shouldChat) {
+      if (!this.agentRuntimeService) {
+        throw new ServiceUnavailableException("AgentRuntimeService is unavailable in this environment");
+      }
+
+      let history: Array<{ role: string; content: string }> = [];
+      let instructionToSend = instruction;
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+        let previousMessages = await db.conversationMessage.findMany({
+          where: {
+            conversationId,
+            id: { not: msgId }
+          },
+          orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+          take: ASSISTANT_CONTEXT_LIMITS.historyMessages
+        });
+
+        if (this.runtimeWorkspaces) previousMessages = await this.runtimeWorkspaces.modelMessages(previousMessages);
+        const transferred = await transferredConversation(db, existingConv);
+        if (transferred) {
+          const sourceMessages = await db.conversationMessage.findMany({ where: { conversationId: transferred.parent.id,
+            id: { in: [...transferred.source.contextMessageIds, transferred.source.messageId] } }, orderBy: [{ createdAt: "desc" }, { id: "desc" }], take: ASSISTANT_CONTEXT_LIMITS.historyMessages });
+          previousMessages = [...previousMessages, ...(this.runtimeWorkspaces ? await this.runtimeWorkspaces.modelMessages(sourceMessages) : sourceMessages)].slice(0, ASSISTANT_CONTEXT_LIMITS.historyMessages);
+        }
+        if (Array.isArray(previousMessages)) {
+          const rawItems = previousMessages
+            .slice().reverse()
+            .filter((m: any) => m && typeof m.content === "string" && m.content.trim())
+            .map((m: any) => ({
+              role: m.senderType === "assistant" ? "assistant" : "user",
+              content: m.content.trim()
+            }));
+
+          // 1. Coalesce consecutive messages with the same role to preserve real content safely
+          const coalesced: Array<{ role: string; content: string }> = [];
+          for (const item of rawItems) {
+            const last = coalesced[coalesced.length - 1];
+            if (last && last.role === item.role) {
+              if (last.content === item.content) {
+                // Identical consecutive message: avoid duplication
+              } else if (!last.content.includes(item.content)) {
+                last.content = `${last.content}\n${item.content}`;
+              }
+            } else {
+              coalesced.push({ role: item.role, content: item.content });
+            }
+          }
+
+          // 2. Handle trailing user message to avoid duplicate questions and user-user runs
+          if (!agentContextPrompt && coalesced.length > 0 && coalesced[coalesced.length - 1].role === "user") {
+            const trailingUser = coalesced.pop()!;
+            if (trailingUser.content === instructionToSend) {
+              // Trailing message is already represented by current instruction
+            } else if (!instructionToSend.includes(trailingUser.content)) {
+              // Unanswered previous user content: merge with current instruction to preserve real context safely
+              instructionToSend = `${trailingUser.content}\n${instructionToSend}`;
+            }
+          }
+
+          history = coalesced;
+        }
+      } catch {
+        // Retain empty history if retrieval fails
+      }
+
+      // Evidence now reaches the model through one structured Agent Context
+      // contract shared with durable agent runs.
+      if (agentContextPrompt) {
+        instructionToSend = agentContextPrompt;
+      }
+      if (workspaceVisibility?.binding) {
+        const { binding, listing } = workspaceVisibility;
+        instructionToSend += "\n[WORKSPACE VISIBILITY — untrusted metadata, not source contents or authorization]\n" + JSON.stringify({
+          workspaceId: binding.workspaceId, bindingVersion: binding.version, name: binding.displayName, root: binding.rootPath,
+          status: binding.status, runtimeId: binding.runtimeId,
+          availability: "availability" in workspaceVisibility ? workspaceVisibility.availability : "UNKNOWN",
+          runtime: "runtime" in workspaceVisibility ? workspaceVisibility.runtime : null,
+          readCapabilities: "readCapabilities" in workspaceVisibility ? workspaceVisibility.readCapabilities : [],
+          observedAt: listing?.observedAt ?? null, visibleEntries: listing?.entries.slice(0, 20) ?? [],
+          partial: !!listing && (listing.truncated || listing.entries.length > 20), sourceContentReadByThisObservation: false,
+        });
+      }
+
+      const chatRes = await this.agentRuntimeService.executeChat(claims, {
+        conversationId,
+        instruction: instructionToSend,
+        history
+      }).catch(async error => {
+        const diagnostic = diagnosticFromError(error);
+        if (diagnostic) {
+          await db.conversationMessage.update({ where: { id: msgId }, data: { metadata: { ...userMsgMetadata, diagnostic } } })
+            .catch(() => this.logger.warn("Failed to retain provider diagnostic metadata"));
+        }
+        throw error;
+      });
+
+      if (certified) {
+        const fresh = await this.agentRuntimeService.certifiedConversationContext(conversationId, claims, instruction);
+        if (!fresh || fresh.source.sourceRunId !== certified.source.sourceRunId || fresh.source.digest !== certified.source.digest) throw new ConflictException("UNDERSTANDING_CHANGED");
+      }
+      const assistantMsgId = this.newId("msg_asst");
+      const asstNow = new Date();
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+      const assistantMsg = await db.conversationMessage.create({
+        data: {
+          id: assistantMsgId,
+          conversationId,
+          senderId: "SekhemEngineer",
+          senderType: "assistant",
+          content: chatRes.answer,
+          metadata: {
+            source: "sekhem_chat",
+            evidenceReceipt: receipt,
+            ...(certified ? { certifiedUnderstanding: { sourceRunId: certified.source.sourceRunId, sequence: certified.source.checkpoint.sequence, digest: certified.source.digest } } : {}),
+            ...(workspaceBinding ? { workspaceBinding } : {}),
+            modelId: chatRes.modelId || "GLM-5.2-Abliterated",
+            providerId: chatRes.providerId,
+            ...(chatRes.diagnostic ? { diagnostic: chatRes.diagnostic } : {}),
+            ...(chatRes.contextBudget ? { contextBudget: chatRes.contextBudget } : {}),
+            ...(contextTruncation ? { contextTruncation } : {})
+          },
+          createdAt: asstNow
+        }
+      });
+
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      if (db.conversation && typeof db.conversation.update === "function") {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+        await db.conversation.update({
+          where: { id: conversationId },
+          data: { updatedAt: asstNow }
+        }).catch(() => { });
+      }
+
+      return this.mapMessage(assistantMsg);
+    }
+
+    return this.mapMessage(txResult.msg);
+  }
+
+  // ---------------------------------------------------------------------------
+  // Create assistant message from agent execution (Idempotent single path)
+  // ---------------------------------------------------------------------------
+
+  async createAssistantMessage(
+    conversationId: string,
+    agentRunId: string,
+    content: string,
+    agentName = "SekhemEngineer",
+    outcome?: AgentOutcome
+  ): Promise<ConversationMessageDto> {
+    if (!conversationId?.trim()) {
+      throw new BadRequestException("conversationId is required");
+    }
+    if (!agentRunId?.trim()) {
+      throw new BadRequestException("agentRunId is required");
+    }
+    if (!content || typeof content !== "string" || !content.trim()) {
+      throw new BadRequestException("content is required");
+    }
+
+    const db = this.requirePrisma();
+    const deterministicId = `msg_agent_${agentRunId.trim()}`;
+
+    // 1. Idempotency check: verify whether a message with this deterministic ID already exists
+    if (db.conversationMessage) {
+      if (typeof db.conversationMessage.findUnique === "function") {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+        const existing = await db.conversationMessage.findUnique({
+          where: { id: deterministicId }
+        }).catch(() => null);
+        if (existing) {
+          return this.mapMessage(existing);
+        }
+      }
+
+      if (typeof db.conversationMessage.findFirst === "function") {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+        const existing = await db.conversationMessage.findFirst({
+          where: { id: deterministicId }
+        }).catch(() => null);
+        if (existing) {
+          return this.mapMessage(existing);
+        }
+      }
+
+      // In-memory test mock compatibility (findMany filter)
+      if (typeof db.conversationMessage.findMany === "function") {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+        const existingList = await db.conversationMessage.findMany({
+          where: { conversationId: conversationId.trim() }
+        }).catch(() => []);
+        if (Array.isArray(existingList)) {
+          const matched = existingList.find(
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+            (m: any) => m.id === deterministicId || m.metadata?.agentRunId === agentRunId.trim()
+          );
+          if (matched) {
+            return this.mapMessage(matched);
+          }
+        }
+      }
+
+      const now = new Date();
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+      const created = await db.conversationMessage.create({
+        data: {
+          id: deterministicId,
+          conversationId: conversationId.trim(),
+          senderId: agentName || "assistant",
+          senderType: "assistant",
+          content: content.trim(),
+          metadata: {
+            agentRunId: agentRunId.trim(),
+            agentName: agentName || "SekhemEngineer",
+            source: "agent_execution",
+            ...(outcome ? { outcome } : {})
+          },
+          createdAt: now
+        }
+      });
+
+      // Update Conversation updatedAt
+      if (db.conversation && typeof db.conversation.update === "function") {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+        await db.conversation.update({
+          where: { id: conversationId.trim() },
+          data: { updatedAt: now }
+        }).catch(() => { });
+      }
+
+      return this.mapMessage(created);
+    }
+
+    throw new ServiceUnavailableException("Database conversationMessage delegate is unavailable");
+  }
+
+  // ---------------------------------------------------------------------------
+  // Private helpers
+  // ---------------------------------------------------------------------------
+
+  private newId(prefix: string): string {
+    return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  }
+  async generatePlan(conversationId: string, claims: SessionClaims, body: unknown) {
+    if (!this.agentRuntimeService) throw new ServiceUnavailableException("Planning unavailable");
+    return this.agentRuntimeService.generatePlan(conversationId, claims, body);
+  }
+
+  private async saveModeNotice(conversation: any, claims: SessionClaims, instruction: string, dto: PostMessageDto, content: string) {
+    const clientId = dto.metadata?.clientMessageId ?? this.newId("request");
+    if (typeof clientId !== "string" || !/^[A-Za-z0-9_-]{1,128}$/.test(clientId)) throw new BadRequestException("CLIENT_MESSAGE_ID_INVALID");
+    return this.requirePrisma().$transaction(async (tx: any) => {
+      await tx.$queryRawUnsafe('SELECT "id" FROM "Conversation" WHERE "id"=$1 FOR NO KEY UPDATE', conversation.id);
+      const id = `mode_message_${toolDigest([conversation.id, claims.sub, clientId])}`;
+      const previous = await tx.conversationMessage.findUnique({ where: { id } });
+      if (previous && previous.content !== instruction) throw new ConflictException("MESSAGE_CONFLICT");
+      if (!previous) await tx.conversationMessage.create({ data: { id, conversationId: conversation.id, senderId: claims.sub, senderType: "user", content: instruction, metadata: { clientMessageId: clientId } } });
+      const reply = await tx.conversationMessage.upsert({ where: { id: `${id}_reply` }, create: { id: `${id}_reply`, conversationId: conversation.id, senderId: "agent", senderType: "assistant", content, metadata: { modeNotice: true, executionStarted: false } }, update: {} });
+      await tx.conversation.update({ where: { id: conversation.id }, data: { updatedAt: new Date() } });
+      return this.mapMessage(reply);
+    });
+  }
+
+  private async transferToAgent(conversation: any, claims: SessionClaims, instruction: string, dto: PostMessageDto, attachmentIds: string[]) {
+    if (claims.role === "Viewer") throw new ForbiddenException("Viewers cannot create Agent conversations");
+    if (this.projectAccess) await this.projectAccess.assert(claims, conversation.projectId, "CREATE");
+    for (const id of attachmentIds) {
+      const attachment = await this.attachmentService!.getAttachment(claims.sub, id);
+      if (attachment.conversationId !== conversation.id) throw new ForbiddenException("ATTACHMENT_CONVERSATION_MISMATCH");
+    }
+    const clientId = dto.metadata?.clientMessageId ?? this.newId("transfer");
+    if (typeof clientId !== "string" || !/^[A-Za-z0-9_-]{1,128}$/.test(clientId)) throw new BadRequestException("CLIENT_MESSAGE_ID_INVALID");
+    const messageId = `transfer_msg_${toolDigest([claims.sub, conversation.id, clientId])}`;
+    const agentConversationId = `agent_conv_${toolDigest([conversation.id, messageId])}`;
+    // Only authoritative inspection views contribute references; caller metadata never supplies evidence.
+    const runs = await this.requirePrisma().agentRun.findMany({ where: { conversationId: conversation.id, userId: claims.sub, projectId: conversation.projectId }, orderBy: { createdAt: "desc" }, take: 10 });
+    const evidence = new Map<string, import("../workspace-intelligence/workspace-runtime.contract").RuntimeEvidenceReference>();
+    for (const run of runs) {
+      const view = await this.agentRuntimeService?.inspectionView(run.id, claims);
+      for (const ref of view?.evidence ?? []) if (ref.verificationState === "VERIFIED" && ref.conversationId === conversation.id && !evidence.has(ref.receiptId)) evidence.set(ref.receiptId, ref);
+    }
+    return this.requirePrisma().$transaction(async (tx: any) => {
+      await tx.$queryRawUnsafe('SELECT "id" FROM "Conversation" WHERE "id"=$1 FOR NO KEY UPDATE', conversation.id);
+      const current = await tx.conversation.findUnique({ where: { id: conversation.id } });
+      if (!current || current.userId !== claims.sub || current.projectId !== conversation.projectId || conversationMode(current) !== "CHAT") throw new ConflictException("TRANSFER_SOURCE_CHANGED");
+      const previous = await tx.conversationMessage.findUnique({ where: { id: messageId } });
+      if (previous) {
+        if (previous.content !== instruction || toolDigest(previous.metadata?.attachmentIds ?? []) !== toolDigest(attachmentIds)) throw new ConflictException("TRANSFER_MESSAGE_CONFLICT");
+        const child = await tx.conversation.findUnique({ where: { id: agentConversationId } });
+        if (!child) throw new ConflictException("TRANSFER_TARGET_MISSING");
+        await transferredConversation(tx, child);
+        return { kind: "AGENT_TRANSFER" as const, conversationId: current.id, messageId, agentConversationId };
+      }
+      const binding = await this.runtimeWorkspaces?.activeBindingTx(tx, claims.sub, current.projectId, claims.organizationId!);
+      if (!binding || binding.status !== "READY") throw new ConflictException("VERIFIED_WORKSPACE_REQUIRED");
+      if (modeContext(current)?.workspace) assertConversationBinding(current, binding);
+      await this.runtimeWorkspaces!.assertInspectionBindingTx(tx, { ...binding, bindingVersion: binding.version });
+      const context: ConversationModeContext = { version: 1, mode: "CHAT", organizationId: claims.organizationId!, workspace: {
+        workspaceId: binding.workspaceId, bindingVersion: binding.version, runtimeId: binding.runtimeId, runtimeFingerprint: binding.runtimeFingerprint } };
+      let messages = await tx.conversationMessage.findMany({ where: { conversationId: current.id }, orderBy: [{ createdAt: "desc" }, { id: "desc" }], take: ASSISTANT_CONTEXT_LIMITS.historyMessages });
+      messages = await this.runtimeWorkspaces!.modelMessagesTx(tx, messages);
+      const source = { conversationId: current.id, messageId, contextMessageIds: messages.filter((m: any) => ["user", "assistant"].includes(m.senderType)).map((m: any) => m.id),
+        evidence: [...evidence.values()].filter(ref => ref.workspaceId === binding.workspaceId && ref.bindingVersion === binding.version && ref.runtimeId === binding.runtimeId && ref.runtimeFingerprint === binding.runtimeFingerprint).slice(0, 5) };
+      await tx.conversationMessage.create({ data: { id: messageId, conversationId: current.id, senderId: claims.sub, senderType: "user", content: instruction,
+        metadata: { clientMessageId: clientId, agentConversationId, attachmentIds } } });
+      await tx.conversation.create({ data: { id: agentConversationId, projectId: current.projectId, userId: claims.sub, title: `Agent · ${instruction.slice(0, 70)}`, status: "active",
+        metadata: { modeContext: { ...context, mode: "AGENT", source }, runtimeWorkspace: { workspaceId: binding.workspaceId, bindingVersion: binding.version } } } });
+      await tx.conversationMessage.create({ data: { id: `${messageId}_source_notice`, conversationId: current.id, senderId: "agent", senderType: "assistant",
+        content: "This request needs Agent execution. I opened a linked Agent conversation with this message, workspace and verified context. No execution has started.", metadata: { agentConversationId, transferNotice: true } } });
+      await tx.conversationMessage.create({ data: { id: `${messageId}_context`, conversationId: agentConversationId, senderId: "agent", senderType: "assistant",
+        content: `Transferred from your source Chat:\n\n${instruction}\n\n${source.evidence.length} verified observation references retained. Prior messages remain linked to the source conversation. No execution has started.`,
+        metadata: { transferContext: true, sourceConversationId: current.id, sourceMessageId: messageId, executionStarted: false } } });
+      await tx.conversation.update({ where: { id: current.id }, data: { updatedAt: new Date(), metadata: { ...current.metadata, modeContext: context } } });
+      return { kind: "AGENT_TRANSFER" as const, conversationId: current.id, messageId, agentConversationId };
+    });
+  }
+
+  private attachmentReadNotice(fileName: string, error: unknown): string {
+    const code = error instanceof FileIntelligenceError ? error.code :
+      error && typeof error === "object" && "getStatus" in error && typeof (error as { getStatus?: unknown }).getStatus === "function"
+        ? (error as { getStatus(): number }).getStatus() === 404 ? "ATTACHMENT_NOT_FOUND" : "ATTACHMENT_ACCESS_DENIED"
+        : "FILE_EXTRACTION_FAILED";
+    const explanation: Record<string, string> = {
+      UNSUPPORTED_FILE_FORMAT: "The content is not supported for reading. Bounded text source and supported text PDFs can be read; binary formats cannot.",
+      IMAGE_INTELLIGENCE_NOT_AVAILABLE: "Image OCR/vision is not available in the deterministic file-reading pipeline.",
+      SCANNED_DOCUMENT_OCR_REQUIRED: "This PDF appears to require OCR, which is not available.",
+      ATTACHMENT_NOT_FOUND: "The attachment is no longer available.",
+      ATTACHMENT_ACCESS_DENIED: "This attachment is not available in this conversation.",
+      FILE_EXTRACTION_FAILED: "The attachment could not be safely extracted."
+    };
+    return `[Attachment Notice: "${fileName}" (${code}): ${explanation[code] ?? "The attachment could not be read."}]`;
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private mapConvSummary(c: any): ConversationSummaryDto {
+    return {
+      mode: conversationMode(c),
+      modeContext: modeContext(c),
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      id: c.id as string,
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      projectId: c.projectId as string,
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      userId: c.userId as string,
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      title: c.title as string,
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      status: c.status as string,
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      messageCount: c._count?.messages ?? c.messages?.length ?? 0,
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      createdAt: c.createdAt as Date,
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      updatedAt: c.updatedAt as Date
+    };
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private mapConvDetail(c: any): ConversationDetailDto {
+    return {
+      ...this.mapConvSummary(c),
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+      messages: (c.messages ?? []).map((m: any) => ({
+        ...this.mapMessage(m),
+        attachments: (c.attachments ?? []).filter((a: any) => a.conversationId === c.id && a.userId === c.userId &&
+          Array.isArray(m.metadata?.attachmentIds) && m.metadata.attachmentIds.includes(a.id)).map((a: any) => ({
+          id: a.id, conversationId: a.conversationId, userId: a.userId, fileName: a.fileName, mimeType: a.mimeType,
+          fileSize: a.fileSize, category: a.category, hasExtractedText: a.hasExtractedText, isScanned: a.isScanned,
+          createdAt: new Date(a.createdAt).toISOString()
+        }))
+      })),
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      agentRuns: (c.agentRuns ?? []).filter((r: any) => r.projectId === c.projectId && r.conversationId === c.id).map((r: any) => ({
+        id: r.id as string,
+        conversationId: r.conversationId as string,
+        projectId: r.projectId as string,
+        agentName: r.agentName as string,
+        title: r.title as string,
+        status: r.status as string,
+        outcome: persistedRunOutcome(r),
+        planVersion: r.planVersion as number,
+        progressPercent: r.progressPercent as number,
+        startedAt: r.startedAt as Date | null,
+        completedAt: r.completedAt as Date | null,
+        createdAt: r.createdAt as Date,
+        updatedAt: r.updatedAt as Date,
+        failureReason: r.failureReason ?? null,
+        presentation: presentPlan(r.plans?.[0]?.steps),
+        control: presentControl(r.artifacts ?? [], r),
+        activity: (r.events ?? []).map((e: any) => ({ id: e.id, agentRunId: e.agentRunId, eventType: e.eventType, timestamp: e.timestamp }))
+          .sort((a: any, b: any) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime() || a.id.localeCompare(b.id)),
+        artifacts: (r.artifacts ?? []).filter((a: any) => a.projectId === c.projectId && a.artifactType !== CONTROL_ARTIFACT).map((a: any) => ({
+          id: a.id, title: a.title, artifactType: a.artifactType, summary: a.summary, version: a.version, createdAt: a.createdAt
+        })),
+        pendingApprovals: (r.approvals ?? []).map((a: any) => ({
+          id: a.id, approvalType: a.approvalType, status: a.status, requiredRole: a.requiredRole, dueAt: a.dueAt
+        }))
+      })),
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      metadata: (c.metadata ?? {}) as Record<string, unknown>
+    };
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private mapMessage(m: any): ConversationMessageDto {
+    return {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      id: m.id as string,
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      conversationId: m.conversationId as string,
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      senderId: m.senderId as string,
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      senderType: m.senderType as string,
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      content: m.content as string,
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      metadata: (m.metadata ?? {}) as Record<string, unknown>,
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      createdAt: m.createdAt as Date
+    };
+  }
+}

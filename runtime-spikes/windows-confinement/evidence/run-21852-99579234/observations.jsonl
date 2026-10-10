@@ -1,0 +1,17 @@
+{"observation":"root","identity":"d850aa8b50aa7044:dca10100000004000000000000000000","fileSystem":"NTFS","driveType":"FIXED","directory":true,"reparse":false,"caseSensitive":false}
+{"observation":"symlinkPrivilege","available":false,"win32Error":1314}
+{"observation":"nativeFlags0","opened":true,"reparseObject":false,"outsideObject":true,"ntstatus":0,"code":"OK"}
+{"observation":"nativeFlags1","opened":false,"reparseObject":false,"outsideObject":false,"ntstatus":3221226763,"code":"REPARSE_POINT_DENIED"}
+{"observation":"nativeFlags2","opened":true,"reparseObject":true,"outsideObject":false,"ntstatus":0,"code":"OK"}
+{"observation":"nativeFlags3","opened":true,"reparseObject":true,"outsideObject":false,"ntstatus":0,"code":"OK"}
+{"observation":"heldHardLink","created":true,"win32Error":0,"readCode":"HARD_LINK_POLICY_DENIED"}
+{"observation":"preopenedLink","ntstatus":0,"readCode":"HARD_LINK_POLICY_DENIED"}
+{"observation":"hardLinkABA","iterations":1000,"exercised":1000,"bytesReleasingReads":795,"safeDenials":205}
+{"observation":"renameProbe","movedOut":true,"outError":0,"movedIn":false,"inError":32}
+{"observation":"caseSensitiveSetup","ntstatus":3221225506}
+{"observation":"file-replacement","iterations":10000,"attempts":16103,"successfulChanges":8247,"reads":457,"safeDenials":9543,"escapes":0}
+{"observation":"parent-move","iterations":10000,"attempts":2605,"successfulChanges":1908,"reads":8,"safeDenials":9992,"escapes":0}
+{"observation":"junction-swap","iterations":10000,"attempts":4498,"successfulChanges":1885,"reads":64,"safeDenials":9936,"escapes":0}
+{"observation":"hard-link-churn","iterations":10000,"attempts":9273,"successfulChanges":9273,"reads":4073,"safeDenials":5927,"escapes":0}
+{"observation":"hard-link-replacement","iterations":10000,"attempts":13248,"successfulChanges":7801,"reads":183,"safeDenials":9817,"escapes":0}
+{"observation":"handleCleanup","before":63,"after":63}

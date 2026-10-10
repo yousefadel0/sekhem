@@ -1,0 +1,1268 @@
+diff --git a/backend/src/agent-runtime/agent-runtime.service.ts b/backend/src/agent-runtime/agent-runtime.service.ts
+index a4b676d..06175ea 100644
+--- a/backend/src/agent-runtime/agent-runtime.service.ts
++++ b/backend/src/agent-runtime/agent-runtime.service.ts
+@@ -20,6 +20,8 @@ import { MemoryService } from "../memory/memory.service";
+ import { AttachmentService, MAX_IMAGE_BASE64_BYTES } from "../attachment/attachment.service";
+ import { AgentUnderstandingService } from "./understanding/agent-understanding.service";
+ import { AgentContextBuilderService } from "./understanding/agent-context-builder.service";
++import { AgentToolControlService } from "./tools/agent-tool-control.service";
++import type { TrustedToolWorkspace } from "./tools/tool-contract";
+ import { preferredReadSkillId } from "./understanding/agent-understanding.types";
+ import { ResourceAuthorizationService, type AuthSubject } from "../auth/resource-authz.service";
+ import { AuditService } from "../audit/audit.service";
+@@ -76,7 +78,8 @@ export class AgentRuntimeService implements OnApplicationBootstrap {
+     @Optional() @Inject(MemoryService) private readonly memoryService?: MemoryService,
+     @Optional() @Inject(AttachmentService) private readonly attachmentService?: AttachmentService,
+     @Optional() @Inject(AgentUnderstandingService) private readonly understandingService?: AgentUnderstandingService,
+-    @Optional() @Inject(AgentContextBuilderService) private readonly contextBuilder?: AgentContextBuilderService
++    @Optional() @Inject(AgentContextBuilderService) private readonly contextBuilder?: AgentContextBuilderService,
++    @Optional() @Inject(AgentToolControlService) private readonly toolControl?: AgentToolControlService
+   ) {
+     if (prismaService) {
+       this.prisma = prismaService;
+@@ -112,6 +115,17 @@ export class AgentRuntimeService implements OnApplicationBootstrap {
+     await this.recoverUnfinishedRuns();
+   }
+ 
++  /** Explicit server-side control-plane entry point; no autonomous decision loop. */
++  async applyDecision(runId: string, claims: SessionClaims, proposal: unknown, workspace?: TrustedToolWorkspace) {
++    if (!this.toolControl) throw new ServiceUnavailableException("Tool control plane unavailable");
++    return this.toolControl.applyDecision(runId, claims, proposal, workspace);
++  }
++
++  async decideToolApproval(runId: string, approvalId: string, claims: SessionClaims, body: unknown) {
++    if (!this.toolControl) throw new ServiceUnavailableException("Tool control plane unavailable");
++    return this.toolControl.decideApproval(runId, approvalId, claims, body);
++  }
++
+   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   private requirePrisma(): any {
+     if (!this.prisma) {
+@@ -555,6 +569,7 @@ export class AgentRuntimeService implements OnApplicationBootstrap {
+       );
+ 
+       // Transition to RUNNING
++      if (await this.toolControl?.suspendRecoveredBoundary(runId, claims)) return;
+       const startTime = new Date();
+       // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+       await db.agentRun.update({
+@@ -949,19 +964,17 @@ export class AgentRuntimeService implements OnApplicationBootstrap {
+   async pauseRun(runId: string, claims: SessionClaims, dto: PauseRunDto): Promise<AgentRunSummaryDto> {
+     const db = this.requirePrisma();
+ 
+-    await this.resourceAuthz.assertAuthorized(
+-      this.subjectFromClaims(claims),
+-      "UPDATE",
+-      { resourceType: "AgentRun", id: runId, projectId: undefined, organizationId: claims.organizationId, userId: claims.sub }
+-    );
+-
+     const now = new Date();
+ 
+     const updatedRun = await db.$transaction(async (tx: any) => {
+-      const run = await tx.agentRun.findUnique({ where: { id: runId } });
++      const run = await tx.agentRun.findUnique({ where: { id: runId }, include: { project: true } });
+       if (!run) {
+         throw new NotFoundException(`Agent run '${runId}' not found`);
+       }
++      await this.resourceAuthz.assertAuthorized(this.subjectFromClaims(claims), "UPDATE", {
++        resourceType: "AgentRun", id: runId, projectId: run.projectId, userId: run.userId,
++        organizationId: run.project?.organizationId ?? undefined
++      });
+       if (run.status === "PAUSED") {
+         return run;
+       }
+@@ -1001,19 +1014,17 @@ export class AgentRuntimeService implements OnApplicationBootstrap {
+   async resumeRun(runId: string, claims: SessionClaims): Promise<AgentRunSummaryDto> {
+     const db = this.requirePrisma();
+ 
+-    await this.resourceAuthz.assertAuthorized(
+-      this.subjectFromClaims(claims),
+-      "UPDATE",
+-      { resourceType: "AgentRun", id: runId, projectId: undefined, organizationId: claims.organizationId, userId: claims.sub }
+-    );
+-
+     const now = new Date();
+ 
+     const updatedRun = await db.$transaction(async (tx: any) => {
+-      const run = await tx.agentRun.findUnique({ where: { id: runId } });
++      const run = await tx.agentRun.findUnique({ where: { id: runId }, include: { project: true } });
+       if (!run) {
+         throw new NotFoundException(`Agent run '${runId}' not found`);
+       }
++      await this.resourceAuthz.assertAuthorized(this.subjectFromClaims(claims), "UPDATE", {
++        resourceType: "AgentRun", id: runId, projectId: run.projectId, userId: run.userId,
++        organizationId: run.project?.organizationId ?? undefined
++      });
+       if (run.status === "RUNNING") {
+         return run;
+       }
+@@ -1052,20 +1063,18 @@ export class AgentRuntimeService implements OnApplicationBootstrap {
+   async cancelRun(runId: string, claims: SessionClaims, dto: CancelRunDto): Promise<AgentRunSummaryDto> {
+     const db = this.requirePrisma();
+ 
+-    await this.resourceAuthz.assertAuthorized(
+-      this.subjectFromClaims(claims),
+-      "UPDATE",
+-      { resourceType: "AgentRun", id: runId, projectId: undefined, organizationId: claims.organizationId, userId: claims.sub }
+-    );
+-
+     const now = new Date();
+-    const allowedSources = ["QUEUED", "PLANNING", "RUNNING", "PAUSED"];
++    const allowedSources = ["QUEUED", "PLANNING", "RUNNING", "PAUSED", "AWAITING_APPROVAL"];
+ 
+     const updatedRun = await db.$transaction(async (tx: any) => {
+-      const run = await tx.agentRun.findUnique({ where: { id: runId } });
++      const run = await tx.agentRun.findUnique({ where: { id: runId }, include: { project: true } });
+       if (!run) {
+         throw new NotFoundException(`Agent run '${runId}' not found`);
+       }
++      await this.resourceAuthz.assertAuthorized(this.subjectFromClaims(claims), "CANCEL", {
++        resourceType: "AgentRun", id: runId, projectId: run.projectId, userId: run.userId,
++        organizationId: run.project?.organizationId ?? undefined
++      });
+       if (run.status === "CANCELLED") {
+         return run;
+       }
+@@ -1079,6 +1088,7 @@ export class AgentRuntimeService implements OnApplicationBootstrap {
+       if (updateResult.count === 0) {
+         throw new BadRequestException(`Cancel not allowed from status ${run.status}`);
+       }
++      await this.toolControl?.cancelPending(tx, runId, claims);
+       await this.auditService.recordWithClaimsTx(tx, claims, {
+         action: "AGENT_RUN_CANCEL",
+         resourceType: "AgentRun",
+@@ -1383,7 +1393,7 @@ export class AgentRuntimeService implements OnApplicationBootstrap {
+         decidedBy: a.decidedBy,
+         decision: a.decision,
+         notes: a.notes,
+-        revisedPlan: a.revisedPlan ? (Array.isArray(a.revisedPlan) ? a.revisedPlan : JSON.parse(a.revisedPlan as string)) : null,
++        revisedPlan: a.revisedPlan ? (typeof a.revisedPlan === "string" ? JSON.parse(a.revisedPlan) : a.revisedPlan) : null,
+         dueAt: a.dueAt,
+         createdAt: a.createdAt,
+         decidedAt: a.decidedAt
+diff --git a/backend/src/agent-runtime/agent-run.dto.ts b/backend/src/agent-runtime/agent-run.dto.ts
+index aa4daf3..99e0568 100644
+--- a/backend/src/agent-runtime/agent-run.dto.ts
++++ b/backend/src/agent-runtime/agent-run.dto.ts
+@@ -1,4 +1,5 @@
+ import type { AuthRoleDto } from "../auth/auth.dto";
++import type { ToolApprovalBinding } from "./tools/tool-contract";
+ 
+ // ---------------------------------------------------------------------------
+ // Agent Run Lifecycle DTOs
+@@ -93,6 +94,14 @@ export type AgentRunEventType =
+   | "EVIDENCE_COLLECTED"
+   | "PLAN_CREATED"
+   | "PLAN_VALIDATED"
++  | "TOOL_REQUESTED"
++  | "TOOL_AUTHORIZATION_CHECKED"
++  | "TOOL_BLOCKED"
++  | "APPROVAL_REQUESTED"
++  | "APPROVAL_GRANTED"
++  | "APPROVAL_DENIED"
++  | "APPROVAL_EXPIRED"
++  | "APPROVAL_CANCELLED"
+   | "CAPABILITY_SELECTED"
+   | "VERIFICATION_REQUIRED"
+   | "UNDERSTANDING_COMPLETED";
+@@ -123,7 +132,7 @@ export interface AgentApprovalDto {
+   decidedBy: string | null;
+   decision: string | null;
+   notes: string | null;
+-  revisedPlan: AgentPlanStep[] | null;
++  revisedPlan: AgentPlanStep[] | ToolApprovalBinding | null;
+   dueAt: Date | null;
+   createdAt: Date;
+   decidedAt: Date | null;
+diff --git a/backend/src/agent-runtime/agent-runtime.module.ts b/backend/src/agent-runtime/agent-runtime.module.ts
+index d261b9a..29ed34c 100644
+--- a/backend/src/agent-runtime/agent-runtime.module.ts
++++ b/backend/src/agent-runtime/agent-runtime.module.ts
+@@ -39,6 +39,13 @@ import { AgentContextBuilderService } from "./understanding/agent-context-builde
+ import { AgentContextSerializerService } from "./understanding/agent-context-serializer.service";
+ import { AgentInitiativeService } from "./initiative/agent-initiative.service";
+ import { AgentInitiativeController } from "./initiative/agent-initiative.controller";
++import { ToolRegistryService } from "./tools/tool-registry.service";
++import { ToolScopeService } from "./tools/tool-scope.service";
++import { ToolPermissionService } from "./tools/tool-permission.service";
++import { ToolRiskService } from "./tools/tool-risk.service";
++import { ToolApprovalService } from "./tools/tool-approval.service";
++import { ToolAuthorizationService } from "./tools/tool-authorization.service";
++import { AgentToolControlService } from "./tools/agent-tool-control.service";
+ 
+ /**
+  * AgentRuntimeModule
+@@ -56,6 +63,13 @@ import { AgentInitiativeController } from "./initiative/agent-initiative.control
+   controllers: [AgentRuntimeController, AgentRuntimeEventsController, AgentInitiativeController],
+   providers: [
+     AgentRuntimeService,
++    ToolRegistryService,
++    ToolScopeService,
++    ToolPermissionService,
++    ToolRiskService,
++    ToolApprovalService,
++    ToolAuthorizationService,
++    AgentToolControlService,
+     SkillRegistryService,
+     AuthService,
+     AuthzGuard,
+@@ -95,6 +109,6 @@ import { AgentInitiativeController } from "./initiative/agent-initiative.control
+     },
+     ExecutionPlaneService
+   ],
+-  exports: [AgentRuntimeService, SkillRegistryService, AgentContextBuilderService]
++  exports: [AgentRuntimeService, SkillRegistryService, AgentContextBuilderService, ToolRegistryService, ToolAuthorizationService]
+ })
+ export class AgentRuntimeModule {}
+diff --git a/backend/src/agent-runtime/agent-runtime.controller.ts b/backend/src/agent-runtime/agent-runtime.controller.ts
+index 1c8a331..d37f547 100644
+--- a/backend/src/agent-runtime/agent-runtime.controller.ts
++++ b/backend/src/agent-runtime/agent-runtime.controller.ts
+@@ -82,5 +82,11 @@ export class AgentRuntimeController {
+     return response(await this.agentRuntime.steerRun(id, claims, body));
+   }
+ 
+-}
++  @Post(':id/tool-approvals/:approvalId/decision')
++  async decideToolApproval(@Param('id') id: string, @Param('approvalId') approvalId: string,
++    @Headers('cookie') cookieHeader: string, @Body() body: unknown) {
++    const claims = await this.authService.sessionClaims(cookieHeader);
++    return response(await this.agentRuntime.decideToolApproval(id, approvalId, claims, body));
++  }
+ 
++}
+diff --git a/backend/src/agent-runtime/tools/agent-tool-control.service.ts b/backend/src/agent-runtime/tools/agent-tool-control.service.ts
+new file mode 100644
+--- /dev/null
++++ b/backend/src/agent-runtime/tools/agent-tool-control.service.ts
+@@ -0,0 +1,96 @@
++import { BadRequestException, Inject, Injectable, NotFoundException } from "@nestjs/common";
++import { PrismaService } from "../../data-access/prisma.service";
++import { ResourceAuthorizationService } from "../../auth/resource-authz.service";
++import { AuditService } from "../../audit/audit.service";
++import type { SessionClaims } from "../../auth/auth.dto";
++import { ToolAuthorizationService, blockedTool } from "./tool-authorization.service";
++import { ToolApprovalService } from "./tool-approval.service";
++import { boundedToolJson, isRecord, toolSubject, validToolId, type AgentDecision, type AuthorizationDecision, type TrustedToolWorkspace } from "./tool-contract";
++
++/** Durable control-plane seam; deliberately has no skill/executor dependency. */
++@Injectable()
++export class AgentToolControlService {
++  constructor(
++    @Inject(PrismaService) private readonly prisma: PrismaService,
++    @Inject(ResourceAuthorizationService) private readonly resources: ResourceAuthorizationService,
++    @Inject(AuditService) private readonly audit: AuditService,
++    @Inject(ToolAuthorizationService) private readonly authorization: ToolAuthorizationService,
++    @Inject(ToolApprovalService) private readonly approvals: ToolApprovalService
++  ) {}
++  async applyDecision(runId: string, claims: SessionClaims, value: unknown, workspace?: TrustedToolWorkspace) {
++    if (!boundedToolJson(value) || !isRecord(value) || !["EXECUTE_TOOL", "REQUEST_APPROVAL", "ASK_USER", "REPLAN", "VERIFY", "COMPLETE", "STOP"].includes(String(value.type)) ||
++      Object.keys(value).some(k => !["type", "toolRequest", "approvalId"].includes(k)) || (value.approvalId !== undefined && !validToolId(value.approvalId))) throw new BadRequestException("INVALID_AGENT_DECISION");
++    const decision = value as unknown as AgentDecision;
++    return this.prisma.$transaction(async (tx: any) => {
++      const run = await this.loadAuthorizedRun(tx, runId, claims, "EXECUTE");
++      if (!["RUNNING", "COMPLETED", "AWAITING_APPROVAL"].includes(run.status)) return { authorization: blockedTool("RUN_NOT_ACTIVE"), executionBoundaryReached: false, executionPerformed: false };
++      // This conditional write holds the run row for the transaction. Cancellation,
++      // pause and concurrent decisions cannot be overwritten after authorization.
++      const locked = await tx.agentRun.updateMany({ where: { id: runId, status: run.status, planVersion: run.planVersion, updatedAt: run.updatedAt }, data: { updatedAt: new Date() } });
++      if (locked.count !== 1) throw new BadRequestException("RUN_STATE_CHANGED");
++      let authorization: AuthorizationDecision | undefined;
++      let status = "PAUSED", code: string = decision.type;
++      if (decision.type === "EXECUTE_TOOL" || decision.type === "REQUEST_APPROVAL") {
++        authorization = await this.authorization.authorize(runId, decision.toolRequest, claims, workspace,
++          { approvalId: decision.approvalId, forceApproval: decision.type === "REQUEST_APPROVAL" }, tx);
++        status = authorization.status === "APPROVAL_REQUIRED" ? "AWAITING_APPROVAL" : "PAUSED";
++        code = authorization.status === "AUTHORIZED" ? "EXECUTION_BOUNDARY_NOT_IMPLEMENTED" : authorization.code ?? "APPROVAL_REQUIRED";
++      } else if (decision.type === "STOP") {
++        status = "CANCELLED";
++        await this.cancelPending(tx, runId, claims);
++      } else if (decision.type === "COMPLETE") {
++        // Completion describes the control-plane job, never verification/execution.
++        const pending = await tx.agentApproval.count({ where: { agentRunId: runId, approvalType: "TOOL_AUTHORIZATION", status: "PENDING" } });
++        if (pending) throw new BadRequestException("APPROVAL_PENDING");
++        status = "COMPLETED";
++      }
++      const metadata = { phase: "5B", decision: decision.type, previousStatus: run.status, newStatus: status, code, executionPerformed: false };
++      await tx.agentRun.update({ where: { id: runId }, data: { status, failureReason: status === "PAUSED" ? code : null,
++        pausedAt: status === "PAUSED" ? new Date() : null, completedAt: status === "COMPLETED" ? new Date() : null, updatedAt: new Date() } });
++      await tx.agentRunEvent.create({ data: { agentRunId: runId, eventType: "STATUS_CHANGE", actor: claims.sub, payload: metadata } });
++      await this.audit.recordWithClaimsTx(tx, claims, { action: "AGENT_CONTROL_DECISION", resourceType: "AgentRun", resourceId: runId, details: metadata });
++      return { authorization, runStatus: status, executionBoundaryReached: authorization?.status === "AUTHORIZED", executionPerformed: false };
++    });
++  }
++  async decideApproval(runId: string, approvalId: string, claims: SessionClaims, body: unknown) {
++    if (!isRecord(body) || Object.keys(body).some(k => !["decision", "fingerprint"].includes(k))) throw new BadRequestException("INVALID_APPROVAL_DECISION");
++    return this.prisma.$transaction(async (tx: any) => {
++      // Use the same run lock ordering as tool proposals/cancellation.
++      const run = await tx.agentRun.findUnique({ where: { id: runId } });
++      if (!run) throw new NotFoundException("Agent run not found");
++      const locked = await tx.agentRun.updateMany({ where: { id: runId, status: run.status, updatedAt: run.updatedAt }, data: { updatedAt: new Date() } });
++      if (locked.count !== 1) throw new BadRequestException("RUN_STATE_CHANGED");
++      const status = await this.approvals.decide(tx, runId, approvalId, claims, body.decision, body.fingerprint);
++      return { approvalId, status, executionPerformed: false };
++    });
++  }
++  async cancelPending(tx: any, runId: string, claims: SessionClaims): Promise<void> {
++    const result = await tx.agentApproval.updateMany({ where: { agentRunId: runId, approvalType: "TOOL_AUTHORIZATION", status: { in: ["PENDING", "APPROVED"] } },
++      data: { status: "CANCELLED", decision: "CANCELLED", decidedBy: claims.sub, decidedAt: new Date() } });
++    if (result.count) {
++      const metadata = { phase: "5B", count: result.count, status: "CANCELLED" };
++      await tx.agentRunEvent.create({ data: { agentRunId: runId, eventType: "APPROVAL_CANCELLED", actor: claims.sub, payload: metadata } });
++      await this.audit.recordWithClaimsTx(tx, claims, { action: "APPROVAL_CANCELLED", resourceType: "AgentRun", resourceId: runId, details: metadata });
++    }
++  }
++  async suspendRecoveredBoundary(runId: string, claims: SessionClaims): Promise<boolean> {
++    const db: any = this.prisma;
++    const prior = await db.agentRunEvent.findFirst({ where: { agentRunId: runId, eventType: "TOOL_AUTHORIZATION_CHECKED" }, select: { id: true } });
++    if (!prior) return false;
++    await db.$transaction(async (tx: any) => {
++      const result = await tx.agentRun.updateMany({ where: { id: runId, status: { in: ["QUEUED", "PLANNING", "RUNNING"] } },
++        data: { status: "PAUSED", pausedAt: new Date(), failureReason: "CONTROL_PLANE_REAUTHORIZATION_REQUIRED", updatedAt: new Date() } });
++      if (result.count) await tx.agentRunEvent.create({ data: { agentRunId: runId, eventType: "STATUS_CHANGE", actor: claims.sub,
++        payload: { phase: "5B", newStatus: "PAUSED", code: "CONTROL_PLANE_REAUTHORIZATION_REQUIRED", executionPerformed: false } } });
++    });
++    return true;
++  }
++  private async loadAuthorizedRun(db: any, runId: string, claims: SessionClaims, action: "EXECUTE") {
++    const run = await db.agentRun.findUnique({ where: { id: runId }, include: { project: true } });
++    if (!run?.project) throw new NotFoundException("Agent run not found");
++    if (run.userId !== claims.sub) throw new BadRequestException("RUN_ACTOR_MISMATCH");
++    await this.resources.assertAuthorized(toolSubject(claims), action, { resourceType: "AgentRun", id: runId, projectId: run.projectId,
++      organizationId: run.project.organizationId ?? undefined, userId: run.userId });
++    return run;
++  }
++}
+diff --git a/backend/src/agent-runtime/tools/tool-approval.service.ts b/backend/src/agent-runtime/tools/tool-approval.service.ts
+new file mode 100644
+--- /dev/null
++++ b/backend/src/agent-runtime/tools/tool-approval.service.ts
+@@ -0,0 +1,85 @@
++import { BadRequestException, Inject, Injectable, NotFoundException } from "@nestjs/common";
++import { ResourceAuthorizationService } from "../../auth/resource-authz.service";
++import { AuditService } from "../../audit/audit.service";
++import type { SessionClaims } from "../../auth/auth.dto";
++import { isRecord, toolDigest, toolSubject, type ToolApprovalBinding, type ToolApprovalStatus, type ToolBlockCode } from "./tool-contract";
++
++export const TOOL_APPROVAL_TTL_MS = 15 * 60 * 1000;
++export interface ToolApprovalEvaluation {
++  status: "NO_APPROVAL_REQUIRED" | "APPROVAL_REQUIRED" | "BLOCKED";
++  approvalId?: string;
++  code?: ToolBlockCode;
++  created?: boolean;
++}
++export function approvalBinding(value: unknown): ToolApprovalBinding | undefined {
++  if (!isRecord(value) || value.kind !== "TOOL_AUTHORIZATION" || value.version !== 1 || typeof value.fingerprint !== "string" || !/^[a-f0-9]{64}$/.test(value.fingerprint)) return;
++  return value as unknown as ToolApprovalBinding;
++}
++@Injectable()
++export class ToolApprovalService {
++  constructor(
++    @Inject(ResourceAuthorizationService) private readonly resources: ResourceAuthorizationService,
++    @Inject(AuditService) private readonly audit: AuditService
++  ) {}
++  async evaluate(db: any, binding: ToolApprovalBinding, required: boolean, suppliedId?: string): Promise<ToolApprovalEvaluation> {
++    const id = `toolapproval_${toolDigest([binding.runId, binding.requestId])}`;
++    if (suppliedId && suppliedId !== id) return { status: "BLOCKED", code: "APPROVAL_INVALID" };
++    let row = await db.agentApproval.findUnique({ where: { id } });
++    let created = false;
++    if (!row && suppliedId) return { status: "BLOCKED", code: "APPROVAL_INVALID" };
++    if (!row && !required) return { status: "NO_APPROVAL_REQUIRED" };
++    if (!row) {
++      // Run-level transaction serialization in AgentRuntime prevents duplicate
++      // requests; upsert also makes standalone authorization idempotent.
++      row = await db.agentApproval.upsert({ where: { id }, update: {}, create: {
++        id, agentRunId: binding.runId, approvalType: "TOOL_AUTHORIZATION", status: "PENDING",
++        requestedBy: binding.requestedBy, requiredRole: "Technical Reviewer",
++        revisedPlan: binding, dueAt: new Date(Date.now() + TOOL_APPROVAL_TTL_MS),
++        notes: "Approval applies only to the bound tool request. Execution remains unavailable."
++      } });
++      created = true;
++    }
++    const stored = approvalBinding(row.revisedPlan);
++    if (row.agentRunId !== binding.runId || row.approvalType !== "TOOL_AUTHORIZATION" || row.requestedBy !== binding.requestedBy ||
++      !stored || toolDigest(stored) !== toolDigest(binding)) return { status: "BLOCKED", code: "APPROVAL_INVALID" };
++    const expiry = row.dueAt && new Date(row.dueAt).getTime();
++    if (!expiry || !Number.isFinite(expiry) || expiry <= Date.now() || row.status === "EXPIRED") {
++      await db.agentApproval.updateMany({ where: { id, status: { in: ["PENDING", "APPROVED"] } }, data: { status: "EXPIRED", decision: "EXPIRED", decidedAt: new Date() } });
++      return { status: "BLOCKED", approvalId: id, code: "APPROVAL_EXPIRED" };
++    }
++    if (row.status === "APPROVED" && row.decision === "APPROVED" && row.decidedBy && row.decidedAt) return { status: "NO_APPROVAL_REQUIRED", approvalId: id };
++    if (row.status !== "PENDING") return { status: "BLOCKED", approvalId: id, code: "APPROVAL_INVALID" };
++    return { status: "APPROVAL_REQUIRED", approvalId: id, created };
++  }
++  /** Called only inside the runtime's transaction; identity is from AuthService. */
++  async decide(db: any, runId: string, id: string, claims: SessionClaims, decision: unknown, fingerprint: unknown): Promise<ToolApprovalStatus> {
++    if (!["APPROVED", "DENIED", "CANCELLED"].includes(String(decision)) || typeof fingerprint !== "string" || !/^[a-f0-9]{64}$/.test(fingerprint)) throw new BadRequestException("INVALID_APPROVAL_DECISION");
++    const row = await db.agentApproval.findUnique({ where: { id } });
++    if (!row || row.agentRunId !== runId || row.approvalType !== "TOOL_AUTHORIZATION") throw new NotFoundException("Tool approval not found");
++    const run = await db.agentRun.findUnique({ where: { id: runId }, include: { project: true, plans: { orderBy: { version: "desc" }, take: 1 } } });
++    if (!run?.project) throw new NotFoundException("Approval scope not found");
++    const subject = toolSubject(claims);
++    await this.resources.assertAuthorized(subject, "APPROVE", { resourceType: "Approval", id, projectId: run.projectId,
++      organizationId: run.project.organizationId ?? undefined, requiredRole: "Technical Reviewer" });
++    const binding = approvalBinding(row.revisedPlan);
++    const plan = run.plans?.[0];
++    if (!binding || binding.fingerprint !== fingerprint || binding.planId !== plan?.id || binding.planVersion !== plan?.version || binding.planDigest !== toolDigest(plan.steps)) throw new BadRequestException("APPROVAL_INVALID");
++    if (!["AWAITING_APPROVAL", "RUNNING", "COMPLETED"].includes(run.status)) throw new BadRequestException("RUN_NOT_ACTIVE");
++    const expiry = row.dueAt && new Date(row.dueAt).getTime();
++    const expired = !expiry || !Number.isFinite(expiry) || expiry <= Date.now();
++    const target = expired ? "EXPIRED" : decision as ToolApprovalStatus;
++    if (row.status !== "PENDING") {
++      if (row.status === target && row.decidedBy === claims.sub) return target;
++      throw new BadRequestException("APPROVAL_ALREADY_DECIDED");
++    }
++    const updated = await db.agentApproval.updateMany({ where: { id, status: "PENDING" }, data: { status: target, decision: target, decidedBy: claims.sub, decidedAt: new Date() } });
++    if (updated.count !== 1) throw new BadRequestException("APPROVAL_ALREADY_DECIDED");
++    const eventType = target === "APPROVED" ? "APPROVAL_GRANTED" : target === "EXPIRED" ? "APPROVAL_EXPIRED" : target === "CANCELLED" ? "APPROVAL_CANCELLED" : "APPROVAL_DENIED";
++    const metadata = { approvalId: id, requestId: binding.requestId, toolId: binding.toolId, planStepId: binding.planStepId, risk: binding.risk, status: target };
++    await db.agentRunEvent.create({ data: { agentRunId: runId, eventType, actor: claims.sub, payload: metadata } });
++    await this.audit.recordWithClaimsTx(db, claims, { action: eventType, resourceType: "AgentRun", resourceId: runId, details: metadata });
++    // Grant records a decision only. Reauthorization must still check permissions,
++    // current plan, scope and expiry; no scheduler or executor is called here.
++    return target;
++  }
++}
+diff --git a/backend/src/agent-runtime/tools/tool-authorization.service.ts b/backend/src/agent-runtime/tools/tool-authorization.service.ts
+new file mode 100644
+--- /dev/null
++++ b/backend/src/agent-runtime/tools/tool-authorization.service.ts
+@@ -0,0 +1,102 @@
++import { Inject, Injectable, Optional } from "@nestjs/common";
++import { PrismaService } from "../../data-access/prisma.service";
++import { AuditService } from "../../audit/audit.service";
++import { ResourceAuthorizationService } from "../../auth/resource-authz.service";
++import type { SessionClaims } from "../../auth/auth.dto";
++import type { AgentPlanningResult } from "../understanding/agent-understanding.types";
++import { ToolRegistryService } from "./tool-registry.service";
++import { ToolPermissionService } from "./tool-permission.service";
++import { ToolScopeService } from "./tool-scope.service";
++import { ToolRiskService } from "./tool-risk.service";
++import { ToolApprovalService } from "./tool-approval.service";
++import { boundedToolJson, isRecord, matchesToolSchema, toolDigest, toolSubject, validToolId,
++  type AuthorizationDecision, type ToolRequest, type ToolScope, type TrustedToolWorkspace } from "./tool-contract";
++
++export interface ToolAuthorizationOptions { approvalId?: string; forceApproval?: boolean }
++export function blockedTool(code: NonNullable<AuthorizationDecision["code"]>): AuthorizationDecision { return { status: "BLOCKED", code, executionAllowed: false }; }
++
++/** The sole Phase 5B gate. No provider, skill, executor or runtime transport dependency. */
++@Injectable()
++export class ToolAuthorizationService {
++  constructor(
++    @Inject(ToolRegistryService) private readonly registry: ToolRegistryService,
++    @Inject(ToolScopeService) private readonly scopes: ToolScopeService,
++    @Inject(ToolPermissionService) private readonly permissions: ToolPermissionService,
++    @Inject(ToolRiskService) private readonly risks: ToolRiskService,
++    @Inject(ToolApprovalService) private readonly approvals: ToolApprovalService,
++    @Inject(ResourceAuthorizationService) private readonly resources: ResourceAuthorizationService,
++    @Inject(AuditService) private readonly audit: AuditService,
++    @Optional() @Inject(PrismaService) private readonly prisma?: PrismaService
++  ) {}
++  async authorize(runId: string, proposal: unknown, claims: SessionClaims, workspace?: TrustedToolWorkspace,
++    options: ToolAuthorizationOptions = {}, transaction?: any): Promise<AuthorizationDecision> {
++    const db = transaction ?? this.prisma;
++    if (!db || !validToolId(runId)) return blockedTool("POLICY_BLOCKED");
++    if (!transaction) return db.$transaction((tx: any) => this.authorize(runId, proposal, claims, workspace, options, tx));
++    const run = await db.agentRun.findUnique({ where: { id: runId }, include: { project: true, plans: { orderBy: { version: "desc" }, take: 1 } } });
++    if (!run?.project || run.userId !== claims.sub || !await this.resources.authorize(toolSubject(claims), "READ", {
++      resourceType: "AgentRun", id: runId, projectId: run.projectId, organizationId: run.project.organizationId ?? undefined, userId: run.userId
++    })) return blockedTool("PERMISSION_DENIED");
++    const locked = await db.agentRun.updateMany({ where: { id: runId, status: run.status, planVersion: run.planVersion, updatedAt: run.updatedAt }, data: { updatedAt: new Date() } });
++    if (locked.count !== 1) return blockedTool("RUN_NOT_ACTIVE");
++    const decision = await this.evaluate(db, run, proposal, claims, workspace, options);
++    const metadata = { phase: "5B", status: decision.status, code: decision.code ?? null, executionAllowed: false,
++      ...(decision.request ? { requestId: decision.request.id, toolId: decision.request.toolId, toolVersion: decision.request.toolVersion,
++        planStepId: decision.request.planStepId, workspaceId: decision.request.scope.workspaceId, risk: decision.request.risk } : {}),
++      ...(decision.approvalId ? { approvalId: decision.approvalId } : {}) };
++    await db.agentRunEvent.create({ data: { agentRunId: runId, eventType: "TOOL_REQUESTED", actor: claims.sub, payload: { ...metadata, status: "PROPOSED" } } });
++    await db.agentRunEvent.create({ data: { agentRunId: runId, eventType: "TOOL_AUTHORIZATION_CHECKED", actor: claims.sub, payload: metadata } });
++    if (decision.status !== "AUTHORIZED") await db.agentRunEvent.create({ data: { agentRunId: runId,
++      eventType: decision.status === "BLOCKED" ? "TOOL_BLOCKED" : "APPROVAL_REQUESTED", actor: claims.sub, payload: metadata } });
++    await this.audit.recordWithClaimsTx(db, claims, { action: "TOOL_AUTHORIZATION_CHECKED", resourceType: "AgentRun", resourceId: runId,
++      result: decision.status === "BLOCKED" ? "DENIED" : "SUCCESS", details: metadata });
++    return decision;
++  }
++  private async evaluate(db: any, run: any, proposal: unknown, claims: SessionClaims, workspace: TrustedToolWorkspace | undefined, options: ToolAuthorizationOptions): Promise<AuthorizationDecision> {
++    if (!boundedToolJson(proposal) || !isRecord(proposal)) return blockedTool("INVALID_INPUT");
++    const keys = ["id", "toolId", "toolVersion", "input", "purpose", "scope", "requestedBy", "runId", "planStepId", "risk", "requiresApproval"];
++    if (Object.keys(proposal).some(k => !keys.includes(k)) || ![proposal.id, proposal.toolId, proposal.toolVersion, proposal.runId, proposal.planStepId].every(validToolId) ||
++      proposal.requestedBy !== "AGENT" || proposal.runId !== run.id || typeof proposal.purpose !== "string" || !proposal.purpose.trim() || proposal.purpose.length > 512 ||
++      !isRecord(proposal.input) || !isRecord(proposal.scope) || Object.keys(proposal.scope).some(k => !["workspaceId", "paths"].includes(k)) ||
++      !validToolId(proposal.scope.workspaceId) || !Array.isArray(proposal.scope.paths) || !proposal.scope.paths.length || proposal.scope.paths.length > 32 ||
++      proposal.scope.paths.some(p => typeof p !== "string") || (proposal.risk !== undefined && !["LOW", "MEDIUM", "HIGH"].includes(String(proposal.risk))) ||
++      (proposal.requiresApproval !== undefined && typeof proposal.requiresApproval !== "boolean")) return blockedTool("INVALID_INPUT");
++    let tool;
++    try { tool = this.registry.resolve(proposal.toolId as string, proposal.toolVersion as string); } catch { return blockedTool("INVALID_TOOL"); }
++    if (!matchesToolSchema(proposal.input, tool.inputSchema)) return blockedTool("INVALID_INPUT");
++    if (!["RUNNING", "COMPLETED", "AWAITING_APPROVAL"].includes(run.status)) return blockedTool("RUN_NOT_ACTIVE");
++    const plan = run.plans?.[0];
++    const work = Array.isArray(plan?.steps) && plan.steps.length === 1 ? plan.steps[0] : undefined;
++    const planning = work?.planningOnly === true && work.skillId === "" ? work.parameters?.planning as AgentPlanningResult | undefined : undefined;
++    const step = Array.isArray(planning?.plan?.steps) ? planning.plan.steps.find(s => s?.id === proposal.planStepId) : undefined;
++    if (!plan || plan.version !== run.planVersion || plan.status !== "PLAN_READY" || planning?.version !== 1 || planning.plan.readiness !== "PLAN_READY" ||
++      !planning.plan.validation?.valid || !Array.isArray(planning.plan.constraints) || planning.understanding?.readiness !== "UNDERSTANDING_READY" || !step || step.status !== "PLANNED") return blockedTool("INVALID_PLAN_STEP");
++    const scoped = this.scopes.validate(tool, proposal.input, proposal.scope as unknown as ToolScope, run.projectId, workspace);
++    if (!scoped.allowed) return blockedTool(scoped.code);
++    const permissions = await this.permissions.check(toolSubject(claims), tool.requiredPermissions, scoped.workspace, scoped.scope, run.project.organizationId ?? undefined);
++    if (permissions.some(p => !p.allowed)) return { ...blockedTool("PERMISSION_DENIED"), permissions };
++    const risk = this.risks.classify(tool);
++    const mutation = tool.requiredPermissions.some(p => !["filesystem.read", "git.read"].includes(p));
++    const destructive = tool.requiredPermissions.includes("filesystem.delete");
++    const execution = tool.category === "TERMINAL";
++    const rules = planning.plan.constraints.map(c => c.rule);
++    if (rules.includes("UNRESOLVED") || (mutation && rules.includes("NO_WRITE")) || (execution && rules.includes("NO_EXECUTE")) ||
++      (destructive && rules.includes("NO_DESTRUCTIVE")) || (mutation && step.effect === "READ_ONLY") || (execution && step.effect !== "EXECUTE") ||
++      (destructive && step.effect !== "DESTRUCTIVE" && tool.id !== "filesystem.move") ||
++      (mutation && !execution && !["WRITE", "DESTRUCTIVE"].includes(step.effect))) return blockedTool("POLICY_BLOCKED");
++    const requiresApproval = mutation || risk !== "LOW" || options.forceApproval === true || !!options.approvalId;
++    const request: ToolRequest = { id: proposal.id as string, toolId: tool.id, toolVersion: tool.version,
++      input: structuredClone(proposal.input), purpose: proposal.purpose, scope: scoped.scope, requestedBy: "AGENT", runId: run.id,
++      planStepId: step.id, risk, requiresApproval };
++    const planDigest = toolDigest(plan.steps);
++    const { requiresApproval: _approval, ...operation } = request;
++    const binding = { kind: "TOOL_AUTHORIZATION" as const, version: 1 as const,
++      fingerprint: toolDigest({ operation, actorId: claims.sub, planDigest, workspace: scoped.workspace, pathBindingHash: scoped.pathBindingHash, policy: "phase5b-v1" }),
++      requestId: request.id, toolId: tool.id, toolVersion: tool.version, runId: run.id, planId: plan.id, planVersion: plan.version,
++      planDigest, planStepId: step.id, risk, scope: scoped.scope, requestedBy: claims.sub };
++    const approval = await this.approvals.evaluate(db, binding, requiresApproval, options.approvalId);
++    request.requiresApproval = requiresApproval || !!approval.approvalId;
++    return { status: approval.status === "NO_APPROVAL_REQUIRED" ? "AUTHORIZED" : approval.status, code: approval.code,
++      request, permissions, approvalId: approval.approvalId, executionAllowed: false };
++  }
++}
+diff --git a/backend/src/agent-runtime/tools/tool-contract.ts b/backend/src/agent-runtime/tools/tool-contract.ts
+new file mode 100644
+--- /dev/null
++++ b/backend/src/agent-runtime/tools/tool-contract.ts
+@@ -0,0 +1,138 @@
++import { createHash } from "node:crypto";
++import type { AuthSubject } from "../../auth/resource-authz.service";
++
++export const TOOL_PERMISSIONS = ["filesystem.read", "filesystem.write", "filesystem.delete", "terminal.execute", "git.read", "git.write", "package.install", "browser.open"] as const;
++export type ToolPermission = typeof TOOL_PERMISSIONS[number];
++export type ToolRisk = "LOW" | "MEDIUM" | "HIGH";
++export type ToolApprovalStatus = "PENDING" | "APPROVED" | "DENIED" | "EXPIRED" | "CANCELLED";
++/** Bounded JSON Schema subset used by definitions and the input validator. */
++export interface ToolJsonSchema {
++  type: "object" | "string" | "array" | "boolean";
++  properties?: Record<string, ToolJsonSchema>;
++  required?: readonly string[];
++  additionalProperties?: false;
++  items?: ToolJsonSchema;
++  maxItems?: number;
++  minLength?: number;
++  maxLength?: number;
++  enum?: readonly string[];
++}
++export interface AgentTool {
++  id: string;
++  version: string;
++  category: "FILESYSTEM" | "TERMINAL" | "GIT";
++  description: string;
++  inputSchema: ToolJsonSchema;
++  outputSchema: ToolJsonSchema;
++  requiredPermissions: readonly ToolPermission[];
++  riskLevel: ToolRisk;
++  executionMode: "DEFINITION_ONLY";
++  supportsDryRun: boolean;
++  reversible: boolean;
++  /** Server-owned schema properties that identify every affected path. */
++  pathFields: readonly string[];
++}
++export interface ToolScope { workspaceId: string; paths: string[] }
++export interface ToolRequest {
++  id: string;
++  toolId: string;
++  toolVersion: string;
++  input: Record<string, unknown>;
++  purpose: string;
++  scope: ToolScope;
++  requestedBy: "AGENT";
++  runId: string;
++  planStepId: string;
++  risk: ToolRisk;
++  requiresApproval: boolean;
++}
++/** Trusted host input, never deserialized from a model, HTTP body, or evidence. */
++export interface TrustedToolWorkspace {
++  workspaceId: string;
++  projectId: string;
++  trustedRoot: string;
++  allowedPaths: readonly string[];
++  permissions: readonly ToolPermission[];
++}
++export interface PermissionDecision {
++  allowed: boolean;
++  permission: ToolPermission;
++  reason: "GRANTED" | "WORKSPACE_GRANT_MISSING" | "RESOURCE_PERMISSION_DENIED";
++  scope: ToolScope;
++}
++export type ToolBlockCode = "INVALID_TOOL" | "INVALID_INPUT" | "INVALID_PLAN_STEP" | "PERMISSION_DENIED" | "SCOPE_VIOLATION" | "POLICY_BLOCKED" | "APPROVAL_INVALID" | "APPROVAL_EXPIRED" | "INSUFFICIENT_SCOPE" | "RUN_NOT_ACTIVE";
++export interface AuthorizationDecision {
++  status: "AUTHORIZED" | "APPROVAL_REQUIRED" | "BLOCKED";
++  code?: ToolBlockCode;
++  request?: ToolRequest;
++  approvalId?: string;
++  permissions?: PermissionDecision[];
++  /** A decision is never an executable permit or an assertion of confinement. */
++  executionAllowed: false;
++}
++export type AgentDecision =
++  | { type: "EXECUTE_TOOL" | "REQUEST_APPROVAL"; toolRequest: unknown; approvalId?: string }
++  | { type: "ASK_USER" | "REPLAN" | "VERIFY" | "COMPLETE" | "STOP" };
++export interface ToolApprovalBinding {
++  kind: "TOOL_AUTHORIZATION";
++  version: 1;
++  fingerprint: string;
++  requestId: string;
++  toolId: string;
++  toolVersion: string;
++  runId: string;
++  planId: string;
++  planVersion: number;
++  planDigest: string;
++  planStepId: string;
++  risk: ToolRisk;
++  scope: ToolScope;
++  requestedBy: string;
++}
++export function toolSubject(claims: { sub: string; email: string; displayName: string; role: AuthSubject["role"]; organizationId?: string }): AuthSubject {
++  return { userId: claims.sub, email: claims.email, displayName: claims.displayName, role: claims.role,
++    organizationId: claims.organizationId, isSystemAdmin: claims.role === "Admin" };
++}
++export function isRecord(value: unknown): value is Record<string, unknown> {
++  return value !== null && typeof value === "object" && !Array.isArray(value) && Object.getPrototypeOf(value) === Object.prototype;
++}
++export function validToolId(value: unknown): value is string {
++  return typeof value === "string" && /^[a-zA-Z0-9][a-zA-Z0-9_.:-]{0,127}$/.test(value);
++}
++/** Preflight before cloning/hashing. JSON only, bounded depth/nodes/text; cycles fail. */
++export function boundedToolJson(value: unknown): boolean {
++  let nodes = 0, chars = 0;
++  const seen = new Set<object>();
++  const visit = (v: unknown, depth: number): boolean => {
++    if (++nodes > 512 || depth > 8) return false;
++    if (typeof v === "string") { chars += v.length; return chars <= 32768; }
++    if (v === null || typeof v === "boolean") return true;
++    if (typeof v === "number") return Number.isFinite(v);
++    if (!v || typeof v !== "object" || seen.has(v)) return false;
++    seen.add(v);
++    if (Array.isArray(v)) return v.length <= 128 && v.every(x => visit(x, depth + 1));
++    if (!isRecord(v)) return false;
++    const keys = Object.keys(v);
++    return keys.length <= 32 && keys.every(k => {
++      const property = Object.getOwnPropertyDescriptor(v, k);
++      return k.length <= 128 && !["__proto__", "constructor", "prototype"].includes(k) && !!property && "value" in property && visit(property.value, depth + 1);
++    });
++  };
++  return visit(value, 0);
++}
++export function matchesToolSchema(value: unknown, schema: ToolJsonSchema): boolean {
++  if (!boundedToolJson(value)) return false;
++  const match = (v: unknown, s: ToolJsonSchema): boolean => {
++    if (s.type === "string") return typeof v === "string" && v.length >= (s.minLength ?? 0) && v.length <= (s.maxLength ?? 0) && (!s.enum || s.enum.includes(v));
++    if (s.type === "boolean") return typeof v === "boolean";
++    if (s.type === "array") return Array.isArray(v) && v.length <= (s.maxItems ?? 0) && !!s.items && v.every(x => match(x, s.items!));
++    if (s.type !== "object" || !isRecord(v) || s.additionalProperties !== false) return false;
++    return (s.required ?? []).every(k => Object.prototype.hasOwnProperty.call(v, k)) && Object.keys(v).every(k => !!s.properties?.[k] && match(v[k], s.properties[k]));
++  };
++  return match(value, schema);
++}
++export function toolDigest(value: unknown): string {
++  const canonical = (v: any): string => Array.isArray(v) ? `[${v.map(canonical).join(",")}]`
++    : v && typeof v === "object" ? `{${Object.keys(v).sort().map(k => `${JSON.stringify(k)}:${canonical(v[k])}`).join(",")}}` : JSON.stringify(v);
++  return createHash("sha256").update(canonical(value)).digest("hex");
++}
+diff --git a/backend/src/agent-runtime/tools/tool-permission.service.ts b/backend/src/agent-runtime/tools/tool-permission.service.ts
+new file mode 100644
+--- /dev/null
++++ b/backend/src/agent-runtime/tools/tool-permission.service.ts
+@@ -0,0 +1,24 @@
++import { Inject, Injectable } from "@nestjs/common";
++import { ResourceAuthorizationService, type AuthAction, type AuthSubject } from "../../auth/resource-authz.service";
++import type { PermissionDecision, ToolPermission, ToolScope, TrustedToolWorkspace } from "./tool-contract";
++
++const actions: Record<ToolPermission, AuthAction> = {
++  "filesystem.read": "READ", "filesystem.write": "UPDATE", "filesystem.delete": "DELETE", "terminal.execute": "EXECUTE",
++  "git.read": "READ", "git.write": "UPDATE", "package.install": "EXECUTE", "browser.open": "EXECUTE"
++};
++@Injectable()
++export class ToolPermissionService {
++  constructor(@Inject(ResourceAuthorizationService) private readonly resources: ResourceAuthorizationService) {}
++  async check(subject: AuthSubject, required: readonly ToolPermission[], workspace: TrustedToolWorkspace, scope: ToolScope, organizationId?: string): Promise<PermissionDecision[]> {
++    const result: PermissionDecision[] = [];
++    for (const permission of [...new Set(required)]) {
++      const granted = workspace.permissions.includes(permission);
++      // Base application permission is checked identically before/after approval.
++      const allowed = granted && await this.resources.authorize(subject, actions[permission], {
++        resourceType: "Project", id: workspace.projectId, projectId: workspace.projectId, organizationId
++      });
++      result.push({ permission, allowed, reason: !granted ? "WORKSPACE_GRANT_MISSING" : allowed ? "GRANTED" : "RESOURCE_PERMISSION_DENIED", scope });
++    }
++    return result;
++  }
++}
+diff --git a/backend/src/agent-runtime/tools/tool-registry.service.ts b/backend/src/agent-runtime/tools/tool-registry.service.ts
+new file mode 100644
+--- /dev/null
++++ b/backend/src/agent-runtime/tools/tool-registry.service.ts
+@@ -0,0 +1,55 @@
++import { Injectable } from "@nestjs/common";
++import { TOOL_PERMISSIONS, boundedToolJson, validToolId, type AgentTool, type ToolJsonSchema, type ToolPermission, type ToolRisk } from "./tool-contract";
++
++const text = (maxLength = 1024): ToolJsonSchema => ({ type: "string", minLength: 1, maxLength });
++const object = (properties: Record<string, ToolJsonSchema>): ToolJsonSchema => ({ type: "object", properties, required: Object.keys(properties), additionalProperties: false });
++const list = (maxItems: number): ToolJsonSchema => ({ type: "array", items: text(), maxItems });
++const output = object({ status: { ...text(32), enum: ["NOT_EXECUTED"] } });
++const definitions = (): AgentTool[] => {
++  const tool = (id: string, riskLevel: ToolRisk, permissions: ToolPermission[], properties: Record<string, ToolJsonSchema>, pathFields: string[]): AgentTool => ({
++    id, version: "1.0.0", category: id.startsWith("filesystem.") ? "FILESYSTEM" : id.startsWith("git.") ? "GIT" : "TERMINAL",
++    description: `Propose ${id}; definition only, no execution implementation.`, inputSchema: object(properties), outputSchema: output,
++    requiredPermissions: permissions, riskLevel, executionMode: "DEFINITION_ONLY", supportsDryRun: false, reversible: false, pathFields
++  });
++  return [
++    ...["list", "read"].map(id => tool(`filesystem.${id}`, "LOW", ["filesystem.read"], { path: text() }, ["path"])),
++    tool("filesystem.search", "LOW", ["filesystem.read"], { path: text(), query: text(512) }, ["path"]),
++    tool("filesystem.write", "MEDIUM", ["filesystem.write"], { path: text(), content: { type: "string", maxLength: 16384 } }, ["path"]),
++    tool("filesystem.delete", "HIGH", ["filesystem.delete"], { path: text() }, ["path"]),
++    tool("filesystem.move", "MEDIUM", ["filesystem.read", "filesystem.write", "filesystem.delete"], { source: text(), destination: text() }, ["source", "destination"]),
++    tool("filesystem.copy", "MEDIUM", ["filesystem.read", "filesystem.write"], { source: text(), destination: text() }, ["source", "destination"]),
++    tool("terminal.execute", "HIGH", ["terminal.execute"], { cwd: text(), command: text(4096) }, ["cwd"]),
++    ...["status", "diff", "log"].map(id => tool(`git.${id}`, "LOW", ["git.read"], { cwd: text() }, ["cwd"])),
++    // Branch is explicitly inspection-only. Creating/switching a branch uses a future version.
++    tool("git.branch", "LOW", ["git.read"], { cwd: text() }, ["cwd"]),
++    tool("git.checkout", "MEDIUM", ["git.write"], { cwd: text(), ref: text(256) }, ["cwd"]),
++    tool("git.add", "MEDIUM", ["git.write"], { cwd: text(), paths: list(32) }, ["cwd", "paths"]),
++    tool("git.commit", "MEDIUM", ["git.write"], { cwd: text(), message: text(1024) }, ["cwd"]),
++    tool("git.push", "HIGH", ["git.write"], { cwd: text(), remote: text(128), ref: text(256) }, ["cwd"])
++  ];
++};
++function freeze<T>(v: T): T {
++  if (v && typeof v === "object") { Object.values(v).forEach(freeze); Object.freeze(v); }
++  return v;
++}
++@Injectable()
++export class ToolRegistryService {
++  private readonly tools = new Map<string, AgentTool>();
++  constructor() { definitions().forEach(tool => this.register(tool)); }
++  register(tool: AgentTool): void {
++    if (!boundedToolJson(tool) || !validToolId(tool.id) || !/^\d+\.\d+\.\d+$/.test(tool.version) || tool.executionMode !== "DEFINITION_ONLY" ||
++      !["LOW", "MEDIUM", "HIGH"].includes(tool.riskLevel) || !Array.isArray(tool.requiredPermissions) || !tool.requiredPermissions.length ||
++      tool.requiredPermissions.some(p => !TOOL_PERMISSIONS.includes(p)) || !Array.isArray(tool.pathFields) || !tool.pathFields.length ||
++      tool.pathFields.some(p => !tool.inputSchema.properties?.[p]) || "execute" in tool) throw new Error("INVALID_TOOL_DEFINITION");
++    if (this.tools.has(tool.id)) throw new Error("DUPLICATE_TOOL");
++    this.tools.set(tool.id, freeze(structuredClone(tool)));
++  }
++  has(id: string): boolean { return this.tools.has(id); }
++  get(id: string): AgentTool | undefined { return this.tools.get(id); }
++  list(): AgentTool[] { return [...this.tools.values()].sort((a, b) => a.id < b.id ? -1 : a.id > b.id ? 1 : 0); }
++  resolve(id: string, version?: string): AgentTool {
++    const tool = this.get(id);
++    if (!tool || (version !== undefined && version !== tool.version)) throw new Error("INVALID_TOOL");
++    return tool;
++  }
++}
+diff --git a/backend/src/agent-runtime/tools/tool-risk.service.ts b/backend/src/agent-runtime/tools/tool-risk.service.ts
+new file mode 100644
+--- /dev/null
++++ b/backend/src/agent-runtime/tools/tool-risk.service.ts
+@@ -0,0 +1,13 @@
++import { Injectable } from "@nestjs/common";
++import type { AgentTool, ToolRisk } from "./tool-contract";
++
++@Injectable()
++export class ToolRiskService {
++  classify(tool: AgentTool): ToolRisk {
++    const high = ["filesystem.delete", "terminal.execute", "git.push", "package.install", "process.kill"];
++    const medium = ["filesystem.write", "filesystem.move", "filesystem.copy", "git.checkout", "git.add", "git.commit"];
++    if (high.includes(tool.id) || tool.riskLevel === "HIGH") return "HIGH";
++    if (medium.includes(tool.id) || tool.riskLevel === "MEDIUM") return "MEDIUM";
++    return "LOW";
++  }
++}
+diff --git a/backend/src/agent-runtime/tools/tool-scope.service.ts b/backend/src/agent-runtime/tools/tool-scope.service.ts
+new file mode 100644
+--- /dev/null
++++ b/backend/src/agent-runtime/tools/tool-scope.service.ts
+@@ -0,0 +1,85 @@
++import { Inject, Injectable } from "@nestjs/common";
++import { lstatSync, realpathSync } from "node:fs";
++import { join } from "node:path";
++import { WorkspaceSourceResolver } from "../capabilities/workspace-source.resolver";
++import { WorkspacePathService } from "../../workspace-intelligence/workspace-path.service";
++import { WorkspaceSecurityService } from "../../workspace-intelligence/security/workspace-security.service";
++import { TOOL_PERMISSIONS, toolDigest, validToolId, type AgentTool, type ToolBlockCode, type ToolScope, type TrustedToolWorkspace } from "./tool-contract";
++
++export type ToolScopeResult = { allowed: true; scope: ToolScope; workspace: TrustedToolWorkspace; pathBindingHash: string } | { allowed: false; code: ToolBlockCode };
++@Injectable()
++export class ToolScopeService {
++  constructor(
++    @Inject(WorkspaceSourceResolver) private readonly resolver: WorkspaceSourceResolver,
++    @Inject(WorkspacePathService) private readonly paths: WorkspacePathService,
++    @Inject(WorkspaceSecurityService) private readonly security: WorkspaceSecurityService
++  ) {}
++  validate(tool: AgentTool, input: Record<string, unknown>, proposed: ToolScope, projectId: string, binding?: TrustedToolWorkspace): ToolScopeResult {
++    if (!binding?.trustedRoot || !binding.workspaceId || !binding.allowedPaths?.length) return { allowed: false, code: "INSUFFICIENT_SCOPE" };
++    if (binding.projectId !== projectId || proposed.workspaceId !== binding.workspaceId) return { allowed: false, code: "SCOPE_VIOLATION" };
++    try {
++      if (!validToolId(binding.workspaceId) || binding.allowedPaths.length > 32 || !Array.isArray(binding.permissions) ||
++        binding.permissions.some(p => !TOOL_PERMISSIONS.includes(p))) throw new Error("scope");
++      const trusted = this.resolver.resolveLocal({ workspaceId: binding.workspaceId, projectId, name: projectId, trustedRoot: binding.trustedRoot });
++      if (!lstatSync(trusted.trustedRoot).isDirectory()) throw new Error("root");
++      const allowedPaths = [...new Set(binding.allowedPaths.map(p => this.normalize(p)))].sort();
++      const allowed = allowedPaths.map(prefix => ({ prefix, resolved: this.checkedPath(trusted.trustedRoot, prefix) }));
++      const addressed: string[] = [];
++      for (const field of tool.pathFields) {
++        const value = input[field];
++        if (Array.isArray(value)) {
++          if (!value.length) throw new Error("empty path scope");
++          addressed.push(...value.map(p => this.normalize(p)));
++        } else addressed.push(this.normalize(value));
++      }
++      const normalized = [...new Set(addressed)].sort();
++      const declared = [...new Set(proposed.paths.map(p => this.normalize(p)))].sort();
++      if (JSON.stringify(declared) !== JSON.stringify(normalized)) throw new Error("scope mismatch");
++      const targets: string[] = [];
++      for (const path of normalized) {
++        const candidate = this.checkedPath(trusted.trustedRoot, path);
++        targets.push(candidate);
++        if (!allowed.some(({ prefix, resolved }) => (prefix === "." || path === prefix || path.startsWith(`${prefix}/`)) &&
++          this.security.isInsideRoot(resolved, candidate))) throw new Error("allowed scope");
++      }
++      // Whole-repository/terminal effects require a whole-workspace grant. A cwd
++      // inside a narrow subtree is not a sandbox for git or arbitrary commands.
++      if ((tool.category === "GIT" || tool.category === "TERMINAL") && !allowedPaths.includes(".")) throw new Error("whole workspace required");
++      return { allowed: true, scope: { workspaceId: binding.workspaceId, paths: normalized },
++        pathBindingHash: toolDigest({ targets, allowed: allowed.map(p => p.resolved) }),
++        workspace: { ...binding, trustedRoot: trusted.trustedRoot, allowedPaths, permissions: [...new Set(binding.permissions)].sort() } };
++    } catch { return { allowed: false, code: "SCOPE_VIOLATION" }; }
++  }
++  private normalize(value: unknown): string {
++    if (typeof value !== "string" || value.length > 1024 || /[\x00-\x1f:*?"<>|]/.test(value)) throw new Error("invalid path");
++    const segments = value.replace(/\\/g, "/").split("/");
++    if (segments.some(p => (p !== "." && /[. ]$/.test(p)) || /^(con|prn|aux|nul|com[1-9]|lpt[1-9])(\.|$)/i.test(p))) throw new Error("ambiguous path");
++    return this.paths.normalizeRelativePath(value) || ".";
++  }
++  private checkedPath(root: string, path: string): string {
++    const candidate = this.security.resolveInsideRoot(root, path);
++    let current = root;
++    let resolved = root;
++    for (const segment of path === "." ? [] : path.split("/")) {
++      if (this.security.isForbiddenDirectoryName(segment) || this.security.isSensitiveFile(segment)) throw new Error("protected path");
++      current = join(current, segment);
++      resolved = join(resolved, segment);
++      try {
++        const info = lstatSync(current);
++        if (info.isSymbolicLink()) {
++          // realpath must succeed even for prospective targets below a symlink.
++          this.security.assertInsideRoot(root, realpathSync.native(current));
++        }
++        this.security.assertInsideRoot(root, current);
++        resolved = realpathSync.native(current);
++      } catch (error) {
++        if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
++        // A dangling symlink's realpath also reports ENOENT: reject it.
++        try { if (lstatSync(current).isSymbolicLink()) throw new Error("unresolved symlink"); }
++        catch (second) { if ((second as NodeJS.ErrnoException).code !== "ENOENT") throw second; }
++      }
++    }
++    this.security.assertInsideRoot(root, resolved);
++    return path === "." ? candidate : resolved;
++  }
++}
+diff --git a/backend/test/tool-authorization.test.ts b/backend/test/tool-authorization.test.ts
+new file mode 100644
+--- /dev/null
++++ b/backend/test/tool-authorization.test.ts
+@@ -0,0 +1,391 @@
++import assert from "node:assert/strict";
++import { after, before, describe, it } from "node:test";
++import { mkdtemp, mkdir, readFile, rm, symlink, unlink, writeFile } from "node:fs/promises";
++import { tmpdir } from "node:os";
++import path from "node:path";
++import { ResourceAuthorizationService } from "../src/auth/resource-authz.service";
++import { WorkspacePathService } from "../src/workspace-intelligence/workspace-path.service";
++import { WorkspaceSecurityService } from "../src/workspace-intelligence/security/workspace-security.service";
++import { WorkspaceSourceResolver } from "../src/agent-runtime/capabilities/workspace-source.resolver";
++import { ToolRegistryService } from "../src/agent-runtime/tools/tool-registry.service";
++import { ToolPermissionService } from "../src/agent-runtime/tools/tool-permission.service";
++import { ToolScopeService } from "../src/agent-runtime/tools/tool-scope.service";
++import { ToolRiskService } from "../src/agent-runtime/tools/tool-risk.service";
++import { ToolApprovalService } from "../src/agent-runtime/tools/tool-approval.service";
++import { ToolAuthorizationService } from "../src/agent-runtime/tools/tool-authorization.service";
++import { AgentToolControlService } from "../src/agent-runtime/tools/agent-tool-control.service";
++import { AgentRuntimeService } from "../src/agent-runtime/agent-runtime.service";
++import { AgentRuntimeController } from "../src/agent-runtime/agent-runtime.controller";
++import { TOOL_PERMISSIONS, toolSubject, type ToolRequest, type TrustedToolWorkspace } from "../src/agent-runtime/tools/tool-contract";
++import type { SessionClaims } from "../src/auth/auth.dto";
++import { AgentUnderstandingService } from "../src/agent-runtime/understanding/agent-understanding.service";
++import { AgentContextSerializerService } from "../src/agent-runtime/understanding/agent-context-serializer.service";
++import { interpretContext, validatePlanningProposal } from "../src/agent-runtime/understanding/agent-planning.contract";
++import { Test } from "@nestjs/testing";
++import { AgentRuntimeModule } from "../src/agent-runtime/agent-runtime.module";
++import { PrismaService } from "../src/data-access/prisma.service";
++
++let temporary = "", root = "";
++const originalRoots = process.env.SEKHEM_REPOSITORY_ALLOWED_LOCAL_ROOTS;
++before(async () => {
++  temporary = await mkdtemp(path.join(tmpdir(), "sekhem-phase5b-"));
++  root = path.join(temporary, "workspace");
++  await mkdir(path.join(root, "src"), { recursive: true });
++  await mkdir(path.join(temporary, "outside"));
++  await writeFile(path.join(root, "src", "safe.txt"), "unchanged fixture");
++  await symlink(path.join(temporary, "outside"), path.join(root, "escape"), "junction");
++  await symlink(path.join(root, "src"), path.join(root, "alias"), "junction");
++  process.env.SEKHEM_REPOSITORY_ALLOWED_LOCAL_ROOTS = temporary;
++});
++after(async () => {
++  if (originalRoots === undefined) delete process.env.SEKHEM_REPOSITORY_ALLOWED_LOCAL_ROOTS;
++  else process.env.SEKHEM_REPOSITORY_ALLOWED_LOCAL_ROOTS = originalRoots;
++  assert.equal(path.dirname(temporary), path.resolve(tmpdir()));
++  assert.ok(path.basename(temporary).startsWith("sekhem-phase5b-"));
++  await rm(temporary, { recursive: true, force: true });
++});
++const claims: SessionClaims = { sub: "user-1", sessionId: "session-1", email: "user@example.test", displayName: "User", role: "PM", organizationId: "org-1", exp: 9999999999 };
++function fixture() {
++  let role: string | null = "PM";
++  const events: any[] = [], audits: any[] = [], approvals = new Map<string, any>();
++  const planned = {
++    version: 1, understanding: { readiness: "UNDERSTANDING_READY" },
++    plan: { readiness: "PLAN_READY", authorization: "NOT_GRANTED", validation: { valid: true, issues: [] },
++      constraints: [{ id: "runtime-planning-only", rule: "PLANNING_ONLY" }],
++      steps: [{ id: "step-1", type: "IMPLEMENT", status: "PLANNED", effect: "WRITE" }] }
++  };
++  const plan: any = { id: "plan-1", agentRunId: "run-1", version: 1, status: "PLAN_READY", steps: [{ index: 0, skillId: "", planningOnly: true, parameters: { planning: planned } }] };
++  const run: any = { id: "run-1", projectId: "project-1", userId: claims.sub, conversationId: "conversation-1", status: "COMPLETED", planVersion: 1,
++    updatedAt: new Date(0), project: { id: "project-1", organizationId: "org-1" }, plans: [plan] };
++  function matches(row: any, where: any): boolean {
++    return Object.entries(where).every(([key, expected]: [string, any]) => expected instanceof Date ? new Date(row[key]).getTime() === expected.getTime()
++      : expected && typeof expected === "object" && Array.isArray(expected.in) ? expected.in.includes(row[key]) : row[key] === expected);
++  }
++  const db: any = {
++    projectMember: { findUnique: async () => role ? { role } : null },
++    agentRun: {
++      findUnique: async ({ where }: any) => where.id === run.id ? structuredClone(run) : null,
++      updateMany: async ({ where, data }: any) => { if (!matches(run, where)) return { count: 0 }; Object.assign(run, data); return { count: 1 }; },
++      update: async ({ data }: any) => Object.assign(run, data),
++      findMany: async ({ where }: any) => where.status.in.includes(run.status) ? [structuredClone(run)] : []
++    },
++    agentApproval: {
++      findUnique: async ({ where }: any) => structuredClone(approvals.get(where.id) ?? null),
++      upsert: async ({ where, create }: any) => { if (!approvals.has(where.id)) approvals.set(where.id, structuredClone(create)); return structuredClone(approvals.get(where.id)); },
++      updateMany: async ({ where, data }: any) => { let count = 0; for (const row of approvals.values()) if (matches(row, where)) { Object.assign(row, data); count++; } return { count }; },
++      count: async ({ where }: any) => [...approvals.values()].filter(a => matches(a, where)).length
++    },
++    agentRunEvent: {
++      create: async ({ data }: any) => { events.push(structuredClone(data)); return data; },
++      findFirst: async ({ where }: any) => events.find(e => matches(e, where)) ?? null
++    }
++  };
++  db.$transaction = async (work: any) => {
++    const snapshot = structuredClone({ run, approvals: [...approvals], events, audits });
++    try { return await work(db); } catch (error) {
++      Object.assign(run, snapshot.run); approvals.clear(); snapshot.approvals.forEach(([k, v]: any) => approvals.set(k, v));
++      events.splice(0, events.length, ...snapshot.events); audits.splice(0, audits.length, ...snapshot.audits); throw error;
++    }
++  };
++  const audit: any = { recordWithClaimsTx: async (_: any, actor: any, record: any) => audits.push({ actor, ...record }) };
++  const resources = new ResourceAuthorizationService(db);
++  const registry = new ToolRegistryService(), paths = new WorkspacePathService();
++  const scopes = new ToolScopeService(new WorkspaceSourceResolver(), paths, new WorkspaceSecurityService(paths));
++  const permissions = new ToolPermissionService(resources), risk = new ToolRiskService();
++  const approvalService = new ToolApprovalService(resources, audit);
++  const authorization = new ToolAuthorizationService(registry, scopes, permissions, risk, approvalService, resources, audit, db);
++  const control = new AgentToolControlService(db, resources, audit, authorization, approvalService);
++  let executions = 0;
++  const skill: any = { getSkill: () => { executions++; throw new Error("must not dispatch"); }, getAvailableSkills: () => [] };
++  const runtime = new AgentRuntimeService(skill, resources, audit, db, undefined, undefined, undefined, undefined, undefined, undefined, control);
++  const workspace: TrustedToolWorkspace = { workspaceId: "workspace-1", projectId: "project-1", trustedRoot: root, allowedPaths: ["."], permissions: [...TOOL_PERMISSIONS] };
++  function request(toolId = "filesystem.read", input: Record<string, unknown> = { path: "src/safe.txt" }): ToolRequest {
++    const tool = registry.get(toolId);
++    const paths = tool?.pathFields.flatMap(k => Array.isArray(input[k]) ? input[k] as string[] : [input[k] as string]) ?? ["src/safe.txt"];
++    return { id: "request-1", toolId, toolVersion: "1.0.0", input, purpose: "Inspect the planned target", scope: { workspaceId: "workspace-1", paths },
++      requestedBy: "AGENT", runId: "run-1", planStepId: "step-1", risk: "LOW", requiresApproval: false };
++  }
++  const authorize = (proposal: unknown = request(), binding: TrustedToolWorkspace | undefined = workspace, approvalId?: string) => authorization.authorize(run.id, proposal, claims, binding, { approvalId });
++  const grant = async (id: string) => control.decideApproval(run.id, id, claims, { decision: "APPROVED", fingerprint: approvals.get(id).revisedPlan.fingerprint });
++  return { db, run, plan, planned, events, audits, approvals, registry, scopes, permissions, risk, control, runtime, workspace, request, authorize, grant,
++    resources, executions: () => executions, setRole: (value: string | null) => { role = value; } };
++}
++
++describe("Phase 5B tool contracts and permissions", () => {
++  it("registers all 16 immutable definitions, resolves versions and lists deterministically", () => {
++    const f = fixture(); assert.equal(f.registry.list().length, 16);
++    assert.deepEqual(f.registry.list().map(t => t.id), [...f.registry.list().map(t => t.id)].sort());
++    assert.equal(f.registry.has("filesystem.read"), true);
++    assert.equal(f.registry.resolve("filesystem.read", "1.0.0").executionMode, "DEFINITION_ONLY");
++    assert.throws(() => { (f.registry.resolve("filesystem.read").requiredPermissions as string[]).push("filesystem.write"); });
++  });
++  it("supports registration but rejects duplicates, unknown tools and version mismatches", () => {
++    const f = fixture(), tool = { ...f.registry.resolve("filesystem.read"), id: "filesystem.custom-read" };
++    f.registry.register(tool); assert.equal(f.registry.get(tool.id)?.id, tool.id);
++    assert.throws(() => f.registry.register(tool), /DUPLICATE_TOOL/);
++    assert.throws(() => f.registry.resolve("unknown"), /INVALID_TOOL/);
++    assert.throws(() => f.registry.resolve("filesystem.read", "2.0.0"), /INVALID_TOOL/);
++    assert.throws(() => f.registry.register({ ...tool, id: "bad", execute: () => {} } as any), /INVALID_TOOL_DEFINITION/);
++  });
++  it("grants a permission only with both a workspace grant and existing project authorization", async () => {
++    const f = fixture(); assert.equal((await f.authorize()).status, "AUTHORIZED");
++    f.workspace.permissions = []; assert.equal((await f.authorize()).code, "PERMISSION_DENIED");
++    f.workspace.permissions = [...TOOL_PERMISSIONS]; f.setRole(null); assert.equal((await f.authorize()).code, "PERMISSION_DENIED");
++  });
++  it("evaluates every required permission, including source/delete permissions for move", async () => {
++    const f = fixture(); f.workspace.permissions = ["filesystem.read", "filesystem.write"];
++    const d = await f.authorize(f.request("filesystem.move", { source: "src/safe.txt", destination: "src/new.txt" }));
++    assert.equal(d.code, "PERMISSION_DENIED"); assert.equal(d.permissions?.length, 3);
++    assert.equal(d.permissions?.find(p => p.permission === "filesystem.delete")?.reason, "WORKSPACE_GRANT_MISSING");
++    assert.equal(f.approvals.size, 0);
++  });
++  it("preserves tenant boundaries even for a system admin and rejects a different run owner", async () => {
++    const f = fixture(); f.run.project.organizationId = "other-org";
++    const d = await (f as any).control.applyDecision(f.run.id, { ...claims, role: "Admin" }, { type: "EXECUTE_TOOL", toolRequest: f.request() }, f.workspace).catch((e: Error) => e);
++    assert.ok(d instanceof Error); f.run.project.organizationId = "org-1"; f.run.userId = "someone-else";
++    assert.equal((await f.authorize()).code, "PERMISSION_DENIED");
++  });
++  for (const [tool, expected] of [["filesystem.read", "LOW"], ["filesystem.write", "MEDIUM"], ["filesystem.delete", "HIGH"], ["terminal.execute", "HIGH"], ["git.push", "HIGH"], ["git.branch", "LOW"]]) {
++    it(`classifies ${tool} as ${expected} on the server`, () => { const f = fixture(); assert.equal(f.risk.classify(f.registry.resolve(tool)), expected); });
++  }
++});
++
++describe("Phase 5B workspace scope", () => {
++  it("accepts existing and prospective paths within the explicit allowed subtree", async () => {
++    const f = fixture(); f.workspace.allowedPaths = ["src"];
++    assert.equal((await f.authorize()).status, "AUTHORIZED");
++    assert.equal((await f.authorize(f.request("filesystem.write", { path: "src/new/child.txt", content: "proposed" }))).status, "APPROVAL_REQUIRED");
++  });
++  for (const candidate of ["../outside/file", "src/../../outside", "C:\\Windows\\System32", "/etc/passwd", "escape/new/file.txt", "escape", ".env", "src/file.txt:stream", "src/con.txt", "src/file. ", "node_modules/pkg"]) {
++    it(`blocks unsafe path ${candidate}`, async () => { const f = fixture(); assert.equal((await f.authorize(f.request("filesystem.read", { path: candidate }))).code, "SCOPE_VIOLATION"); });
++  }
++  it("does not silently expand missing scope or trust a different workspace/project", async () => {
++    const f = fixture();
++    assert.equal((await f.authorize(f.request(), { ...f.workspace, trustedRoot: "" })).code, "INSUFFICIENT_SCOPE");
++    assert.equal((await f.authorize(f.request(), { ...f.workspace, allowedPaths: [] })).code, "INSUFFICIENT_SCOPE");
++    assert.equal((await f.authorize(f.request(), { ...f.workspace, workspaceId: "workspace-2" })).code, "SCOPE_VIOLATION");
++    assert.equal((await f.authorize(f.request(), { ...f.workspace, projectId: "project-2" })).code, "SCOPE_VIOLATION");
++  });
++  it("enforces both source and destination and exact declared path coverage", async () => {
++    const f = fixture(); f.workspace.allowedPaths = ["src"];
++    assert.equal((await f.authorize(f.request("filesystem.copy", { source: "src/safe.txt", destination: "other/file.txt" }))).code, "SCOPE_VIOLATION");
++    const request = f.request(); request.scope.paths = ["."]; assert.equal((await f.authorize(request)).code, "SCOPE_VIOLATION");
++    assert.equal((await f.authorize(f.request("filesystem.read", { path: "alias/safe.txt" }))).code, "SCOPE_VIOLATION");
++  });
++  it("retains configured allowed-root checks and requires full workspace scope for git/terminal", async () => {
++    const f = fixture();
++    assert.equal((await f.authorize(f.request(), { ...f.workspace, trustedRoot: tmpdir() })).code, "SCOPE_VIOLATION");
++    f.workspace.allowedPaths = ["src"];
++    assert.equal((await f.authorize(f.request("git.status", { cwd: "src" }))).code, "SCOPE_VIOLATION");
++    f.planned.plan.steps[0].effect = "EXECUTE";
++    assert.equal((await f.authorize(f.request("terminal.execute", { cwd: "src", command: "not executed" }))).code, "SCOPE_VIOLATION");
++  });
++});
++
++describe("Phase 5B authorization and approval lifecycle", () => {
++  it("rejects unknown tools, invalid input, actor spoofing and extra privileged fields", async () => {
++    const f = fixture(); assert.equal((await f.authorize({ ...f.request(), toolId: "unknown.tool" })).code, "INVALID_TOOL");
++    for (const request of [{ ...f.request(), input: {} }, { ...f.request(), requestedBy: "ADMIN" }, { ...f.request(), role: "Admin" },
++      { ...f.request(), input: { path: "src/safe.txt", execute: true } }, { ...f.request(), scope: { ...f.request().scope, trustedRoot: root } }]) {
++      assert.equal((await f.authorize(request)).code, "INVALID_INPUT");
++    }
++    assert.equal(f.approvals.size, 0);
++  });
++  it("bounds malformed, huge, cyclic and deeply nested proposals", async () => {
++    const f = fixture(), cyclic: any = {}; cyclic.self = cyclic;
++    let deep: unknown = "leaf"; for (let i = 0; i < 20; i++) deep = { child: deep };
++    for (const v of [null, [], "raw text", cyclic, deep, Array(129).fill("entry"), { ...f.request(), purpose: "x".repeat(33000) }, { ...f.request(), input: JSON.parse('{"__proto__":{}}') }]) assert.equal((await f.authorize(v)).code, "INVALID_INPUT");
++  });
++  it("requires a valid current Phase 4 run/plan/step relationship", async () => {
++    const f = fixture(); assert.equal((await f.authorize({ ...f.request(), runId: "other-run" })).code, "INVALID_INPUT");
++    assert.equal((await f.authorize({ ...f.request(), planStepId: "invented" })).code, "INVALID_PLAN_STEP");
++    f.plan.version++; assert.equal((await f.authorize()).code, "INVALID_PLAN_STEP");
++    f.plan.version--; f.planned.plan.readiness = "PLAN_NOT_READY"; assert.equal((await f.authorize()).code, "INVALID_PLAN_STEP");
++  });
++  it("does not turn a descriptive read plan or constraint into write permission", async () => {
++    const f = fixture(), write = f.request("filesystem.write", { path: "src/new.txt", content: "proposed" });
++    f.planned.plan.steps[0].effect = "READ_ONLY"; assert.equal((await f.authorize(write)).code, "POLICY_BLOCKED");
++    f.planned.plan.steps[0].effect = "WRITE"; f.planned.plan.constraints.push({ id: "user", rule: "NO_WRITE" });
++    assert.equal((await f.authorize(write)).code, "POLICY_BLOCKED"); assert.equal(f.approvals.size, 0);
++  });
++  it("requires no approval for low-risk read and creates one idempotent pending approval for write", async () => {
++    const f = fixture(); assert.equal((await f.authorize()).status, "AUTHORIZED"); assert.equal(f.approvals.size, 0);
++    const write = f.request("filesystem.write", { path: "src/new.txt", content: "proposed" });
++    const first = await f.authorize(write), second = await f.authorize(write);
++    assert.equal(first.status, "APPROVAL_REQUIRED"); assert.equal(first.request?.risk, "MEDIUM");
++    assert.equal(first.request?.requiresApproval, true); assert.equal(first.approvalId, second.approvalId); assert.equal(f.approvals.size, 1);
++  });
++  it("cannot downgrade terminal risk or execute an arbitrary command", async () => {
++    const f = fixture(); f.planned.plan.steps[0].effect = "EXECUTE";
++    const result = await f.authorize(f.request("terminal.execute", { cwd: ".", command: "Remove-Item -Recurse C:\\" }));
++    assert.equal(result.status, "APPROVAL_REQUIRED"); assert.equal(result.request?.risk, "HIGH"); assert.equal(result.executionAllowed, false);
++    assert.equal(f.executions(), 0); assert.equal(await readFile(path.join(root, "src/safe.txt"), "utf8"), "unchanged fixture");
++  });
++  it("authorizes an approved exact request but never grants execution", async () => {
++    const f = fixture(), write = f.request("filesystem.write", { path: "src/new.txt", content: "proposed" });
++    const pending = await f.authorize(write); await f.grant(pending.approvalId!);
++    const allowed = await f.authorize(write, f.workspace, pending.approvalId);
++    assert.equal(allowed.status, "AUTHORIZED"); assert.equal(allowed.executionAllowed, false);
++    assert.equal(f.approvals.get(pending.approvalId).decidedBy, claims.sub);
++  });
++  it("keeps denied permission blocked even with a previously approved request", async () => {
++    const f = fixture(), write = f.request("filesystem.write", { path: "src/new.txt", content: "proposed" });
++    const pending = await f.authorize(write); await f.grant(pending.approvalId!); f.setRole("Viewer");
++    assert.equal((await f.authorize(write, f.workspace, pending.approvalId)).code, "PERMISSION_DENIED");
++    f.setRole("PM"); f.workspace.permissions = ["filesystem.read"];
++    assert.equal((await f.authorize(write, f.workspace, pending.approvalId)).code, "PERMISSION_DENIED");
++  });
++  it("expires pending and already approved requests", async () => {
++    for (const approved of [false, true]) {
++      const f = fixture(), write = f.request("filesystem.write", { path: "src/new.txt", content: "proposed" });
++      const pending = await f.authorize(write); if (approved) await f.grant(pending.approvalId!);
++      f.approvals.get(pending.approvalId).dueAt = new Date(0);
++      assert.equal((await f.authorize(write, f.workspace, pending.approvalId)).code, "APPROVAL_EXPIRED");
++      assert.equal(f.approvals.get(pending.approvalId).status, "EXPIRED");
++    }
++  });
++  it("prevents approval replay after request, input, step, plan or scope changes", async () => {
++    const f = fixture(), write = f.request("filesystem.write", { path: "src/new.txt", content: "original" });
++    const pending = await f.authorize(write); await f.grant(pending.approvalId!);
++    assert.equal((await f.authorize({ ...write, id: "another-request" }, f.workspace, pending.approvalId)).code, "APPROVAL_INVALID");
++    assert.equal((await f.authorize({ ...write, input: { ...write.input, content: "different" } }, f.workspace, pending.approvalId)).code, "APPROVAL_INVALID");
++    assert.equal((await f.authorize(write, { ...f.workspace, allowedPaths: ["src"] }, pending.approvalId)).code, "APPROVAL_INVALID");
++    f.planned.plan.steps[0].type = "PROPOSE";
++    assert.equal((await f.authorize(write, f.workspace, pending.approvalId)).code, "APPROVAL_INVALID");
++  });
++  it("invalidates approval if a symlink is retargeted within the same workspace", async () => {
++    const f = fixture(), link = path.join(root, "retarget-test");
++    await mkdir(path.join(root, "alternate"), { recursive: true });
++    await symlink(path.join(root, "src"), link, "junction");
++    try {
++      const write = f.request("filesystem.write", { path: "retarget-test/new.txt", content: "proposed" });
++      const pending = await f.authorize(write); assert.equal(pending.status, "APPROVAL_REQUIRED"); await f.grant(pending.approvalId!);
++      await unlink(link); await symlink(path.join(root, "alternate"), link, "junction");
++      assert.equal((await f.authorize(write, f.workspace, pending.approvalId)).code, "APPROVAL_INVALID");
++    } finally { await unlink(link); }
++  });
++  it("denies unauthorized reviewers and keeps denied/cancelled approvals terminal", async () => {
++    const f = fixture(), write = f.request("filesystem.write", { path: "src/new.txt", content: "proposed" });
++    const pending = await f.authorize(write), row = f.approvals.get(pending.approvalId);
++    f.setRole("Viewer"); await assert.rejects(f.grant(pending.approvalId!)); assert.equal(f.approvals.get(pending.approvalId).status, "PENDING");
++    f.setRole("PM"); await f.control.decideApproval(f.run.id, pending.approvalId!, claims, { decision: "DENIED", fingerprint: row.revisedPlan.fingerprint });
++    assert.equal((await f.authorize(write, f.workspace, pending.approvalId)).code, "APPROVAL_INVALID");
++    await assert.rejects(f.grant(pending.approvalId!), /APPROVAL_ALREADY_DECIDED/);
++  });
++  it("rejects missing approvals, fabricated approved flags and stale reviewer fingerprints", async () => {
++    const f = fixture(); assert.equal((await f.authorize(f.request(), f.workspace, "invented-approval")).code, "APPROVAL_INVALID");
++    const write = f.request("filesystem.write", { path: "src/new.txt", content: "proposed" }), pending = await f.authorize(write);
++    await assert.rejects(f.control.decideApproval(f.run.id, pending.approvalId!, claims, { decision: "APPROVED", fingerprint: "0".repeat(64) }), /APPROVAL_INVALID/);
++    const row = f.approvals.get(pending.approvalId); row.status = "APPROVED"; row.decision = "APPROVED";
++    assert.equal((await f.authorize(write, f.workspace, pending.approvalId)).code, "APPROVAL_INVALID");
++  });
++});
++
++describe("Phase 5B AgentRuntime control boundary", () => {
++  it("resolves the control plane through the production Nest module without bootstrapping execution", async () => {
++    const f = fixture();
++    const module = await Test.createTestingModule({ imports: [AgentRuntimeModule] }).overrideProvider(PrismaService).useValue(f.db).compile();
++    try {
++      assert.ok(module.get(ToolAuthorizationService)); assert.ok(module.get(AgentToolControlService));
++      assert.equal(module.get(ToolRegistryService).list().length, 16);
++    } finally { await module.close(); }
++  });
++  it("consumes a real validated Phase 4 result without changing its planning authorization", async () => {
++    const f = fixture(), understandingService = new AgentUnderstandingService();
++    const context = understandingService.understand({ userId: claims.sub, projectId: f.run.projectId,
++      instruction: "Inspect this workspace and explain the architecture.", workspaceAvailable: true, availableCapabilities: ["workspace_reader"] });
++    const ref = "project-1:src/safe.txt";
++    context.evidence = [{ sourceType: "workspace", sourceId: "project-1", relativePath: "src/safe.txt", provenance: ref, status: "COLLECTED",
++      metadata: {}, warnings: [], content: { text: "unchanged fixture", extractorId: "text", detectedMime: "text/plain", truncated: false } }];
++    const visible = new Map<string, string>(); new AgentContextSerializerService().forReasoning(context, visible);
++    const base = interpretContext(context, visible);
++    const planning = validatePlanningProposal(base, { constraintIds: base.constraints.map(c => c.id),
++      facts: [{ id: "fact-1", text: "unchanged fixture", evidenceRef: ref }], inferences: [], hypotheses: [], unknowns: [],
++      steps: [{ id: "step-1", type: "INSPECT", purpose: "UNDERSTAND", evidenceRefs: [ref], missingInformationIds: [], dependencies: [],
++        scopeRefs: ["scope-1"], verificationCriterionIds: ["grounding"], effect: "READ_ONLY", dependencyStatus: "KNOWN" }] }, visible);
++    assert.equal(planning.plan.readiness, "PLAN_READY");
++    f.plan.steps[0].parameters.planning = planning;
++    const result = await f.runtime.applyDecision(f.run.id, claims, { type: "EXECUTE_TOOL", toolRequest: f.request() }, f.workspace);
++    assert.equal(result.authorization?.status, "AUTHORIZED"); assert.equal(planning.plan.authorization, "NOT_GRANTED"); assert.equal(f.executions(), 0);
++  });
++  it("EXECUTE_TOOL reaches authorization and pauses without dispatching a skill", async () => {
++    const f = fixture(), result = await f.runtime.applyDecision(f.run.id, claims, { type: "EXECUTE_TOOL", toolRequest: f.request() }, f.workspace);
++    assert.equal(result.executionBoundaryReached, true); assert.equal(result.executionPerformed, false); assert.equal(f.run.status, "PAUSED");
++    assert.equal(f.run.failureReason, "EXECUTION_BOUNDARY_NOT_IMPLEMENTED"); assert.equal(f.executions(), 0);
++    await f.runtime.executeRun(f.run.id, claims); assert.equal(f.executions(), 0);
++  });
++  it("approval required moves to AWAITING_APPROVAL; granting only records approval", async () => {
++    const f = fixture(), write = f.request("filesystem.write", { path: "src/new.txt", content: "secret-content" });
++    const result = await f.runtime.applyDecision(f.run.id, claims, { type: "EXECUTE_TOOL", toolRequest: write }, f.workspace);
++    assert.equal(f.run.status, "AWAITING_APPROVAL"); await f.grant(result.authorization!.approvalId!);
++    assert.equal(f.run.status, "AWAITING_APPROVAL"); assert.equal(f.executions(), 0);
++    const retry = await f.runtime.applyDecision(f.run.id, claims, { type: "EXECUTE_TOOL", toolRequest: write, approvalId: result.authorization!.approvalId }, f.workspace);
++    assert.equal(retry.authorization?.status, "AUTHORIZED"); assert.equal(f.run.status, "PAUSED");
++    const persisted = JSON.stringify({ events: f.events, audits: f.audits, approvals: [...f.approvals.values()] });
++    assert.equal(persisted.includes("secret-content"), false); assert.equal(persisted.includes(root.replace(/\\/g, "\\\\")), false);
++    assert.ok(f.events.some(e => e.eventType === "APPROVAL_GRANTED")); assert.ok(f.audits.every(a => a.actor.sub === claims.sub));
++  });
++  it("REQUEST_APPROVAL uses the same permission gate and can require review for a read", async () => {
++    const f = fixture();
++    const r = await f.runtime.applyDecision(f.run.id, claims, { type: "REQUEST_APPROVAL", toolRequest: f.request() }, f.workspace);
++    assert.equal(r.authorization?.status, "APPROVAL_REQUIRED"); assert.equal(f.run.status, "AWAITING_APPROVAL");
++    await f.grant(r.authorization!.approvalId!);
++    const retry = await f.runtime.applyDecision(f.run.id, claims, { type: "EXECUTE_TOOL", toolRequest: f.request(), approvalId: r.authorization!.approvalId }, f.workspace);
++    assert.equal(retry.authorization?.status, "AUTHORIZED");
++    const denied = fixture(); denied.workspace.permissions = [];
++    assert.equal((await denied.runtime.applyDecision(denied.run.id, claims, { type: "REQUEST_APPROVAL", toolRequest: denied.request() }, denied.workspace)).authorization?.code, "PERMISSION_DENIED");
++    assert.equal(denied.approvals.size, 0);
++  });
++  it("persists a bounded blocked diagnostic without raw malformed input", async () => {
++    const f = fixture(); const result = await f.runtime.applyDecision(f.run.id, claims, { type: "EXECUTE_TOOL", toolRequest: { command: "secret-command" } }, f.workspace);
++    assert.equal(result.authorization?.code, "INVALID_INPUT"); assert.equal(f.run.status, "PAUSED");
++    assert.ok(f.events.some(e => e.eventType === "TOOL_BLOCKED")); assert.equal(JSON.stringify(f.events).includes("secret-command"), false);
++  });
++  it("preserves paused/cancelled states and cancellation invalidates pending approvals", async () => {
++    for (const status of ["PAUSED", "CANCELLED"]) {
++      const f = fixture(); f.run.status = status;
++      assert.equal((await f.runtime.applyDecision(f.run.id, claims, { type: "EXECUTE_TOOL", toolRequest: f.request() }, f.workspace)).authorization?.code, "RUN_NOT_ACTIVE");
++      assert.equal(f.run.status, status); assert.equal(f.approvals.size, 0);
++    }
++    const f = fixture(); await f.runtime.applyDecision(f.run.id, claims, { type: "REQUEST_APPROVAL", toolRequest: f.request() }, f.workspace);
++    await f.runtime.cancelRun(f.run.id, claims, {});
++    assert.equal(f.run.status, "CANCELLED"); assert.equal([...f.approvals.values()][0].status, "CANCELLED");
++  });
++  it("recovery/resume cannot dispatch or regenerate a prior tool control boundary", async () => {
++    const f = fixture(); await f.runtime.applyDecision(f.run.id, claims, { type: "EXECUTE_TOOL", toolRequest: f.request() }, f.workspace);
++    await f.runtime.resumeRun(f.run.id, claims); assert.equal(f.run.status, "RUNNING");
++    await f.runtime.executeRun(f.run.id, claims); assert.equal(f.run.status, "PAUSED");
++    assert.equal(f.run.failureReason, "CONTROL_PLANE_REAUTHORIZATION_REQUIRED"); assert.equal(f.executions(), 0);
++  });
++  it("non-tool decisions stop at the control plane without a verification/replan loop", async () => {
++    for (const type of ["ASK_USER", "REPLAN", "VERIFY", "COMPLETE", "STOP"]) {
++      const f = fixture(); await f.runtime.applyDecision(f.run.id, claims, { type });
++      assert.equal(f.run.status, type === "COMPLETE" ? "COMPLETED" : type === "STOP" ? "CANCELLED" : "PAUSED");
++      assert.equal(f.planned.plan.steps[0].status, "PLANNED"); assert.equal(f.executions(), 0);
++    }
++  });
++  it("uses durable project/owner scope for pause, resume and cancellation", async () => {
++    const f = fixture(); f.run.status = "RUNNING";
++    await f.runtime.pauseRun(f.run.id, claims, {}); assert.equal(f.run.status, "PAUSED");
++    f.run.project.organizationId = "another-org";
++    await assert.rejects(f.runtime.resumeRun(f.run.id, { ...claims, role: "Admin" }));
++    await assert.rejects(f.runtime.cancelRun(f.run.id, { ...claims, role: "Admin" }, {}));
++    f.run.project.organizationId = "org-1"; f.run.userId = "another-owner";
++    await assert.rejects(f.runtime.resumeRun(f.run.id, claims));
++    f.run.userId = claims.sub; await f.runtime.resumeRun(f.run.id, claims);
++    assert.equal(f.run.status, "RUNNING");
++  });
++  it("approval controller derives identity from the session and rejects actor fields", async () => {
++    const f = fixture(), pending = await f.authorize(f.request("filesystem.write", { path: "src/new.txt", content: "proposed" }));
++    const controller = new AgentRuntimeController(f.runtime, { sessionClaims: async () => claims } as any);
++    const body = { decision: "APPROVED", fingerprint: f.approvals.get(pending.approvalId).revisedPlan.fingerprint };
++    await assert.rejects(controller.decideToolApproval(f.run.id, pending.approvalId!, "session", { ...body, actor: "admin" }));
++    await controller.decideToolApproval(f.run.id, pending.approvalId!, "session", body);
++    assert.equal(f.approvals.get(pending.approvalId).decidedBy, claims.sub);
++  });
++  it("rolls back approval creation and state changes if durable audit fails", async () => {
++    const f = fixture(); f.db.agentRunEvent.create = async () => { throw new Error("durability unavailable"); };
++    await assert.rejects(f.runtime.applyDecision(f.run.id, claims, { type: "REQUEST_APPROVAL", toolRequest: f.request() }, f.workspace));
++    assert.equal(f.approvals.size, 0); assert.equal(f.run.status, "COMPLETED");
++  });
++});

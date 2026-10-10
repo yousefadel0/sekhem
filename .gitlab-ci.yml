@@ -1,0 +1,69 @@
+default:
+  image: node:24.21.0-bookworm-slim
+  interruptible: true
+
+stages:
+  - verify
+  - preview
+  - production
+
+.pnpm_setup:
+  before_script:
+    - corepack enable
+    - corepack prepare pnpm@11.1.2 --activate
+
+frontend_verify:
+  extends: .pnpm_setup
+  stage: verify
+  script:
+    - pnpm install --frozen-lockfile
+    - pnpm test
+    - pnpm lint
+    - pnpm typecheck
+    - pnpm build
+
+backend_verify:
+  extends: .pnpm_setup
+  stage: verify
+  variables:
+    DATABASE_URL: postgresql://sekhem_dummy:sekhem_dummy@127.0.0.1:5432/sekhem_dummy?schema=public
+  script:
+    - cd backend
+    - pnpm install --frozen-lockfile
+    - pnpm prisma:generate
+    - pnpm test
+    - pnpm lint
+    - pnpm typecheck
+    - pnpm build
+    - pnpm prisma:validate
+
+vercel_preview:
+  extends: .pnpm_setup
+  stage: preview
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      when: manual
+  environment:
+    name: review/$CI_COMMIT_REF_SLUG
+  script:
+    - pnpm install --frozen-lockfile
+    - pnpm dlx vercel@59.11.2 pull --yes --environment=preview --token="$VERCEL_TOKEN"
+    - pnpm dlx vercel@59.11.2 build --token="$VERCEL_TOKEN"
+    - pnpm dlx vercel@59.11.2 deploy --prebuilt --token="$VERCEL_TOKEN"
+
+vercel_production:
+  extends: .pnpm_setup
+  stage: production
+  resource_group: production-frontend
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+      when: manual
+  environment:
+    name: production
+    url: https://app.sekhem-ai.com
+  script:
+    - test "$CI_COMMIT_BRANCH" = "$CI_DEFAULT_BRANCH"
+    - pnpm install --frozen-lockfile
+    - pnpm dlx vercel@59.11.2 pull --yes --environment=production --token="$VERCEL_TOKEN"
+    - pnpm dlx vercel@59.11.2 build --prod --token="$VERCEL_TOKEN"
+    - pnpm dlx vercel@59.11.2 deploy --prebuilt --prod --token="$VERCEL_TOKEN"
